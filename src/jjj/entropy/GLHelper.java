@@ -17,15 +17,6 @@ public class GLHelper {
 	private int tableModel;
 	
 	
-	public File LoadTexture(GL2 gl, Texture texture, String file)
-	{
-
-
-        return new File(file);
-        
-		
-	}
-	
 	public void InitTexture(GL2 gl, Texture texture)
 	{
 		texture.setTexParameteri(gl, GL2.GL_TEXTURE_WRAP_S, GL2.GL_REPEAT);

@@ -161,6 +161,8 @@ public class Game implements GLEventListener  {
     
     public void init(GLAutoDrawable gLDrawable) 
     {
+    	System.out.println("init() called");
+    	
     	UIComponents = new ArrayList<EntUIComponent>();
     	
     	FPSLabel = new EntLabel(50, 50, "0", new EntFont(EntFont.FontTypes.MainParagraph, Font.BOLD, 14));
@@ -170,18 +172,12 @@ public class Game implements GLEventListener  {
     	UIComponents.add(new EntTextfield(200, 200, canvas));
     	
 
-     
-
-        File img = glHelper.LoadTexture(gl, cardBackside, "resources/textures/card1.png");
-        File img2 = glHelper.LoadTexture(gl, cardtestfront, "resources/textures/backside.png");
-        File boardFile = glHelper.LoadTexture(gl, board, "resources/textures/board.jpg");
-        	
 
            
    		try {
-   			cardtestfront = TextureIO.newTexture(img, true);
-   			cardBackside = TextureIO.newTexture(img2, true);
-   			board = TextureIO.newTexture(boardFile, true);
+   			cardtestfront = TextureIO.newTexture(new File("resources/textures/card1.png"), true);
+   			cardBackside = TextureIO.newTexture(new File("resources/textures/backside.png"), true);
+   			board = TextureIO.newTexture(new File("resources/textures/board.jpg"), true);
    		} catch (GLException e) {
    			// TODO Auto-generated catch block
    			e.printStackTrace();
@@ -190,18 +186,12 @@ public class Game implements GLEventListener  {
    			e.printStackTrace();
    		}
    		
- 
 
-		
 		CardType TinidQueen = new CardType(cardtestfront);
-		
-		
-		
 		
 		Card card1 = new Card(-0.5f, 0, 1.0f, 
 				0f, -1f ,0f, 
 				1, 0, 0, TinidQueen);
-		
 		
 		Card card2 = new Card(0.5f, 0f, 3.0f, TinidQueen);
 		Card card3 = new Card(1.5f, 0f, 3.0f, TinidQueen);
@@ -225,7 +215,8 @@ public class Game implements GLEventListener  {
 		ShowCard(card6);
 		ShowCard(card7);
 		
-    	System.out.println("init() called");
+		
+    	
         gl = gLDrawable.getGL().getGL2();
         gl.glClearColor(0.9f, 0.78f, 0.6f, 1.0f);
         
