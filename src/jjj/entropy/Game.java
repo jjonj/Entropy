@@ -172,9 +172,9 @@ public class Game implements GLEventListener  {
 
      
 
-           File img = glHelper.LoadTexture(gl, cardBackside, "resources/textures/card1.png");
-        	File img2 = glHelper.LoadTexture(gl, cardtestfront, "resources/textures/backside.png");
-        	File boardFile = glHelper.LoadTexture(gl, board, "resources/textures/board.jpg");
+        File img = glHelper.LoadTexture(gl, cardBackside, "resources/textures/card1.png");
+        File img2 = glHelper.LoadTexture(gl, cardtestfront, "resources/textures/backside.png");
+        File boardFile = glHelper.LoadTexture(gl, board, "resources/textures/board.jpg");
         	
 
            
