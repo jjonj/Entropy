@@ -86,7 +86,14 @@ public class Main {
             }
         });
         
-        frame.addKeyListener(new EntKeyListener());
+        
+    //    frame.addMouseListener(new EntMouseListener());
+        
+        
+        
+        
+        canvas.addKeyListener(new EntKeyListener());
+      
         
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PrintStream ps = new PrintStream(baos);
@@ -100,6 +107,11 @@ public class Main {
       //  OpenGLManager glManager = new OpenGLManager(GAME_WIDTH, GAME_HEIGHT, "resources/textures/backside.png");
         
         Game game = new Game("Entropy", GAME_WIDTH, GAME_HEIGHT, animator, baos, panel, canvas);
+        
+        EntMouseListener MListener = new EntMouseListener(game);
+        
+        canvas.addMouseListener(MListener);
+        canvas.addMouseMotionListener(MListener);
         
        //lManager.RegisterGame(game);
         canvas.addGLEventListener(game);

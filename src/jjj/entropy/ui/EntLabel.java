@@ -3,6 +3,8 @@ package jjj.entropy.ui;
 import java.awt.Font;
 import java.awt.Color;
 
+import jjj.entropy.Game;
+
 import com.jogamp.opengl.util.awt.TextRenderer;
 
 public class EntLabel extends EntUIComponent{
@@ -14,13 +16,13 @@ public class EntLabel extends EntUIComponent{
 	
 	
 	
-	public EntLabel(int x, int y)
+	public EntLabel(Game game, int x, int y)
 	{
-		this(x, y, "", new EntFont(EntFont.FontTypes.MainParagraph, Font.PLAIN, 16));
+		this(x, y, "", new EntFont(game, EntFont.FontTypes.MainParagraph, Font.PLAIN, 16));
 	}
-	public EntLabel(int x, int y, String text)
+	public EntLabel(Game game, int x, int y, String text)
 	{
-		this(x, y, text, new EntFont(EntFont.FontTypes.MainParagraph, Font.PLAIN, 16));
+		this(x, y, text, new EntFont(game, EntFont.FontTypes.MainParagraph, Font.PLAIN, 16));
 	}
 	public EntLabel(int x, int y, String text, EntFont font)
 	{

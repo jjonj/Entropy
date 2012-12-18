@@ -9,6 +9,9 @@ public class EntKeyListener implements KeyListener {
 	public void keyPressed(KeyEvent e) {
 		// TODO Auto-generated method stub
 		System.out.print(e.toString());
+		
+	//	Game.GetObjectID(500, 500);
+		
 	}
 
 	@Override
