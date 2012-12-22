@@ -5,10 +5,13 @@
 	<classpathentry kind="lib" path="lib/gluegen-rt.jar"/>
 	<classpathentry kind="lib" path="lib/jogl-all-natives-windows-amd64.jar"/>
 	<classpathentry kind="lib" path="lib/jogl-all.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6">
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7">
 		<attributes>
 			<attribute name="owner.project.facets" value="java"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="D:/Users/JavaWorkspace/Entropy/lib/mysql-connector-java-5.1.22-bin.jar"/>
+	<classpathentry kind="lib" path="D:/Users/JavaWorkspace/Entropy/lib/kryonet-debug-2.18-all.jar"/>
+	<classpathentry kind="src" path="/EntropyCore"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

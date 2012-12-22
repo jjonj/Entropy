@@ -3,12 +3,9 @@ package jjj.entropy;
 
 import java.awt.Frame;
 import java.awt.Panel;
-import java.awt.TextField;
-import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
 import java.io.PrintStream;
 
 import javax.media.opengl.GLCapabilities;
@@ -27,7 +24,6 @@ import com.jogamp.newt.event.MouseAdapter;
 import com.jogamp.newt.event.MouseEvent;
 import com.jogamp.newt.opengl.GLWindow;*/
 
-import com.jogamp.opengl.util.Animator;
 import com.jogamp.opengl.util.FPSAnimator;
 
 //http://www.land-of-kain.de/docs/jogl/
@@ -44,10 +40,7 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// setup OpenGL Version 2
-		
-		
-		
+
 		String FPSCounter ="";
 		
 		GLProfile.initSingleton();
@@ -60,13 +53,7 @@ public class Main {
 
 		
 		 Panel panel = new Panel();
-		
-	//	 TextField tf1 = new TextField("I am TextField tf1!", 30);
-	//	 panel.add(canvas);
-	//	 panel.add(tf1);
-		 
-		 
-		 
+
 		 
 		Frame frame = new Frame("AWT Window Test");
         frame.setSize(GAME_WIDTH, GAME_HEIGHT);
@@ -77,18 +64,6 @@ public class Main {
         
         frame.setVisible(true);
        
-        
-        
-        
-        frame.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                System.exit(0);
-            }
-        });
-        
-        
-    //    frame.addMouseListener(new EntMouseListener());
-        
         
         
         
@@ -104,19 +79,24 @@ public class Main {
         animator.add(canvas);
         animator.start();
         
-      //  OpenGLManager glManager = new OpenGLManager(GAME_WIDTH, GAME_HEIGHT, "resources/textures/backside.png");
-        
-        Game game = new Game("Entropy", GAME_WIDTH, GAME_HEIGHT, animator, baos, panel, canvas);
+
+        final Game game = new Game("Entropy", GAME_WIDTH, GAME_HEIGHT, animator, baos, panel, canvas);
         
         EntMouseListener MListener = new EntMouseListener(game);
         
         canvas.addMouseListener(MListener);
+        canvas.addMouseWheelListener(MListener);
         canvas.addMouseMotionListener(MListener);
-        
-       //lManager.RegisterGame(game);
+
         canvas.addGLEventListener(game);
         
         
+        frame.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+            	game.Cleanup();
+                System.exit(0);
+            }
+        });
         
         
 	}

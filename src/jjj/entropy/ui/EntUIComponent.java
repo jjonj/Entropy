@@ -1,40 +1,49 @@
 package jjj.entropy.ui;
 
+import jjj.entropy.Game;
+
 public abstract class EntUIComponent {
 
 	
-	protected int x;
-	protected int y;
+	protected float x;
+	protected float y;
 	
-	public EntUIComponent(int x, int y)
+	public EntUIComponent(float x, float y)
 	{
 		this.x = x;
 		this.y = y;
 	}
 	
-	public int GetX()
+	public float GetX()
 	{
 		return x;
 	}
-	public int GetY()
+	public float GetY()
 	{
 		return y;
 	}
-	public void SetX(int x)
+	public void SetX(float x)
 	{
 		this.x = x;
 	}
-	public void SetY(int y)
+	public void SetY(float y)
 	{
 		this.y = y;
 	}
-	public void Move(int x, int y)
+	public void Move(float x, float y)
 	{
 		this.x = x;
 		this.y = y;
 	}
 	
+	public abstract void Render(Game game);
+
+
+
+	public void Activate(Game game) {}
+
+	public void OnResize(int[] view, double[] model , double[] proj) {
+	}
+
 	
-	public abstract void Render();
-	
-}
+	}

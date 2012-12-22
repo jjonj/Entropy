@@ -10,6 +10,9 @@ import javax.media.opengl.GL2;
 import javax.media.opengl.GLException;
 import javax.media.opengl.glu.GLU;
 
+import jjj.entropy.classes.Card;
+import jjj.entropy.ui.EntButton;
+
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureIO;
 
@@ -17,7 +20,12 @@ public class GLHelper {
 
 	private int tableModel,
 				cardModel,
-				deckModel;
+				deckModel,
+				UIModel,
+				BigButtonModel,
+				MediumButtonModel,
+				SmallButtonModel;
+	
 	private static float HALF_CARD_HEIGHT;
 	private static float HALF_CARD_WIDTH;
 
@@ -82,6 +90,34 @@ public class GLHelper {
 		 
 		 gl.glEndList();
 	}
+	
+	public void GenerateUI(GL2 gl, float screenZ, float screenWidth, float screenHeight, Texture bottomPanelTexture)
+	{
+		
+		UIModel = gl.glGenLists(1);
+		
+		
+		gl.glDisable(GL2.GL_TEXTURE_2D);
+		
+        gl.glNewList(UIModel, GL2.GL_COMPILE);
+        bottomPanelTexture.bind(gl);
+		// Drawing the Table
+        
+        gl.glColor3f(0.5f, 0.1f, 0);
+        
+		 gl.glBegin(GL2.GL_QUADS);
+		 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(0,0, screenZ);
+		 	gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(screenWidth,0,screenZ);
+		 	gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(screenWidth,screenHeight, screenZ);
+		 	gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(0,screenHeight, screenZ);
+		 gl.glEnd();
+
+		 gl.glEndList();
+		 
+		 gl.glEnable(GL2.GL_TEXTURE_2D);
+		 
+	}
+	
 	
 	public void DrawCard(GL2 gl, GLU glu, Card card)
 	{
@@ -202,6 +238,58 @@ public class GLHelper {
 
 	}
 	
+	
+	public void DrawUI(GL2 gl)
+	{
+		
+		 gl.glPushMatrix();
+		 
+
+			 
+		 gl.glLoadIdentity();
+
+		 gl.glCallList(UIModel);
+		 gl.glPopMatrix();
+	}
+
+	
+	public void GenerateButtons(GL2 gl, Texture texture)
+	{
+		texture.bind(gl);
+		BigButtonModel = gl.glGenLists(1);
+        gl.glNewList(BigButtonModel, GL2.GL_COMPILE);
+
+		 gl.glBegin(GL2.GL_QUADS);
+		/* 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( -0.12f, -0.035f, 0 );
+		    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f( 0.12f, -0.035f, 0 );
+		    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(0.12f, 0.035f, 0 );
+		    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-0.12f, 0.035f, 0 );*/
+		 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(0, 0, 0f );
+		    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(Game.BIG_BUTTON_WIDTH, 0, 0f );
+		    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(Game.BIG_BUTTON_WIDTH, -Game.BIG_BUTTON_HEIGHT, 0f  );
+		    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(0, -Game.BIG_BUTTON_HEIGHT, 0f  );
+	
+		    
+		 gl.glEnd();
+		 
+		 gl.glEndList();
+	}
+	
+	public void DrawBigButton(GL2 gl, EntButton button)
+	{
+		 gl.glPushMatrix();
+		 
+		// gl.glLoadIdentity();
+		 float x = button.GetX();
+		 float y = button.GetY();
+		 gl.glTranslatef(button.GetX(), button.GetY(), 0);
+	//	 gl.glTranslatef(button.GetGLX(), 0.3f, 0);
+
+		 gl.glCallList(BigButtonModel);
+		 gl.glPopMatrix();
+	}
+	
+
 
 	public void DrawDeck(GL2 gl, float x,  float y, float z)
 	{

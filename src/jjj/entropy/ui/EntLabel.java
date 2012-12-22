@@ -13,16 +13,16 @@ public class EntLabel extends EntUIComponent{
 	
 	private String text;
 	private EntFont  font;
-	
-	
+	private boolean boxed;
+	private int maxLines; 
 	
 	public EntLabel(Game game, int x, int y)
 	{
-		this(x, y, "", new EntFont(game, EntFont.FontTypes.MainParagraph, Font.PLAIN, 16));
+		this(x, y, "", new EntFont(EntFont.FontTypes.MainParagraph, Font.PLAIN, 16));
 	}
 	public EntLabel(Game game, int x, int y, String text)
 	{
-		this(x, y, text, new EntFont(game, EntFont.FontTypes.MainParagraph, Font.PLAIN, 16));
+		this(x, y, text, new EntFont(EntFont.FontTypes.MainParagraph, Font.PLAIN, 16));
 	}
 	public EntLabel(int x, int y, String text, EntFont font)
 	{
@@ -30,12 +30,21 @@ public class EntLabel extends EntUIComponent{
 		this.text = text;
 		this.font = font;
 	}
-	 
-	
-	public void Render()
+	public EntLabel(int x, int y, int maxLines, String text, EntFont font)
 	{
-		// optionally set the color
-		font.Render(x, y, text);
+		super(x, y);
+		this.text = text;
+		this.font = font;
+		boxed = true;
+		this.maxLines = maxLines;
+	}
+	
+	public void Render(Game game)
+	{
+		if (boxed)
+			font.RenderBox(game, (int)x, (int)y, maxLines, text);
+		else
+			font.Render(game, (int)x, (int)y, text);
 	}
 	
 	public String GetText()
@@ -46,6 +55,17 @@ public class EntLabel extends EntUIComponent{
 	{
 		this.text = text;
 	}
-	
-	
+	public void AppendText(String text)
+	{
+		this.text = this.text + text;
+	}
+	public void RemoveFromEnd(int number)
+	{
+		if (text.length() >= number)
+			this.text = this.text.substring(0, this.text.length() - number);
+	}
+	public void RemoveFromEnd()
+	{
+		RemoveFromEnd(1);
+	}
 }
