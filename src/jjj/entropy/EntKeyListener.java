@@ -56,7 +56,20 @@ int keyCode = e.getKeyCode();
 	        	chatTypeArea.RemoveFromEnd();
 	        	break;
 	        case KeyEvent.VK_ESCAPE:
-	        	Game.SetState(GameState.MAIN_MENU);
+	        	switch (Game.Gamestate)
+	        	{
+	        	case LOGIN:
+	        		System.exit(0);
+	        		break;
+	        	case MAIN_MENU:
+	        		Game.SetState(GameState.LOGIN);
+	        		break;
+	        	case IN_GAME:
+	        		Game.SetState(GameState.MAIN_MENU);
+	        		break;
+	        	}
+	        	
+	        	
 	        	break;
 	        default:
 	            Game.modeNumber = keyCode-48; //Numbers

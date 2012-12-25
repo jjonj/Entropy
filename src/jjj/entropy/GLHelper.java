@@ -12,6 +12,7 @@ import javax.media.opengl.glu.GLU;
 
 import jjj.entropy.classes.Card;
 import jjj.entropy.ui.EntButton;
+import jjj.entropy.ui.EntTextbox;
 
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureIO;
@@ -24,7 +25,8 @@ public class GLHelper {
 				UIModel,
 				BigButtonModel,
 				MediumButtonModel,
-				SmallButtonModel;
+				SmallButtonModel,
+				TextboxModel;
 	
 	private static float HALF_CARD_HEIGHT;
 	private static float HALF_CARD_WIDTH;
@@ -275,13 +277,29 @@ public class GLHelper {
 		 gl.glEndList();
 	}
 	
+	public void GenerateTextbox(GL2 gl, Texture texture)
+	{
+	    	
+		texture.bind(gl);
+		TextboxModel = gl.glGenLists(1);
+        gl.glNewList(TextboxModel, GL2.GL_COMPILE);
+
+		 gl.glBegin(GL2.GL_QUADS);
+		 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(0, 0, 0f );
+		    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(Game.TEXTBOX_WIDTH, 0, 0f );
+		    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(Game.TEXTBOX_WIDTH, -Game.TEXTBOX_HEIGHT, 0f  );
+		    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(0, -Game.TEXTBOX_HEIGHT, 0f  );		    
+		 gl.glEnd();
+		 
+		 gl.glEndList();
+	}
+	
+	
 	public void DrawBigButton(GL2 gl, EntButton button)
 	{
 		 gl.glPushMatrix();
 		 
-		// gl.glLoadIdentity();
-		 float x = button.GetX();
-		 float y = button.GetY();
+
 		 gl.glTranslatef(button.GetX(), button.GetY(), 0);
 	//	 gl.glTranslatef(button.GetGLX(), 0.3f, 0);
 
@@ -289,7 +307,15 @@ public class GLHelper {
 		 gl.glPopMatrix();
 	}
 	
+	public void DrawTextbox(GL2 gl, EntTextbox textbox)
+	{
+		 gl.glPushMatrix();
 
+		 gl.glTranslatef(textbox.GetX(), textbox.GetY(), 0);
+
+		 gl.glCallList(TextboxModel);
+		 gl.glPopMatrix();
+	}
 
 	public void DrawDeck(GL2 gl, float x,  float y, float z)
 	{

@@ -50,6 +50,14 @@ public class EntMouseListener implements MouseListener, MouseMotionListener, Mou
 					game.ShowCard(c);
 					
 				}
+				else if (c.glMIndex == 1)
+				{
+					return;
+			/*		c = new Card(3, 0.51f, 10.0f, 
+							Facing.DOWN, game.TinidQueen, Status.IN_ZONE, Game.Player2);
+					
+					game.ShowCard(c);
+				*/}
 				//c.SetTarget(c.GetX(), 0, c.GetZ()+3, 90, 0, 0);
 				
 				
@@ -101,7 +109,7 @@ public class EntMouseListener implements MouseListener, MouseMotionListener, Mou
 				
 			}
 		}
-		else if (game.Gamestate == GameState.MAIN_MENU)
+		else if (Game.Gamestate == GameState.MAIN_MENU || Game.Gamestate == GameState.LOGIN)
 		{
 			EntUIComponent uic = game.CheckUICollision();
 			if (uic != null)
@@ -149,7 +157,7 @@ public class EntMouseListener implements MouseListener, MouseMotionListener, Mou
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
 		Card c = game.CheckCardCollision();
-		if (c != null && !(c.glMIndex == 0))
+		if (c != null && (c.glMIndex > 1))
 		{
 			if (e.getWheelRotation() > 0)
 			{

@@ -126,13 +126,7 @@ public class EntButton extends EntUIComponent{
        // textOffsetX = (w - (int)((temp)))/2;
      textOffsetX = xOffset;
      textOffsetY = yOffset;
-           //glX = 5.5f;
-       //  glY = 5.5f;
-  
-  
-    // this.y = y;// realy;
-//		this.glX = glX;
-//		this.glY = glY;
+
          
          
 	}
@@ -140,12 +134,14 @@ public class EntButton extends EntUIComponent{
 	public void Render(Game game)
 	{
 		
+		Game.gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+	    	
 		switch (buttonSize)
 		{
 		case BIG:
 			texture.bind(Game.gl);
 			game.getGLHelper().DrawBigButton(Game.gl, this);
-			font.Render(game, textX + textOffsetX, textY+ textOffsetY, text);
+			font.Render(game, textX + textOffsetX, textY - textOffsetY, text);
 			break;
 		default:
 			break;
@@ -205,6 +201,7 @@ public class EntButton extends EntUIComponent{
 	{
 		this.text = text;
 	}
+	
 	public float GetScreenX() {
 		return screenLeft;
 	}
@@ -221,6 +218,10 @@ public class EntButton extends EntUIComponent{
 			NetworkManager.JoinGame();
 			
 			game.Gamestate = GameState.IN_GAME;
+			break;
+		case "Login":
+			
+			game.Gamestate = GameState.MAIN_MENU;
 			break;
 		}
 	}
