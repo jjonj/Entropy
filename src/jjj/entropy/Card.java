@@ -61,8 +61,7 @@ public class Card {
 	
 	public Card(float x, float y, float z, CardTemplate type, Player owner)	
 	{
-		this(x,y,z,
-				Facing.FRONT, type, Status.IN_DECK, owner);
+		this(x,y,z,Facing.FRONT, type, Status.IN_DECK, owner);
 	}
 	
 	public Card(float x, float y, float z, Facing face, CardTemplate template, Status status, Player owner)	

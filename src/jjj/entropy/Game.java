@@ -88,7 +88,8 @@ public class Game implements GLEventListener  {
     private List<Card> cardsToRender;
     private EntTextbox chatTextbox;
     private EntLabel chatWindow;
-    
+    private EntTextbox usernameTextbox,
+    				   passwordTextbox;
     
     private int c = 0;
     private float rotator = 0.0f;
@@ -146,7 +147,7 @@ public class Game implements GLEventListener  {
         neutralPlayer = new Player(0, "Neutral", null);
         
   //  	NetworkManager.Connect("10.0.0.5", 11759);
-    	NetworkManager.Connect("127.0.0.1", 54555);	//Temporary location
+    	NetworkManager.GetInstance().Connect("127.0.0.1", 54555);	//Temporary location
     } 
 
     public void init(GLAutoDrawable gLDrawable) 
@@ -238,21 +239,26 @@ public class Game implements GLEventListener  {
     	
      	MainMenuUIComponents.add(new EntButton(-0.16f, 0.05f, 48, 15, "Multiplayer", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.orange), bigButtonTexture,
      			new UIAction() {public void Activate(){
-	     				NetworkManager.JoinGame();
+	     				NetworkManager.GetInstance().JoinGame();
 	     				Game.GetInstance().SetGameState(GameState.IN_GAME);
      				}
      			}
      	));
      	
      	
-     	LoginScreenUIComponents.add(new EntTextbox(-0.155f, 0.05f, 15, 8, "", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black), textboxTexture));
-     	LoginScreenUIComponents.add(new EntTextbox(-0.155f, -0.06f, 15, 8, "", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black), textboxTexture));
+     	
+        usernameTextbox = new EntTextbox(-0.155f, 0.05f, 15, 8, "", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black), textboxTexture);
+     	passwordTextbox = new EntTextbox(-0.155f, -0.06f, 15, 8, "", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black), textboxTexture);
+     	
+     	LoginScreenUIComponents.add(usernameTextbox);
+     	LoginScreenUIComponents.add(passwordTextbox);
      	LoginScreenUIComponents.add(new EntLabel(555, 415, "Username", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black)));
      	LoginScreenUIComponents.add(new EntLabel(555, 320, "Password", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black)));
      	
      	LoginScreenUIComponents.add(new EntButton(-0.155f, -0.155f, 85, 28, "Login", new EntFont(FontTypes.MainParagraph, Font.BOLD, 22, Color.black), bigButtonTexture,
      			new UIAction() {public void Activate(){
-     				Game.GetInstance().SetGameState(GameState.MAIN_MENU);
+     				NetworkManager.GetInstance().Login(usernameTextbox.GetText(), passwordTextbox.GetText());
+     				//Game.GetInstance().SetGameState(GameState.MAIN_MENU);
  				}
  			}
  	));
@@ -468,7 +474,7 @@ public class Game implements GLEventListener  {
 
 	//All non-openGL cleanup code
 	public void Cleanup() {
-		NetworkManager.Disconnect();
+		NetworkManager.GetInstance().Disconnect();
 	}
 
     public void ShowCard(Card card)

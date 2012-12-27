@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+import jjj.entropy.classes.Enums.GameState;
 import jjj.entropy.messages.*;
 
 import com.esotericsoftware.kryo.Kryo;
@@ -20,15 +21,24 @@ public class NetworkManager extends Listener
 		OFFLINE, CONNECTED, LOGGING_IN, LOGGED_IN, IN_GAME
 	}
 	
-	private static List<CardTemplate> cardsToLoad = new ArrayList<CardTemplate>();
+	private static NetworkManager instance = new NetworkManager();
 	
-	private NetworkManager(){}	//Shouldn't be initialized as it's a purely static class
 	
-	private static Client client;
+	public static NetworkManager GetInstance()
+	{
+		return instance;
+	}
 	
-	private static NetworkState networkState = NetworkState.OFFLINE;
+	protected NetworkManager(){}
 	
-	public static void Connect(String IP, int port)
+	private List<CardTemplate> cardsToLoad = new ArrayList<CardTemplate>();
+	
+	
+	private Client client;
+	
+	private NetworkState networkState = NetworkState.OFFLINE;
+	
+	public void Connect(String IP, int port)
 	{
 		if (networkState == NetworkState.OFFLINE)
 		{
@@ -46,8 +56,17 @@ public class NetworkManager extends Listener
 			  Kryo kryo = client.getKryo();
 			  kryo.register(ChatMessage.class);
 			  kryo.register(GameMessage.class);
-			//  kryo.register(AuthenticationMessage.class);
 			  kryo.register(ActionMessage.class);
+			  kryo.register(CardDataMessage.class);
+			  kryo.register(LoginMessage.class);
+			  kryo.register(PlayerDataMessage.class);
+			  kryo.register(String[].class);
+			  kryo.register(int[].class);
+			  
+				
+			  client.addListener(this);
+				
+			  
 			  
 			  client.start();
 			  try {
@@ -63,12 +82,12 @@ public class NetworkManager extends Listener
 	}
 	
 
-	public static void Disconnect() {
+	public void Disconnect() {
 		client.close();
 		networkState = NetworkState.OFFLINE;
 	}
 	
-	public static void Login(String username, String password)
+	public void Login(String username, String password)
 	{
 		if (networkState == NetworkState.CONNECTED)
 		{
@@ -80,24 +99,24 @@ public class NetworkManager extends Listener
 		}
 	}
 	
-	public static void JoinGame()
+	public void JoinGame()
 	{
 		GameMessage joinRequest = new GameMessage();
 		joinRequest.playerID = 3;
 		client.sendTCP(joinRequest);
 	}
-	public static void SendTextMessage(String text)
+	public void SendTextMessage(String text)
 	{
 		ChatMessage request = new ChatMessage();
 		client.sendTCP(request);
 	}
 	
-	public static void QueueCardTemplateLoad(CardTemplate template)
+	public void QueueCardTemplateLoad(CardTemplate template)
 	{
 		cardsToLoad.add(template);
 	}
 	
-	public static NetworkState GetNetworkState()
+	public NetworkState GetNetworkState()
 	{
 		return networkState;
 	}
@@ -118,27 +137,29 @@ public class NetworkManager extends Listener
 	
 	@Override
 	public void received (Connection connection, Object object) {
+		System.out.println("Message recieved!");
 		if(object instanceof LoginMessage) {	//Assert: Only recieved when login was denied
 			if (networkState == NetworkState.LOGGING_IN && ((LoginMessage)object).rejected)
 			{
 				// MISSING: Notify user
-				System.out.println(((LoginMessage)object).message);
-				networkState = NetworkState.OFFLINE;
+				networkState = NetworkState.CONNECTED;
 			}
 			
 		}
-		else if (object instanceof PlayerDataMessage)
+		else if (object instanceof PlayerDataMessage)	//When logging in, a cardDataMessage should always be recieved first to load the players deck.
 		{
 			PlayerDataMessage pdm = (PlayerDataMessage)object;
 			if (pdm.loginAccepted)
 			{
 				Game.GetInstance().SetPlayer(1, new Player(pdm.playerID, pdm.name, pdm.deck));
 				networkState = NetworkState.LOGGED_IN;
+				Game.GetInstance().SetGameState(GameState.MAIN_MENU);
 			}
 		}
 		else if (object instanceof CardDataMessage)
 		{
-			for (String s : ((CardDataMessage) object).cardTemplates)
+			System.out.println("CardMessage recieved!!! :)");
+			for (String s : ((CardDataMessage) object).cardTemplates) //Load each cardtype/template 
 			{
 				CardTemplate.LoadCardTemplate(s);
 			}

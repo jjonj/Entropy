@@ -1,5 +1,6 @@
 package jjj.entropy;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -14,7 +15,7 @@ public class CardCollection {
 	
 	public CardCollection()
 	{
-		
+		cards = new ArrayList<Card>();
 	}
 	
 	public void AddCard(Card card)
