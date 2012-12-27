@@ -52,7 +52,6 @@ public class EntFont extends Font {
 		if (text.length() > 0)
 		{
 			renderer.beginRendering(game.GetWidth(), game.GetHeight());
-	        // optionally set the color
 	        renderer.setColor(color);
 	        renderer.draw(text, x, y);
 	        renderer.endRendering();
@@ -61,7 +60,7 @@ public class EntFont extends Font {
 
 	private Rectangle2D rec;
 	List<String> cLines = new ArrayList<String>();
-	public void RenderBox(Game game, int x, int y, int maxLines, String text)
+	public void RenderBox(Game game, int x, int y, int maxLines, int lineWidth, String text)
 	{
 		if (text.length() > 0)
 		{
@@ -75,7 +74,7 @@ public class EntFont extends Font {
 	        
 	        for (String s : lines)
 	        {
-	        	SplitStringRec(s);
+	        	SplitStringRec(s, lineWidth);
 	        }
 	        
 	        
@@ -95,11 +94,11 @@ public class EntFont extends Font {
 		}
 	}
 
-	private void SplitStringRec(String s) {
+	private void SplitStringRec(String s, int lineWidth) {
 		//rec = renderer.getBounds(s);
 		
 		//if (s.length() > charsPerLine)
-		if (renderer.getBounds(s).getWidth() > Game.CHAT_LINE_WIDTH)
+		if (renderer.getBounds(s).getWidth() > lineWidth)
 		{
 			String[] words = s.split(" ");
 			int i = 0;
@@ -108,20 +107,20 @@ public class EntFont extends Font {
 			String tempString = "";
 			while (i < words.length)
 			{
-				if (renderer.getBounds(words[i]).getWidth() > Game.CHAT_LINE_WIDTH)
+				if (renderer.getBounds(words[i]).getWidth() > lineWidth)
 				{
 					String s2 = words[i];
 					//Split word into lines of correct length, add them and put the rest back into the word
 					do 
 					{
-						int charsPerLine = GetLengthOfStringWidth(s2, Game.CHAT_LINE_WIDTH);
+						int charsPerLine = GetLengthOfStringWidth(s2, lineWidth);
 						cLines.add(s2.substring(0, charsPerLine-1) + "-");
 						s2 = s2.substring(charsPerLine-1, s2.length());
-					} while (renderer.getBounds(s2).getWidth() > Game.CHAT_LINE_WIDTH);
+					} while (renderer.getBounds(s2).getWidth() > lineWidth);
 					words[i] = s2;
 				}
 				tempString = addString + " " +  words[i];
-				if (renderer.getBounds(tempString).getWidth() > Game.CHAT_LINE_WIDTH)
+				if (renderer.getBounds(tempString).getWidth() > lineWidth)
 				{
 					cLines.add(addString);
 					addString = "";
@@ -142,7 +141,8 @@ public class EntFont extends Font {
 		}
 	}
 	
-	public int GetLengthOfStringWidth(String s, float width)
+	//Finds the number of chars frmo a string to include to obtain a given length
+	public int GetLengthOfStringWidth(String s, float width) 
 	{
 		int i = s.length()/2;
 		while (renderer.getBounds(s.substring(0, i)).getWidth() > width)

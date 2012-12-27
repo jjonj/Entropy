@@ -3,17 +3,14 @@ package jjj.entropy;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Panel;
 import java.io.ByteArrayOutputStream;
-import java.io.Console;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
-import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.ArrayList;
 
-import javax.imageio.ImageIO;
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
@@ -22,34 +19,26 @@ import javax.media.opengl.GLException;
 import javax.media.opengl.awt.GLCanvas;
 import javax.media.opengl.glu.GLU;
 
-import jjj.entropy.classes.Card;
-import jjj.entropy.classes.CardTemplate;
-import jjj.entropy.classes.Card.Facing;
-import jjj.entropy.classes.Card.Status;
+import jjj.entropy.Card.Facing;
+import jjj.entropy.Card.Status;
+import jjj.entropy.CardTemplate.CardRace;
+import jjj.entropy.CardTemplate.CardType;
+import jjj.entropy.classes.*;
 import jjj.entropy.classes.Enums.GameState;
-import jjj.entropy.classes.Player;
-import jjj.entropy.ui.EntButton;
-import jjj.entropy.ui.EntFont;
+import jjj.entropy.ui.*;
 import jjj.entropy.ui.EntFont.FontTypes;
-import jjj.entropy.ui.EntLabel;
-import jjj.entropy.ui.EntTextbox;
-//import jjj.entropy.ui.EntTextfield;
-import jjj.entropy.ui.EntUIComponent;
 
 import com.jogamp.opengl.util.FPSAnimator;
-import com.jogamp.opengl.util.awt.TextRenderer;
- 
 import com.jogamp.opengl.util.texture.*;
-import com.jogamp.opengl.util.texture.TextureIO.*;
+
 
 public class Game implements GLEventListener  {
 	
 	final static float CARD_HEIGHT = 1.5f;
     final static float CARD_WIDTH = 0.9f;
+    final static float HALF_CARD_HEIGHT = CARD_HEIGHT/2;	//I don't trust the compiler to optimize this
+    final static float HALF_CARD_WIDTH = CARD_WIDTH/2;
     final static float CARD_THICKNESS = 0.001f;
-    
-    static float HALF_CARD_HEIGHT;
-    static float HALF_CARD_WIDTH;
     
     public static final float BOARD_LENGTH = 12.0f;
     public static final float BOARD_WIDTH = 12.0f;
@@ -59,40 +48,37 @@ public class Game implements GLEventListener  {
     public static final float BIG_BUTTON_WIDTH = 0.25f,
     					      BIG_BUTTON_HEIGHT = 0.075f;
     
+    public static final int TEXTBOX_LINE_WIDTH = 205;
+    
     public static final int CHAT_LINE_WIDTH = 240;
     public static final int CHAT_LINES = 5;
 	public static final float TEXTBOX_HEIGHT = 0.05f,
-							   TEXTBOX_WIDTH = 0.25f;
+							  TEXTBOX_WIDTH = 0.25f;
     
-    //Test var
-    public static int mode;
+    
+	public static int mode;
     public static int modeNumber;
     
-    public static GameState Gamestate = GameState.LOGIN;
+    private static GameState gamestate;;
     
-   
-    
-    
+    private static Game instance = null;
 	private String title;
 	private int gameWidth, 
 				gameHeight;
-	public static float AspectRatio;
+	private float aspectRatio;
 	private boolean fullscreen = false;
 	private boolean showFPS = false;
-    public static int realGameHeight;	//Used for calculating the real Y values
+    private int realGameHeight;	//Used for calculating the real Y values
 	
-	public static GL2 gl;
+	public static GL2 gl;				//These are made 'public static' as they can be accessed that way regardless.
     public static GLU glu = new GLU();	//OpenGL utilities object
-    private GLHelper glHelper;
     private FPSAnimator animator;
     private ByteArrayOutputStream FPSCounter;
 	
-	public static Player Player1,
-						 Player2;
-    
-	
-	
-    private Panel panel;
+	private Player neutralPlayer,
+				   player1,
+			       player2;
+
     private GLCanvas canvas;
     private List<EntUIComponent> IngameUIComponents;	
     private List<EntUIComponent> MainMenuUIComponents;	
@@ -100,15 +86,16 @@ public class Game implements GLEventListener  {
     private EntUIComponent focusedUIComponent;
     private EntLabel FPSLabel;
     private List<Card> cardsToRender;
-    
+    private EntTextbox chatTextbox;
+    private EntLabel chatWindow;
     
     
     private int c = 0;
     private float rotator = 0.0f;
     
-    public Texture cardtestfront; //The texture with transparent parts.
+    public Texture cardtestfront; 	//Temporary texture location.
     public Texture crawnidworkertexture; 
-    public Texture cardBackside; //The texture with transparent parts.
+    public Texture cardBackside; 
     public Texture board;
     public Texture deckSideTexture;
     public Texture uiTexture;
@@ -116,195 +103,57 @@ public class Game implements GLEventListener  {
     public Texture loginScreenTexture;
     public Texture bigButtonTexture;
     public Texture textboxTexture;
+
+    public CardTemplate TinidQueen;	//Temporary
     
     
-    NetworkManager nwm;
-    
-    Game(String title, int width, int height, FPSAnimator animator, ByteArrayOutputStream FPSCounter, Panel panel, GLCanvas canvas)
+    public static void InitSingleton(String title, int width, int height, GLCanvas canvas)
     {
-    	this.panel = panel;
-    	this.FPSCounter = FPSCounter;
-    	this.animator = animator;
-    	glHelper = new GLHelper();
+    	new Game(title, width, height, canvas);
+    }
+    
+    public static Game GetInstance()
+    {
+    	if (instance != null)
+    		return instance;
+    	System.out.println("ERROR: Please call Game.InitSingleton in your intialization.");
+    	System.exit(1);
+    	return null;
+    }
+    
+    protected Game(String title, int width, int height, GLCanvas canvas)
+    {
+    	instance = this;
+    	
+    	this.canvas = canvas;
     	this.title = title;
     	gameWidth = width;
     	gameHeight = height;
-    	AspectRatio = (float)width/height;
-    	cardsToRender = new ArrayList<Card>();
-    	HALF_CARD_HEIGHT = CARD_HEIGHT / 2;
-    	HALF_CARD_WIDTH = CARD_WIDTH / 2;  
+    	aspectRatio = (float)width/height;
     	
-    	
+    	FPSCounter = new ByteArrayOutputStream();
+        PrintStream ps = new PrintStream(FPSCounter);
+        animator = new FPSAnimator(canvas, 60);
+        animator.setUpdateFPSFrames(60, ps);
+        animator.add(canvas);
+        animator.start();
+
+        cardsToRender = new ArrayList<Card>();
     	IngameUIComponents = new ArrayList<EntUIComponent>();
     	MainMenuUIComponents = new ArrayList<EntUIComponent>();
         LoginScreenUIComponents = new ArrayList<EntUIComponent>();
     	
-    	Player1 = new Player("p1");
-    	Player2 = new Player("p2");
-    	
-    	
-    	nwm = new NetworkManager();
-    	
-  //  	nwm.Connect("10.0.0.5", 11759);
-    	nwm.Connect("127.0.0.1", 54555);
-    	
-  //nwm.SendTextMessage("HELLO");
-    }
-    
-    
-    public void ShowCard(Card card)
-	{
-		cardsToRender.add(card);
-		card.SetGLMIndex(cardsToRender.size()-1);
-	}
-	
-	public void RemoveCard(Card card)
-	{
-		cardsToRender.remove(card.GetGLMIndex());
-		int decrementFrom = card.GetGLMIndex();
-		card.SetGLMIndex(0);
-		for (int i = decrementFrom; i < cardsToRender.size(); i++)
-		{
-			cardsToRender.get(i).SetGLMIndex(i);
-		}
-	}
-    
-	//Depth testing not tested, and only tests for card center
-	public Card CheckCardCollision()
-	{
-		Card rCard = null;
-		
-		double  px = (double)EntMouseListener.MouseX, 
-				py = (double)(EntMouseListener.MouseY);	//calculating the real Y from the viewport value
-		for(Card ca : cardsToRender)
-		{
-	//		System.out.println("Card coords: " + ca.GetWinX(0) + ", ")
-			/*==============================================
-			`Returns 1 if point is inside triangle, 0 if not
-			`Point (px,py)
-			`triangle (x1,y1),(x2,y2),(x3,y3)
-			`==============================================*/
-			double  x1 = ca.GetWinX(0),
-					y1 = ca.GetWinY(0),
-					x2 = ca.GetWinX(1),
-					y2 = ca.GetWinY(1),
-					x3 = ca.GetWinX(2),
-					y3 = ca.GetWinY(2);
-			for (int i = 0; i < 2; i++)	//Do for two triangles
-			{
-			
-				double dABx = x2-x1, 
-					   dABy = y2-y1,
-					   dBCx = x3-x2,
-					   dBCy = y3-y2;
-		        	
-			  // System.out.println("Card ID: " + ca.glMIndex + " - Point coords: " + px + ", " + py + " - " + "triangle coords: " + x1 + " " + y1 + ", " + x2 + " " + y2 + ", " + x3 + " " + y3);
-			   if ((dABx*dBCy - dABy*dBCx) < 0)	//Clockwise
-			   {
-			      if (dABx*(py-y1) >= dABy*(px-x1)) 
-			      {
-			    	  x2 = ca.GetWinX(3);
-					  y2 = ca.GetWinY(3);
-					  continue;
-			      }
-			      if (dBCx*(py-y2) >= dBCy*(px-x2)) 
-			      {
-			    	  x2 = ca.GetWinX(3);
-					  y2 = ca.GetWinY(3);
-					  continue;
-			      }
-			      if ((x1-x3)*(py-y3) >= (y1-y3)*(px-x3)) 
-			      {
-			    	  x2 = ca.GetWinX(3);
-					  y2 = ca.GetWinY(3);
-					  continue;
-			      }
-			   }
-			   else								// Counter clockwise
-			   {
-			      if (dABx*(py-y1) < dABy*(px-x1)) 
-			      {
-			    	  x2 = ca.GetWinX(3);
-					  y2 = ca.GetWinY(3);
-					  continue;
-			      }
-			      if (dBCx*(py-y2) < dBCy*(px-x2)) 
-			      {
-			    	  x2 = ca.GetWinX(3);
-					  y2 = ca.GetWinY(3);
-					  continue;
-			      }
-			      if ((x1-x3)*(py-y3) < (y1-y3)*(px-x3))
-			      {
-			    	  x2 = ca.GetWinX(3);
-					  y2 = ca.GetWinY(3);
-					  continue;
-			      }
-			   }
-			   
-			   if (rCard == null)
-			   {
-				   rCard = ca;
-			   }
-			   else
-			   {
-				   if (ca.GetZ() < rCard.GetZ())
-					   rCard = ca;
-			   }
-			   break;
-			}
-		}
+        neutralPlayer = new Player(0, "Neutral", null);
+        
+  //  	NetworkManager.Connect("10.0.0.5", 11759);
+    	NetworkManager.Connect("127.0.0.1", 54555);	//Temporary location
+    } 
 
-		return rCard;	//no card found
-	}
-	
-    public String GetTitle()
-    {
-    	return title;
-    }
-    public int GetWidth()
-    {
-    	return gameWidth;
-    }
-    
-    public int GetHeight()
-    {
-    	return gameHeight;
-    }
-    
-    public GL2 GetGL()
-    {
-    	return gl;
-    }
-    public GLHelper getGLHelper() {
-		return glHelper;
-	}
-	public void SetFocusedUIComponent(EntUIComponent newFocus)
-	{
-		focusedUIComponent = newFocus;
-	}
-    
-    
-    public CardTemplate TinidQueen;
-    
     public void init(GLAutoDrawable gLDrawable) 
     {
     	gl = gLDrawable.getGL().getGL2();
     	System.out.println("init() called");
-    	
-    	FPSLabel = new EntLabel(50, 150, "0", new EntFont(EntFont.FontTypes.MainParagraph, Font.BOLD, 14));
-    	
-    	
-    
-    	
-    	
-    	IngameUIComponents.add(EntKeyListener.GetChatTypelabel());
-    	IngameUIComponents.add(EntKeyListener.GetChatWindowlabel());
-    	
-    //	UIComponents.add(new EntLabel(gameWidth / 2 - 120, gameHeight - 70, "Entropy", new EntFont(this, EntFont.FontTypes.MainTitle, Font.BOLD, 50)));
-    	IngameUIComponents.add(FPSLabel);
- //   	IngameUICompontents.add(new EntTextfield(200, 200, canvas));
-    	
+
    		try {
    			cardtestfront = TextureIO.newTexture(new File("resources/textures/card1.png"), true);
    			cardBackside = TextureIO.newTexture(new File("resources/textures/backside.png"), true);
@@ -325,14 +174,12 @@ public class Game implements GLEventListener  {
    		}
    		
    		
-   		
-		TinidQueen = new CardTemplate(cardtestfront, 2,2,2,2,2,2);
-		CardTemplate CrawnidWorker = new CardTemplate(crawnidworkertexture, 2,2,2,2,2,2);
-		
+		TinidQueen = new CardTemplate((short)1, "Tinid Queen", CardRace.CRAWNID, CardType.CREATURE, (short)0,(short)0,(short)0,(short)0,(short)0,(short)0,cardtestfront);
+
 		Card card0 = new Card(-3, 0.51f, 1.0f, 
-				Facing.DOWN, TinidQueen, Status.IN_ZONE, Game.Player1);
+				Facing.DOWN, TinidQueen, Status.IN_ZONE, neutralPlayer);
 		Card card1 = new Card(3, 0.51f, 10.0f, 
-				Facing.DOWN, TinidQueen, Status.IN_ZONE, Game.Player2);
+				Facing.DOWN, TinidQueen, Status.IN_ZONE, neutralPlayer);
 		/*Card card1 = new Card(-0.5f, 0, 1.0f, 
 				Facing.UP, TinidQueen, Status.IN_ZONE);
 		
@@ -349,18 +196,9 @@ public class Game implements GLEventListener  {
 
 		ShowCard(card0);
 		ShowCard(card1);
-	/*	ShowCard(card1);
-		ShowCard(card2);
-		ShowCard(card3);
-		ShowCard(card4);
-		ShowCard(card5);
-	    ShowCard(card6);
-		ShowCard(card7);*/
-		    	
        
         gl.glClearColor(0.9f, 0.78f, 0.6f, 1.0f);
         
-     
     	gl.glEnable(GL.GL_BLEND);
         gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
          
@@ -372,54 +210,68 @@ public class Game implements GLEventListener  {
     	gl.glShadeModel(GL2.GL_SMOOTH);
         gl.glEnable(GL2.GL_DEPTH_TEST);
         
-    	glHelper.InitTexture(gl, cardBackside);
-     	glHelper.InitTexture(gl, cardtestfront);
-     	glHelper.InitTexture(gl, crawnidworkertexture);
-     	glHelper.InitTexture(gl, deckSideTexture);
-     	glHelper.InitTexture(gl, board);
-     	glHelper.InitTexture(gl, uiTexture);
-     	glHelper.InitTexture(gl, mainMenuTexture);
-     	glHelper.InitTexture(gl, loginScreenTexture);
-     	glHelper.InitTexture(gl, bigButtonTexture);
-     	glHelper.InitTexture(gl, textboxTexture);
+    	GLHelper.InitTexture(gl, cardBackside);
+     	GLHelper.InitTexture(gl, cardtestfront);
+     	GLHelper.InitTexture(gl, crawnidworkertexture);
+     	GLHelper.InitTexture(gl, deckSideTexture);
+     	GLHelper.InitTexture(gl, board);
+     	GLHelper.InitTexture(gl, uiTexture);
+     	GLHelper.InitTexture(gl, mainMenuTexture);
+     	GLHelper.InitTexture(gl, loginScreenTexture);
+     	GLHelper.InitTexture(gl, bigButtonTexture);
+     	GLHelper.InitTexture(gl, textboxTexture);
 
-     	
-     	glHelper.GenerateTable(gl, BOARD_WIDTH, BOARD_LENGTH, BOARD_THICKNESS);
-     	glHelper.GenerateButtons(gl, bigButtonTexture);
-     	glHelper.GenerateUI(gl, 0, 0, 0, uiTexture);
-     	glHelper.GenerateDeck(gl, cardBackside, deckSideTexture, CARD_WIDTH, CARD_HEIGHT, 0.5f);
-       	glHelper.GenerateTextbox(gl, textboxTexture);
-
-     	glHelper.GenerateCard(gl, cardBackside, CARD_WIDTH, CARD_HEIGHT, CARD_THICKNESS);
+     	GLHelper.GenerateTable(gl, BOARD_WIDTH, BOARD_LENGTH, BOARD_THICKNESS);
+     	GLHelper.GenerateButtons(gl, bigButtonTexture);
+     	GLHelper.GenerateUI(gl, 0, 0, 0, uiTexture);
+     	GLHelper.GenerateDeck(gl, cardBackside, deckSideTexture, CARD_WIDTH, CARD_HEIGHT, 0.5f);
+       	GLHelper.GenerateTextbox(gl, textboxTexture);
+     	GLHelper.GenerateCard(gl, cardBackside, CARD_WIDTH, CARD_HEIGHT, CARD_THICKNESS);
         
+    	chatWindow = new EntLabel(129, 116,  Game.CHAT_LINES, "", new EntFont(EntFont.FontTypes.MainParagraph, Font.BOLD, 12, Color.BLUE));
+    	chatTextbox = new EntTextbox(-0.59f, -0.389f, 5,  10, "", new EntFont(EntFont.FontTypes.MainParagraph, Font.BOLD, 12, Color.BLUE), null);
      	
-     	MainMenuUIComponents.add(new EntButton(-0.16f, 0.05f, 48, 15, "Multiplayer", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.orange), bigButtonTexture));
+    	IngameUIComponents.add(chatWindow);
+    	IngameUIComponents.add(chatTextbox);
+    	FPSLabel = new EntLabel(50, 150, "0", new EntFont(EntFont.FontTypes.MainParagraph, Font.BOLD, 14));
+    	IngameUIComponents.add(FPSLabel);
+    	
+     	MainMenuUIComponents.add(new EntButton(-0.16f, 0.05f, 48, 15, "Multiplayer", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.orange), bigButtonTexture,
+     			new UIAction() {public void Activate(){
+	     				NetworkManager.JoinGame();
+	     				Game.GetInstance().SetGameState(GameState.IN_GAME);
+     				}
+     			}
+     	));
+     	
+     	
      	LoginScreenUIComponents.add(new EntTextbox(-0.155f, 0.05f, 15, 8, "", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black), textboxTexture));
      	LoginScreenUIComponents.add(new EntTextbox(-0.155f, -0.06f, 15, 8, "", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black), textboxTexture));
      	LoginScreenUIComponents.add(new EntLabel(555, 415, "Username", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black)));
      	LoginScreenUIComponents.add(new EntLabel(555, 320, "Password", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black)));
      	
-     	
-     	LoginScreenUIComponents.add(new EntButton(-0.155f, -0.155f, 85, 28, "Login", new EntFont(FontTypes.MainParagraph, Font.BOLD, 22, Color.black), bigButtonTexture));
+     	LoginScreenUIComponents.add(new EntButton(-0.155f, -0.155f, 85, 28, "Login", new EntFont(FontTypes.MainParagraph, Font.BOLD, 22, Color.black), bigButtonTexture,
+     			new UIAction() {public void Activate(){
+     				Game.GetInstance().SetGameState(GameState.MAIN_MENU);
+ 				}
+ 			}
+ 	));
 
-    	
+     	SetGameState(GameState.LOGIN);
      	
      	int viewport[] = new int[4];
         gl.glGetIntegerv(GL2.GL_VIEWPORT, viewport, 0);
         realGameHeight = viewport[3];
     }
  
-    
-   
-    float x = 0;
     public void display(GLAutoDrawable gLDrawable) 
     {
 		gl.glMatrixMode(GL2.GL_PROJECTION);	//Switch to camera adjustment mode
     	gl.glLoadIdentity();
-    	glu.gluPerspective(45, AspectRatio, 1, 100);
+    	glu.gluPerspective(45, aspectRatio, 1, 100);
     	gl.glMatrixMode(GL2.GL_MODELVIEW);	//Switch to hand adjustment mode
 		
-    	switch (Gamestate)
+    	switch (gamestate)
     	{
     		case LOGIN:
 	    		gl.glLoadIdentity();   		
@@ -513,9 +365,9 @@ public class Game implements GLEventListener  {
     			 //     ---------------------------------         DRAW OTHERS       ------------------------------------------
     			 
     			 board.bind(gl);
-    	    	 glHelper.DrawTable(gl, -BOARD_WIDTH/2, BOARD_HEIGHT);
-    	    	 glHelper.DrawDeck(gl, -3.0f, 0.5f, 1.0f);
-    	    	 glHelper.DrawDeck(gl, 3.0f, 0.5f, 10.0f);
+    	    	 GLHelper.DrawTable(gl, -BOARD_WIDTH/2, BOARD_HEIGHT);
+    	    	 GLHelper.DrawDeck(gl, -3.0f, 0.5f, 1.0f);
+    	    	 GLHelper.DrawDeck(gl, 3.0f, 0.5f, 10.0f);
     	    	 
     			 gl.glPopMatrix();
     			 
@@ -523,10 +375,9 @@ public class Game implements GLEventListener  {
     			 
     			 for(Card ca : cardsToRender)
     			 {
-    				glHelper.DrawCard(gl, glu, ca);
+    				GLHelper.DrawCard(gl, glu, ca);
     				ca.Update();
     			 }
-    			 
     			 
     			 //     ---------------------------------         DRAW UI       ------------------------------------------
     			 gl.glPushMatrix();
@@ -542,9 +393,9 @@ public class Game implements GLEventListener  {
     	 		 
     			 
     	    	 c++;
-    	         for (EntUIComponent c : IngameUIComponents)
+    	         for (EntUIComponent ui : IngameUIComponents)
     	         {
-    	         	c.Render(this);
+    	        	 ui.Render(this);
     	         }
     	         if (c == 120)
     	 		 {
@@ -565,74 +416,18 @@ public class Game implements GLEventListener  {
     	        if (rotator >= 360f)
     	         	rotator = 0f;
     	        
-    	       
-    	       
-    	        //     ---------------------------------         2D CALCULATIONS      ------------------------------------------
-    	        /*
-    	        int x = EntMouseListener.MouseX, 
-    	        	y = EntMouseListener.MouseY;
-    	   //     System.out.println(x);
-    	   //     System.out.println(y);
-    	       
-    	        int viewport[] = new int[4];
-    	        double mvmatrix[] = new double[16];
-    	        double projmatrix[] = new double[16];
-    	        int realy = 0;// GL y coord pos
-    	        double wcoord[] = new double[4];// wx, wy, wz;// returned xyz coords
-    	        double wcoord2[] = new double[4];// wx, wy, wz;// returned xyz coords
-    	        
-    	        
-    	        gl.glGetIntegerv(GL2.GL_VIEWPORT, viewport, 0);
-    	        gl.glGetDoublev(GL2.GL_MODELVIEW_MATRIX, mvmatrix, 0);
-    	        gl.glGetDoublev(GL2.GL_PROJECTION_MATRIX, projmatrix, 0);
-    	        // note viewport[3] is height of window in pixels 
-    	        realy = realGameHeight - (int) y - 1;
-    	    //    System.out.println("Coordinates at cursor are (" + x + ", " + realy);
-    	        
-    	        
-    	        
-    	        
-    	        glu.gluUnProject((double) x, (double) realy, 0.0, //
-    	            mvmatrix, 0,
-    	            projmatrix, 0, 
-    	            viewport, 0, 
-    	            wcoord, 0);
-    	
-    	        
-    	        glu.gluUnProject((double) x, (double) realy, 1.0, //
-    	            mvmatrix, 0,
-    	            projmatrix, 0,
-    	            viewport, 0, 
-    	            wcoord2, 0);
-    	        */
-    	      /*  gl.glBegin(GL2.GL_QUADS);
-    	        
-    	        	gl.glVertex3f(0.0f,0.0f,0.0f);
-    	        	gl.glVertex3f(0.3f,0.0f,0.0f);
-    	        	gl.glVertex3f(0.3f,0.3f,0.0f);
-    	        	gl.glVertex3f(0.0f,0.3f,0.0f);
-    	        gl.glEnd();*/
-    	        
-    	        
     	        gl.glEnable(GL2.GL_TEXTURE_2D);     
     			break;
     	}
     	gl.glFlush();		
-    		
-	    
-
 	}
     
     public void displayChanged(GLAutoDrawable gLDrawable, boolean modeChanged, boolean deviceChanged) 
     {
-    	//System.out.println("displayChanged called TEST TEST");
     }
- 
-  
  
     public void reshape(GLAutoDrawable gLDrawable, int x, int y, int width, int height) 
     {
-    //	System.out.println("reshape() called: x = "+x+", y = "+y+", width = "+width+", height = "+height);
         final GL2 gl = gLDrawable.getGL().getGL2();
  
         if (height <= 0) // avoid a divide by zero error!
@@ -640,14 +435,6 @@ public class Game implements GLEventListener  {
             height = 1;
         }
         
-        final float h = (float) width / (float) height;
- 
-      /*  gl.glViewport(0, 0, width, height);
-        gl.glMatrixMode(GL2.GL_PROJECTION);
-        gl.glLoadIdentity();
-        glu.gluPerspective(45.0f, h, 1.0, 20.0);
-        gl.glMatrixMode(GL2.GL_MODELVIEW);
-        gl.glLoadIdentity();*/
     	int viewport[] = new int[4];
         gl.glGetIntegerv(GL2.GL_VIEWPORT, viewport, 0);
         realGameHeight = viewport[3];
@@ -655,10 +442,14 @@ public class Game implements GLEventListener  {
         int view[] = new int[4];
 	    double model[] = new double[16];
 	    double proj[] = new double[16];
-		 Game.gl.glGetIntegerv(GL2.GL_VIEWPORT, view, 0);
-		 Game.gl.glGetDoublev(GL2.GL_MODELVIEW_MATRIX, model, 0);
-		 Game.gl.glGetDoublev(GL2.GL_PROJECTION_MATRIX, proj, 0);
+		gl.glGetIntegerv(GL2.GL_VIEWPORT, view, 0);
+		gl.glGetDoublev(GL2.GL_MODELVIEW_MATRIX, model, 0);
+		gl.glGetDoublev(GL2.GL_PROJECTION_MATRIX, proj, 0);
         
+		for (EntUIComponent uic : LoginScreenUIComponents)
+        {
+    		uic.OnResize(view, model, proj);
+        }
         for (EntUIComponent uic : MainMenuUIComponents)
         {
     		uic.OnResize(view, model, proj);
@@ -667,36 +458,126 @@ public class Game implements GLEventListener  {
         {
     		uic.OnResize(view, model, proj);
         }
-        
     }
  
- 
-	public void dispose(GLAutoDrawable arg0) 
+    //openGL specific cleanup code
+	public void dispose(GLAutoDrawable arg0)
 	{
 		animator.stop();
-		/* RUN THIS
-		
-		 Assert.assertFalse(animator.isAnimating());
-		 Assert.assertFalse(animator.isStarted());
-		
-		 Assert.assertEquals(true,  AWTRobotUtil.waitForRealized(glWindow, false));*/
 	}
 
-
+	//All non-openGL cleanup code
 	public void Cleanup() {
-		nwm.Disconnect();
+		NetworkManager.Disconnect();
 	}
 
-
-	public EntUIComponent CheckUICollision() {
-
-		 
+    public void ShowCard(Card card)
+	{
+		cardsToRender.add(card);
+		card.SetGLMIndex(cardsToRender.size()-1);
+	}
+	
+	public void RemoveCard(Card card)
+	{
+		cardsToRender.remove(card.GetGLMIndex());
+		int decrementFrom = card.GetGLMIndex();
+		card.SetGLMIndex(0);
+		for (int i = decrementFrom; i < cardsToRender.size(); i++)
+		{
+			cardsToRender.get(i).SetGLMIndex(i);
+		}
+	}
+    
+	public Card CheckCardCollision()
+	{
+		//NOTE: Depth testing not tested, and only tests for card center
+		Card rCard = null;
 		
-		if (Gamestate == GameState.MAIN_MENU || Gamestate == GameState.LOGIN)
+		double  px = (double)EntMouseListener.MouseX, 
+				py = (double)(EntMouseListener.MouseY);
+		for(Card ca : cardsToRender)
+		{
+			// This code was copied and modified with permission, i can't remember all the details (Work out later)
+			// Each cards rectangle are divided into two rectangles that are checked for intersection with the mouse position
+			double  x1 = ca.GetWinX(0),	// triangle vertice coordinates
+					y1 = ca.GetWinY(0),
+					x2 = ca.GetWinX(1),
+					y2 = ca.GetWinY(1),
+					x3 = ca.GetWinX(2),
+					y3 = ca.GetWinY(2);
+			for (int i = 0; i < 2; i++)	//Do for the two triangles
+			{
+				double dABx = x2-x1, 
+					   dABy = y2-y1,
+					   dBCx = x3-x2,
+					   dBCy = y3-y2;
+		        	
+			   if ((dABx*dBCy - dABy*dBCx) < 0)	//Clockwise
+			   {
+			      if (dABx*(py-y1) >= dABy*(px-x1)) 
+			      {
+			    	  x2 = ca.GetWinX(3);
+					  y2 = ca.GetWinY(3);
+					  continue;
+			      }
+			      if (dBCx*(py-y2) >= dBCy*(px-x2)) 
+			      {
+			    	  x2 = ca.GetWinX(3);
+					  y2 = ca.GetWinY(3);
+					  continue;
+			      }
+			      if ((x1-x3)*(py-y3) >= (y1-y3)*(px-x3)) 
+			      {
+			    	  x2 = ca.GetWinX(3);
+					  y2 = ca.GetWinY(3);
+					  continue;
+			      }
+			   }
+			   else								// Counter clockwise
+			   {
+			      if (dABx*(py-y1) < dABy*(px-x1)) 
+			      {
+			    	  x2 = ca.GetWinX(3);
+					  y2 = ca.GetWinY(3);
+					  continue;
+			      }
+			      if (dBCx*(py-y2) < dBCy*(px-x2)) 
+			      {
+			    	  x2 = ca.GetWinX(3);
+					  y2 = ca.GetWinY(3);
+					  continue;
+			      }
+			      if ((x1-x3)*(py-y3) < (y1-y3)*(px-x3))
+			      {
+			    	  x2 = ca.GetWinX(3);
+					  y2 = ca.GetWinY(3);
+					  continue;
+			      }
+			   }
+			   
+			   if (rCard == null)
+			   {
+				   rCard = ca;
+			   }
+			   else
+			   {
+				   if (ca.GetZ() < rCard.GetZ())
+					   rCard = ca;
+			   }
+			   break;
+			}
+		}
+
+		return rCard;	// Returns null if no card was hit
+	}
+	
+	public EntUIComponent CheckUICollision() 
+	{
+		if (gamestate == GameState.MAIN_MENU || gamestate == GameState.LOGIN)
 		{
 			List<EntUIComponent> toIterate = null;
 			
-			switch (Gamestate)
+			switch (gamestate)
 			{
 			case MAIN_MENU:
 				toIterate = MainMenuUIComponents;
@@ -704,6 +585,8 @@ public class Game implements GLEventListener  {
 			case LOGIN:
 				toIterate = LoginScreenUIComponents;
 				break;
+			case IN_GAME:
+				toIterate = IngameUIComponents;
 			}
 			
 			for (EntUIComponent uic : toIterate)
@@ -748,12 +631,89 @@ public class Game implements GLEventListener  {
 			}
 		}
 		return null;
-
 	}
 
+	public GameState GetGameState() {
+		return gamestate;
+	}
+	
+	public void SetGameState(GameState state) {
+		gamestate = state;		
+		switch (gamestate)
+		{
+		case LOGIN:
+			SetFocusedUIComponent(LoginScreenUIComponents.get(0));
+			break;
+		case MAIN_MENU:
+			SetFocusedUIComponent(MainMenuUIComponents.get(0));
+			break;
+		case IN_GAME:
+			SetFocusedUIComponent(IngameUIComponents.get(0));
+			break;
+		}
+	}
 
-	public static void SetState(GameState state) {
-		Gamestate = state;		
+	public int GetRealGameHeight() {
+		return realGameHeight;
+	}
+
+	public Player GetPlayer(int i) 
+	{
+		switch (i)
+		{
+		case 0:
+			return neutralPlayer;
+		case 1:
+			return player1;
+		case 2:
+			return player2;
+		}
+		return null;
+	}
+	
+
+	public void SetPlayer(int i, Player player) 
+	{
+		switch (i)
+		{
+		case 1:
+			player1 = player;
+		case 2:
+			player2 = player;
+		}
+	}
+	
+    public int GetWidth()
+    {
+    	return gameWidth;
+    }
+    
+    public int GetHeight()
+    {
+    	return gameHeight;
+    }
+
+    public float GetAspectRatio()
+    {
+    	return aspectRatio;
+    }
+    
+	public EntTextbox GetChatTextbox() {
+		return chatTextbox;
+	}
+	
+	public EntLabel GetChatWindowlabel() {
+		return chatWindow;
+	}
+	
+	public void SetFocusedUIComponent(EntUIComponent newFocus)
+	{
+		focusedUIComponent = newFocus;
+	}
+		
+	public EntUIComponent GetFocusedUIComponent()
+	{
+		return focusedUIComponent;
 	}
 
 

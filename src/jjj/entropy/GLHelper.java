@@ -10,7 +10,6 @@ import javax.media.opengl.GL2;
 import javax.media.opengl.GLException;
 import javax.media.opengl.glu.GLU;
 
-import jjj.entropy.classes.Card;
 import jjj.entropy.ui.EntButton;
 import jjj.entropy.ui.EntTextbox;
 
@@ -19,7 +18,10 @@ import com.jogamp.opengl.util.texture.TextureIO;
 
 public class GLHelper {
 
-	private int tableModel,
+	private GLHelper(){}	//Should not be instantiated.
+	
+	
+	private static int tableModel,
 				cardModel,
 				deckModel,
 				UIModel,
@@ -31,12 +33,12 @@ public class GLHelper {
 	private static float HALF_CARD_HEIGHT;
 	private static float HALF_CARD_WIDTH;
 
-	private int viewport[] = new int[4];
-	private double mvmatrix[] = new double[16];
-	private double projmatrix[] = new double[16];
-	private double wincoord[] = new double[4];
+	private static int viewport[] = new int[4];
+	private static double mvmatrix[] = new double[16];
+	private static double projmatrix[] = new double[16];
+	private static double wincoord[] = new double[4];
 	
-	public void InitTexture(GL2 gl, Texture texture)
+	public static void InitTexture(GL2 gl, Texture texture)
 	{
 		texture.setTexParameteri(gl, GL2.GL_TEXTURE_WRAP_S, GL2.GL_REPEAT);
 		texture.setTexParameteri(gl, GL2.GL_TEXTURE_WRAP_T, GL2.GL_REPEAT);
@@ -45,7 +47,7 @@ public class GLHelper {
 				GL.GL_LINEAR_MIPMAP_LINEAR);
 	}
 	
-	public void DrawTable(GL2 gl, float x, float BOARD_HEIGHT )
+	public static void DrawTable(GL2 gl, float x, float BOARD_HEIGHT )
 	{
 		gl.glPushMatrix();
 		
@@ -55,7 +57,7 @@ public class GLHelper {
 		gl.glPopMatrix();
 	}
 	
-	public void GenerateTable(GL2 gl, float BOARD_WIDTH, float BOARD_LENGTH, float BOARD_THICKNESS)
+	public static void GenerateTable(GL2 gl, float BOARD_WIDTH, float BOARD_LENGTH, float BOARD_THICKNESS)
 	{
 		
 		tableModel = gl.glGenLists(1);
@@ -93,7 +95,7 @@ public class GLHelper {
 		 gl.glEndList();
 	}
 	
-	public void GenerateUI(GL2 gl, float screenZ, float screenWidth, float screenHeight, Texture bottomPanelTexture)
+	public static void GenerateUI(GL2 gl, float screenZ, float screenWidth, float screenHeight, Texture bottomPanelTexture)
 	{
 		
 		UIModel = gl.glGenLists(1);
@@ -121,7 +123,7 @@ public class GLHelper {
 	}
 	
 	
-	public void DrawCard(GL2 gl, GLU glu, Card card)
+	public static void DrawCard(GL2 gl, GLU glu, Card card)
 	{
 		
 		 gl.glPushMatrix();
@@ -181,7 +183,7 @@ public class GLHelper {
 		 
 	}
 	
-	public void GenerateCard(GL2 gl, Texture backSideTexture, float CARD_WIDTH, float CARD_HEIGHT, float CARD_THICKNESS)
+	public static void GenerateCard(GL2 gl, Texture backSideTexture, float CARD_WIDTH, float CARD_HEIGHT, float CARD_THICKNESS)
 	{
 		HALF_CARD_HEIGHT = CARD_HEIGHT / 2;
 		HALF_CARD_WIDTH = CARD_WIDTH / 2;
@@ -241,7 +243,7 @@ public class GLHelper {
 	}
 	
 	
-	public void DrawUI(GL2 gl)
+	public static void DrawUI(GL2 gl)
 	{
 		
 		 gl.glPushMatrix();
@@ -255,7 +257,7 @@ public class GLHelper {
 	}
 
 	
-	public void GenerateButtons(GL2 gl, Texture texture)
+	public static void GenerateButtons(GL2 gl, Texture texture)
 	{
 		texture.bind(gl);
 		BigButtonModel = gl.glGenLists(1);
@@ -277,7 +279,7 @@ public class GLHelper {
 		 gl.glEndList();
 	}
 	
-	public void GenerateTextbox(GL2 gl, Texture texture)
+	public static void GenerateTextbox(GL2 gl, Texture texture)
 	{
 	    	
 		texture.bind(gl);
@@ -295,7 +297,7 @@ public class GLHelper {
 	}
 	
 	
-	public void DrawBigButton(GL2 gl, EntButton button)
+	public static void DrawBigButton(GL2 gl, EntButton button)
 	{
 		 gl.glPushMatrix();
 		 
@@ -307,7 +309,7 @@ public class GLHelper {
 		 gl.glPopMatrix();
 	}
 	
-	public void DrawTextbox(GL2 gl, EntTextbox textbox)
+	public static void DrawTextbox(GL2 gl, EntTextbox textbox)
 	{
 		 gl.glPushMatrix();
 
@@ -317,7 +319,7 @@ public class GLHelper {
 		 gl.glPopMatrix();
 	}
 
-	public void DrawDeck(GL2 gl, float x,  float y, float z)
+	public static void DrawDeck(GL2 gl, float x,  float y, float z)
 	{
 		
 		 gl.glPushMatrix();
@@ -336,7 +338,7 @@ public class GLHelper {
 	}
 	
 	
-	public void GenerateDeck(GL2 gl, Texture backSideTexture, Texture deckSideTexture, float CARD_WIDTH, float CARD_HEIGHT, float DECK_THICKNESS)
+	public static void GenerateDeck(GL2 gl, Texture backSideTexture, Texture deckSideTexture, float CARD_WIDTH, float CARD_HEIGHT, float DECK_THICKNESS)
 	{
 		deckModel = gl.glGenLists(1);
         gl.glNewList(deckModel, GL2.GL_COMPILE);

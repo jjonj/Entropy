@@ -4,29 +4,33 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.File;
+import java.io.IOException;
+
+import javax.media.opengl.GLException;
+
+import com.jogamp.opengl.util.texture.Texture;
+import com.jogamp.opengl.util.texture.TextureIO;
 
 import jjj.entropy.classes.Enums.GameState;
 import jjj.entropy.ui.EntFont;
 import jjj.entropy.ui.EntLabel;
+import jjj.entropy.ui.EntTextbox;
 import jjj.entropy.ui.EntUIComponent;
 
 public class EntKeyListener implements KeyListener {
 
 	
-    private static EntLabel chatTypeArea;
-    private static EntLabel chatWindow;
 	
     public EntKeyListener()
     {
-    	chatWindow = new EntLabel(129, 116,  Game.CHAT_LINES, "", new EntFont(EntFont.FontTypes.MainParagraph, Font.BOLD, 12, Color.BLUE));
-    	chatTypeArea = new EntLabel(122, 10, 1, "",  new EntFont(EntFont.FontTypes.MainParagraph, Font.BOLD, 12, Color.BLUE));
     }
     
 	@Override
 	public void keyPressed(KeyEvent e) {
 		
 		
-int keyCode = e.getKeyCode();
+		int keyCode = e.getKeyCode();
 	
 			
 
@@ -47,25 +51,27 @@ int keyCode = e.getKeyCode();
 	            break;
 	        case KeyEvent.VK_ENTER:
 	        	
-	        //	if (e.getKeyChar() != '\n')
-	        	if (chatTypeArea.GetText() != "")
-	        		chatWindow.AppendText("You:\u00A0" + chatTypeArea.GetText() + '\n');	// \f is replaced with a space
-	        	chatTypeArea.SetText("");
+	        	EntTextbox chatTextbox = Game.GetInstance().GetChatTextbox();
+	        	if (chatTextbox.GetText() != "")
+	        		Game.GetInstance().GetChatWindowlabel().AppendText("You:\u00A0" + chatTextbox.GetText() + '\n');	// \f is replaced with a space
+	        	chatTextbox.SetText("");
 	            break;
 	        case KeyEvent.VK_BACK_SPACE:
-	        	chatTypeArea.RemoveFromEnd();
+	        	EntUIComponent ui = Game.GetInstance().GetFocusedUIComponent();
+				if (ui instanceof EntTextbox)
+					((EntTextbox) ui).RemoveFromEnd();
 	        	break;
 	        case KeyEvent.VK_ESCAPE:
-	        	switch (Game.Gamestate)
+	        	switch (Game.GetInstance().GetGameState())
 	        	{
 	        	case LOGIN:
 	        		System.exit(0);
 	        		break;
 	        	case MAIN_MENU:
-	        		Game.SetState(GameState.LOGIN);
+	        		Game.GetInstance().SetGameState(GameState.LOGIN);
 	        		break;
 	        	case IN_GAME:
-	        		Game.SetState(GameState.MAIN_MENU);
+	        		Game.GetInstance().SetGameState(GameState.MAIN_MENU);
 	        		break;
 	        	}
 	        	
@@ -92,17 +98,12 @@ int keyCode = e.getKeyCode();
 
 		//System.out.print(Character.toString(e.getKeyChar()).replace('\n', 'å'));
 		if (e.getKeyChar() != '\n' && e.getKeyChar() != '\b')
-			chatTypeArea.AppendText(Character.toString(e.getKeyChar()));
+		{
+			EntUIComponent ui = Game.GetInstance().GetFocusedUIComponent();
+			if (ui instanceof EntTextbox)
+				((EntTextbox) ui).AppendText(Character.toString(e.getKeyChar()));
+		}
 		
-		
 	}
-
-	public static EntUIComponent GetChatTypelabel() {
-		return chatTypeArea;
-	}
-	public static EntUIComponent GetChatWindowlabel() {
-		return chatWindow;
-	}
-	
 	
 }

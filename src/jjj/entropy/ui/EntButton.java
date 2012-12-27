@@ -24,6 +24,8 @@ public class EntButton extends EntUIComponent{
 		SMALL, MEDIUM, BIG
 	}
 	
+	UIAction onClick;
+	
 	private String text;
 	private EntFont  font;
 	private Texture texture;
@@ -40,31 +42,31 @@ public class EntButton extends EntUIComponent{
 				textY;
 	
 	
-	public EntButton(float x, float y, int xOffset, int yOffset, String text, Texture texture)
+	public EntButton(float x, float y, int xOffset, int yOffset, String text, Texture texture, UIAction action)
 	{
-		this(x, y, xOffset, yOffset, text, new EntFont(EntFont.FontTypes.MainParagraph, Font.BOLD, 24), ButtonSize.BIG, texture);
+		this(x, y, xOffset, yOffset, text, new EntFont(EntFont.FontTypes.MainParagraph, Font.BOLD, 24), ButtonSize.BIG, texture, action);
 	}
-	public EntButton(float x, float y, int xOffset, int yOffset, String text, EntFont font, Texture texture)
+	public EntButton(float x, float y, int xOffset, int yOffset, String text, EntFont font, Texture texture, UIAction action)
 	{
-		this(x, y, xOffset, yOffset, text, font, ButtonSize.BIG, texture);
+		this(x, y, xOffset, yOffset, text, font, ButtonSize.BIG, texture, action);
 	}
-	public EntButton(float x, float y, int xOffset, int yOffset, String text, ButtonSize size, Texture texture)
+	public EntButton(float x, float y, int xOffset, int yOffset, String text, ButtonSize size, Texture texture, UIAction action)
 	{
-		this(x, y, xOffset, yOffset, text, new EntFont(EntFont.FontTypes.MainParagraph, Font.BOLD, 24), size, texture);
+		this(x, y, xOffset, yOffset, text, new EntFont(EntFont.FontTypes.MainParagraph, Font.BOLD, 24), size, texture, action);
 	}
-	public EntButton(float x, float y, int xOffset,int yOffset, String text, EntFont font, ButtonSize size, Texture texture)
+	public EntButton(float x, float y, int xOffset,int yOffset, String text, EntFont font, ButtonSize size, Texture texture, UIAction action)
 	{
 		super(x, y);
 		this.text = text;
 		this.font = font;
 		this.buttonSize = size;
-
+		this.onClick = action;
 
 		this.texture = texture;
 
 		 Game.gl.glMatrixMode(GL2.GL_PROJECTION);	//Switch to camera adjustment mode
 		 Game.gl.glLoadIdentity();
-		 Game.glu.gluPerspective(45, Game.AspectRatio, 1, 100);
+		 Game.glu.gluPerspective(45, Game.GetInstance().GetAspectRatio(), 1, 100);
 		 Game.gl.glMatrixMode(GL2.GL_MODELVIEW);	//Switch to hand adjustment mode
 		
 		 Game.gl.glLoadIdentity();   		
@@ -140,7 +142,7 @@ public class EntButton extends EntUIComponent{
 		{
 		case BIG:
 			texture.bind(Game.gl);
-			game.getGLHelper().DrawBigButton(Game.gl, this);
+			GLHelper.DrawBigButton(Game.gl, this);
 			font.Render(game, textX + textOffsetX, textY - textOffsetY, text);
 			break;
 		default:
@@ -210,19 +212,8 @@ public class EntButton extends EntUIComponent{
 	}
 	
 	@Override
-	public void Activate(Game game)
+	public void Activate()
 	{
-		switch (text)
-		{
-		case "Multiplayer":
-			NetworkManager.JoinGame();
-			
-			game.Gamestate = GameState.IN_GAME;
-			break;
-		case "Login":
-			
-			game.Gamestate = GameState.MAIN_MENU;
-			break;
-		}
+		onClick.Activate();
 	}
 }

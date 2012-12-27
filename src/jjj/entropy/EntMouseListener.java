@@ -8,9 +8,8 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
 
-import jjj.entropy.classes.Card;
-import jjj.entropy.classes.Card.Facing;
-import jjj.entropy.classes.Card.Status;
+import jjj.entropy.Card.Facing;
+import jjj.entropy.Card.Status;
 import jjj.entropy.classes.Enums.GameState;
 import jjj.entropy.classes.Enums.Life;
 import jjj.entropy.classes.Enums.Zone;
@@ -33,19 +32,27 @@ public class EntMouseListener implements MouseListener, MouseMotionListener, Mou
 	
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		// TODO Auto-generated method stub
 		
-		if (game.Gamestate == GameState.IN_GAME)
+		Game game = Game.GetInstance();
+		
+		switch (game.GetGameState())
 		{
+		case LOGIN:
+			//Case will fall through to MAIN_MENU as intended
+		case MAIN_MENU:
+			EntUIComponent uicmm = game.CheckUICollision();
+			if (uicmm != null)
+				uicmm.Activate();
+			break;
+		case IN_GAME:
 			Card c = game.CheckCardCollision();
-			
 			
 			if (c != null)
 			{
 				if (c.glMIndex == 0)
 				{
 					c = new Card(-3, 0.51f, 1.0f, 
-							Facing.DOWN, game.TinidQueen, Status.IN_ZONE, Game.Player1);
+							Facing.DOWN, game.TinidQueen, Status.IN_ZONE, Game.GetInstance().GetPlayer(1));
 					
 					game.ShowCard(c);
 					
@@ -108,12 +115,7 @@ public class EntMouseListener implements MouseListener, MouseMotionListener, Mou
 					
 				
 			}
-		}
-		else if (Game.Gamestate == GameState.MAIN_MENU || Game.Gamestate == GameState.LOGIN)
-		{
-			EntUIComponent uic = game.CheckUICollision();
-			if (uic != null)
-				uic.Activate(game);
+			break;
 		}
 	}
 
@@ -151,7 +153,7 @@ public class EntMouseListener implements MouseListener, MouseMotionListener, Mou
 	public void mouseMoved(MouseEvent e) {
 		
 		MouseX = e.getX();
-		MouseY = Game.realGameHeight - e.getY();
+		MouseY = Game.GetInstance().GetRealGameHeight() - e.getY();
 	}
 
 	@Override

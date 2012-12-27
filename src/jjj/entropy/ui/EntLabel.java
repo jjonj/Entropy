@@ -42,7 +42,7 @@ public class EntLabel extends EntUIComponent{
 	public void Render(Game game)
 	{
 		if (boxed)
-			font.RenderBox(game, (int)x, (int)y, maxLines, text);
+			font.RenderBox(game, (int)x, (int)y, maxLines, Game.CHAT_LINE_WIDTH, text);
 		else
 			font.Render(game, (int)x, (int)y, text);
 	}

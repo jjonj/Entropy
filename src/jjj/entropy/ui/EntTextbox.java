@@ -5,6 +5,7 @@ import java.awt.Color;
 
 import javax.media.opengl.GL2;
 
+import jjj.entropy.GLHelper;
 import jjj.entropy.Game;
 import jjj.entropy.NetworkManager;
 import jjj.entropy.classes.Enums.GameState;
@@ -27,6 +28,11 @@ public class EntTextbox extends EntUIComponent{
 				textOffsetY;
 	private Texture texture;
 	
+	private int textX,
+				textY;
+
+	
+	
 	public EntTextbox(float x, float y, int xOffset, int yOffset, Texture texture)
 	{
 		this(x, y, xOffset, yOffset, "", new EntFont(EntFont.FontTypes.MainParagraph, Font.PLAIN, 16), texture);
@@ -45,7 +51,7 @@ public class EntTextbox extends EntUIComponent{
 		
 		Game.gl.glMatrixMode(GL2.GL_PROJECTION);	//Switch to camera adjustment mode
 		Game.gl.glLoadIdentity();
-		Game.glu.gluPerspective(45, Game.AspectRatio, 1, 100);
+		Game.glu.gluPerspective(45, Game.GetInstance().GetAspectRatio(), 1, 100);
 		Game.gl.glMatrixMode(GL2.GL_MODELVIEW);	//Switch to hand adjustment mode
 		
 		Game.gl.glLoadIdentity();   		
@@ -75,6 +81,9 @@ public class EntTextbox extends EntUIComponent{
        this.screenLeft = (int) winPos[0];
        this.screenTop = (int) winPos[1];
        
+       this.textX = screenLeft;
+       this.textY = screenTop;
+       
        
        double right = 0, bottom = 0;
 		right = (double) x+Game.TEXTBOX_WIDTH;
@@ -98,9 +107,11 @@ public class EntTextbox extends EntUIComponent{
 	
 	public void Render(Game game)
 	{
-		texture.bind(Game.gl);
-		game.getGLHelper().DrawTextbox(Game.gl, this);
-		font.Render(game, screenLeft + textOffsetX, screenTop - textOffsetY, text);
+		Game.gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+		if (texture != null)
+			texture.bind(Game.gl);
+		 GLHelper.DrawTextbox(Game.gl, this);
+		font.RenderBox(game, textX + textOffsetX, textY - textOffsetY, 1, Game.TEXTBOX_LINE_WIDTH, text);
 	}
 	
 	public String GetText()
@@ -138,8 +149,44 @@ public class EntTextbox extends EntUIComponent{
 		return screenTop;
 	}
 	@Override
-	public void Activate(Game game)
+	public void Activate()
 	{
-		game.SetFocusedUIComponent(this);
+		Game.GetInstance().SetFocusedUIComponent(this);
 	}
-}
+	
+	@Override
+	public void OnResize(int[] view, double[] model , double[] proj) 
+	{ 
+	
+	    double winPos[] = new double[4];// wx, wy, wz;// returned xyz coords
+	    
+
+        Game.glu.gluProject((double) x, (double) y, 0f, //
+       		 model, 0,
+       		 proj, 0, 
+       		 view, 0, 
+       		 winPos, 0);
+       
+       this.screenLeft = (int) winPos[0];
+       this.screenTop = (int) winPos[1];
+       
+       
+       double right = 0, bottom = 0;
+	   right = (double) x+Game.TEXTBOX_WIDTH;
+	   bottom = (double) y-Game.TEXTBOX_HEIGHT;
+       
+       Game.glu.gluProject(right, bottom, 0f, //
+      		 model, 0,
+      		 proj, 0, 
+      		 view, 0, 
+      		 winPos, 0);
+      
+      this.screenRight = (int) winPos[0];
+      this.screenBottom =(int) winPos[1];
+      
+      this.w = this.screenRight - this.screenLeft;
+      this.h = this.screenTop - this.screenBottom ;
+	}
+
+	
+} 
