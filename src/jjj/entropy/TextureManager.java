@@ -19,7 +19,7 @@ public class TextureManager
 {
 
 	private TextureManager(){} //Shouldn't be instantiated.
-	
+
 	private static String[] texturePaths = {	//Load from file instead! (Which probably means singleton, which probably means all statics = singleton
 		"resources/textures/templates/Crawnid/AnidQueen.png",
 		"resources/textures/templates/Crawnid/CrawnidWorker.png",

@@ -141,8 +141,11 @@ public class EntButton extends EntUIComponent{
 		switch (buttonSize)
 		{
 		case BIG:
-			texture.bind(Game.gl);
-			GLHelper.DrawBigButton(Game.gl, this);
+			if (texture != null)
+			{
+				texture.bind(Game.gl);
+				GLHelper.DrawBigButton(Game.gl, this);
+			}
 			font.Render(game, textX + textOffsetX, textY - textOffsetY, text);
 			break;
 		default:

@@ -259,21 +259,14 @@ public class GLHelper {
 	
 	public static void GenerateButtons(GL2 gl, Texture texture)
 	{
-		texture.bind(gl);
 		BigButtonModel = gl.glGenLists(1);
         gl.glNewList(BigButtonModel, GL2.GL_COMPILE);
 
 		 gl.glBegin(GL2.GL_QUADS);
-		/* 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( -0.12f, -0.035f, 0 );
-		    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f( 0.12f, -0.035f, 0 );
-		    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(0.12f, 0.035f, 0 );
-		    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-0.12f, 0.035f, 0 );*/
 		 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(0, 0, 0f );
 		    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(Game.BIG_BUTTON_WIDTH, 0, 0f );
 		    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(Game.BIG_BUTTON_WIDTH, -Game.BIG_BUTTON_HEIGHT, 0f  );
 		    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(0, -Game.BIG_BUTTON_HEIGHT, 0f  );
-	
-		    
 		 gl.glEnd();
 		 
 		 gl.glEndList();
@@ -303,8 +296,7 @@ public class GLHelper {
 		 
 
 		 gl.glTranslatef(button.GetX(), button.GetY(), 0);
-	//	 gl.glTranslatef(button.GetGLX(), 0.3f, 0);
-
+		 
 		 gl.glCallList(BigButtonModel);
 		 gl.glPopMatrix();
 	}

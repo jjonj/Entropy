@@ -51,23 +51,28 @@ public class EntMouseListener implements MouseListener, MouseMotionListener, Mou
 			{
 				if (c.glMIndex == 0)
 				{
-					c = new Card(-3, 0.51f, 1.0f, 
-							Facing.DOWN, game.TinidQueen, Status.IN_ZONE, Game.GetInstance().GetPlayer(1));
+				//	c = new Card(-3, 0.51f, 1.0f, 
+				//			Facing.DOWN, game.TinidQueen, Status.IN_ZONE, Game.GetInstance().GetPlayer(1));
+					c = game.GetPlayer(1).GetDeck().GameGetTopCard();
 					
-					game.ShowCard(c);
+					if (c == null)	//If deck is empty
+						return;
+					
+					if (Game.GetInstance().GetPlayer(1).GetDeck() == Game.GetInstance().GetPlayer(2).GetDeck())
+						System.exit(1);
+					
+					c.MoveToDeck(1);
+					game.ShowCard(c);	//Show if not already shown (HashSet implementation makes sure that it isn't added twice)
+					
 					
 				}
 				else if (c.glMIndex == 1)
 				{
 					return;
-			/*		c = new Card(3, 0.51f, 10.0f, 
-							Facing.DOWN, game.TinidQueen, Status.IN_ZONE, Game.Player2);
-					
-					game.ShowCard(c);
-				*/}
-				//c.SetTarget(c.GetX(), 0, c.GetZ()+3, 90, 0, 0);
-				
-				
+
+				}
+
+				NetworkManager.GetInstance().SendAction(c.GetID(), Game.mode, Game.modeNumber);
 	
 				switch(Game.mode)
 				{

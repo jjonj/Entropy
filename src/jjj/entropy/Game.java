@@ -8,8 +8,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Set;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
@@ -59,7 +61,7 @@ public class Game implements GLEventListener  {
 	public static int mode;
     public static int modeNumber;
     
-    private static GameState gamestate;;
+    private static GameState gamestate;
     
     private static Game instance = null;
 	private String title;
@@ -85,7 +87,7 @@ public class Game implements GLEventListener  {
     private List<EntUIComponent> LoginScreenUIComponents;	
     private EntUIComponent focusedUIComponent;
     private EntLabel FPSLabel;
-    private List<Card> cardsToRender;
+    private Set<Card> cardsToRender;
     private EntTextbox chatTextbox;
     private EntLabel chatWindow;
     private EntTextbox usernameTextbox,
@@ -106,6 +108,8 @@ public class Game implements GLEventListener  {
     public Texture textboxTexture;
 
     public CardTemplate TinidQueen;	//Temporary
+	private int gameID = -1;
+	private int iteratingCardsToRender = 0;
     
     
     public static void InitSingleton(String title, int width, int height, GLCanvas canvas)
@@ -139,7 +143,7 @@ public class Game implements GLEventListener  {
         animator.add(canvas);
         animator.start();
 
-        cardsToRender = new ArrayList<Card>();
+        cardsToRender = new HashSet<Card>();
     	IngameUIComponents = new ArrayList<EntUIComponent>();
     	MainMenuUIComponents = new ArrayList<EntUIComponent>();
         LoginScreenUIComponents = new ArrayList<EntUIComponent>();
@@ -240,7 +244,6 @@ public class Game implements GLEventListener  {
      	MainMenuUIComponents.add(new EntButton(-0.16f, 0.05f, 48, 15, "Multiplayer", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.orange), bigButtonTexture,
      			new UIAction() {public void Activate(){
 	     				NetworkManager.GetInstance().JoinGame();
-	     				Game.GetInstance().SetGameState(GameState.IN_GAME);
      				}
      			}
      	));
@@ -263,7 +266,7 @@ public class Game implements GLEventListener  {
  			}
  	));
 
-     	SetGameState(GameState.LOGIN);
+     	SetGameState(Const.INIT_GAMESTATE);
      	
      	int viewport[] = new int[4];
         gl.glGetIntegerv(GL2.GL_VIEWPORT, viewport, 0);
@@ -331,6 +334,16 @@ public class Game implements GLEventListener  {
 		         }
     			break;
     		case IN_GAME:
+    			
+    			//   -------------------------------------- LOAD ANY MISSING TEXTURES   ----------------------------------
+    			
+    			
+    			if (Const.INIT_GAMESTATE == GameState.LOGIN)	//Check that makes ingame debugging easier
+    			{
+	    			player1.GetDeck().LoadTextures(gl);
+	    			player2.GetDeck().LoadTextures(gl);
+    			}
+    			
     			 //     ---------------------------------         INIT FRAME       ------------------------------------------
 
     	    	gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
@@ -378,12 +391,13 @@ public class Game implements GLEventListener  {
     			 gl.glPopMatrix();
     			 
     			 //     ---------------------------------        DRAW/UPDATE CARDS      ------------------------------------------
-    			 
+    			 ++iteratingCardsToRender;
     			 for(Card ca : cardsToRender)
     			 {
     				GLHelper.DrawCard(gl, glu, ca);
     				ca.Update();
     			 }
+    			 --iteratingCardsToRender;
     			 
     			 //     ---------------------------------         DRAW UI       ------------------------------------------
     			 gl.glPushMatrix();
@@ -401,14 +415,13 @@ public class Game implements GLEventListener  {
     	    	 c++;
     	         for (EntUIComponent ui : IngameUIComponents)
     	         {
-    	        	 ui.Render(this);
+    	         	 ui.Render(this);
     	         }
     	         if (c == 120)
     	 		 {
     	 			try {
     	 	    		FPSLabel.SetText(FPSCounter.toString("UTF8"));
     	 			} catch (UnsupportedEncodingException e) {
-    	 				
     	 				// TODO Auto-generated catch block
     	 				e.printStackTrace();
     	 			}
@@ -479,21 +492,36 @@ public class Game implements GLEventListener  {
 
     public void ShowCard(Card card)
 	{
+    	while (iteratingCardsToRender > 0)	//Busywait until the cards have been iterated so we don't get an exception from modifying while iterating
+		{
+		}
 		cardsToRender.add(card);
 		card.SetGLMIndex(cardsToRender.size()-1);
 	}
 	
 	public void RemoveCard(Card card)
 	{
-		cardsToRender.remove(card.GetGLMIndex());
+		while (iteratingCardsToRender > 0)	//Busywait until the cards have been iterated so we don't get an exception from modifying while iterating
+		{
+		}
+		cardsToRender.remove(card);
+		
+		/*cardsToRender.remove(card.GetGLMIndex());		LIST IMPLEMENTATION
 		int decrementFrom = card.GetGLMIndex();
 		card.SetGLMIndex(0);
 		for (int i = decrementFrom; i < cardsToRender.size(); i++)
 		{
 			cardsToRender.get(i).SetGLMIndex(i);
-		}
+		}*/
 	}
     
+	public void StartGame()
+	{
+		player1.GetDeck().GameResetDeck();
+		player2.GetDeck().GameResetDeck();
+		SetGameState(GameState.IN_GAME);
+	}
+	
 	public Card CheckCardCollision()
 	{
 		//NOTE: Depth testing not tested, and only tests for card center
@@ -501,6 +529,7 @@ public class Game implements GLEventListener  {
 		
 		double  px = (double)EntMouseListener.MouseX, 
 				py = (double)(EntMouseListener.MouseY);
+		++iteratingCardsToRender;
 		for(Card ca : cardsToRender)
 		{
 			// This code was copied and modified with permission, i can't remember all the details (Work out later)
@@ -573,6 +602,7 @@ public class Game implements GLEventListener  {
 			   break;
 			}
 		}
+		--iteratingCardsToRender;
 
 		return rCard;	// Returns null if no card was hit
 	}
@@ -720,6 +750,15 @@ public class Game implements GLEventListener  {
 	public EntUIComponent GetFocusedUIComponent()
 	{
 		return focusedUIComponent;
+	}
+
+	
+	public int GetGameID()
+	{
+		return gameID;
+	}
+	public void SetGameID(int gameID) {
+		this.gameID = gameID;
 	}
 
 

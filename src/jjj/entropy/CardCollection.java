@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import javax.media.opengl.GL2;
+
 import jjj.entropy.*;
 import jjj.entropy.classes.EntUtilities;
 
@@ -18,6 +20,7 @@ public class CardCollection {
 		cards = new ArrayList<Card>();
 	}
 	
+	
 	public void AddCard(Card card)
 	{
 		cards.add(card);
@@ -27,9 +30,18 @@ public class CardCollection {
 		cards.remove(index);
 	}
 	
+	public void LoadTextures(GL2 gl)
+	{
+		for (Card card : cards)
+		{
+			card.GetTemplate().LoadTexture(gl);
+		}
+	}
+	
+	
 	public Card GetRandomCard()
 	{
-		return cards.get(EntUtilities.GetRandom(0, cards.size()));
+		return cards.get(EntUtilities.GetRandom(0, cards.size()-1, 1));
 	}
 	
 	public int GetSize()

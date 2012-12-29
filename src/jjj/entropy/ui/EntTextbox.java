@@ -107,10 +107,13 @@ public class EntTextbox extends EntUIComponent{
 	
 	public void Render(Game game)
 	{
-		Game.gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 		if (texture != null)
-			texture.bind(Game.gl);
-		 GLHelper.DrawTextbox(Game.gl, this);
+		{
+			Game.gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+			if (texture != null)
+				texture.bind(Game.gl);
+			 GLHelper.DrawTextbox(Game.gl, this);
+		}
 		font.RenderBox(game, textX + textOffsetX, textY - textOffsetY, 1, Game.TEXTBOX_LINE_WIDTH, text);
 	}
 	

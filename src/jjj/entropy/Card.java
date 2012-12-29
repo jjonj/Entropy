@@ -31,9 +31,6 @@ public class Card {
 	
 	private CardTemplate template;
 	
-	
-	private static int NextID = 0;
-	
 
 	private float oldX, oldY, oldZ,
 				  oldRX, oldRY, oldRZ,
@@ -52,8 +49,8 @@ public class Card {
 	private double[] winX,
 				     winY;
 	
-	private int id;
-	public int glMIndex = 0;
+	private int id;	//Id is an auto incrementing value, Note that there is an individual incrementer per player so two cards can have id X, one for each player.
+	public int glMIndex = -1;
 	
 	private short zone;
 	
@@ -66,9 +63,9 @@ public class Card {
 	
 	public Card(float x, float y, float z, Facing face, CardTemplate template, Status status, Player owner)	
 	{
-		this.id = NextID;
-		NextID++;
 
+		this.id = owner.GetNextCardID();
+		
 		this.status = status;
 		
 		this.currentOwner = owner;
@@ -175,7 +172,12 @@ public class Card {
 	
 	public int Attack(Card target)
 	{
-		int dmg = template.DmgBase + EntUtilities.GetRandom(0, template.DmgDice);
+		int randToUse = -1;
+		if (currentOwner == Game.GetInstance().GetPlayer(1))
+			randToUse = 1;
+		else if (currentOwner == Game.GetInstance().GetPlayer(2))
+			randToUse = 2;
+		int dmg = template.DmgBase + EntUtilities.GetRandom(0, template.DmgDice, randToUse);
 		target.Damage(dmg);
 		return dmg;
 	}
@@ -200,9 +202,10 @@ public class Card {
 		glMIndex = index;
 	}
 	
-	
+	public int GetID() {
+		return id;
+	}
 
-	
 	public void SetTarget(float x, float y, float z, float rotX, float rotY, float rotZ)
 	{
 		
@@ -270,7 +273,7 @@ public class Card {
 	{
 		this.z = z;
 	}
-	public void Move(int x, int y, int z)
+	public void Move(float x, float y, float z)
 	{
 		this.x = x;
 		this.y = y;
@@ -373,8 +376,24 @@ public class Card {
 	}
 
 	public static Card LoadCard(int id, Player owner) throws IllegalAccessException {
-		CardTemplate template = CardTemplate.GetTempalte(id);
+		CardTemplate template = CardTemplate.GetTemplate(id);
 		return new Card(0, 0, 0, template, owner);
 	}
+
+	public void MoveToDeck(int player) {
+		if (player == 1)
+		{
+			rotX = -90;
+			Move(-3f, 0.51f, 1.0f);
+		}
+		else
+		{
+			rotX = 90;
+			rotY = 180;
+			Move(3f, 0.51f, 10.0f);
+		}
+	}
+
+	
 
 }

@@ -6,7 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+import jjj.entropy.classes.EntUtilities;
 import jjj.entropy.classes.Enums.GameState;
+import jjj.entropy.classes.Enums.Life;
+import jjj.entropy.classes.Enums.Zone;
 import jjj.entropy.messages.*;
 
 import com.esotericsoftware.kryo.Kryo;
@@ -23,6 +26,7 @@ public class NetworkManager extends Listener
 	
 	private static NetworkManager instance = new NetworkManager();
 	
+	private boolean searchingGame = false;
 	
 	public static NetworkManager GetInstance()
 	{
@@ -84,6 +88,7 @@ public class NetworkManager extends Listener
 
 	public void Disconnect() {
 		client.close();
+		searchingGame = false;
 		networkState = NetworkState.OFFLINE;
 	}
 	
@@ -101,10 +106,27 @@ public class NetworkManager extends Listener
 	
 	public void JoinGame()
 	{
-		GameMessage joinRequest = new GameMessage();
-		joinRequest.playerID = 3;
-		client.sendTCP(joinRequest);
+		if (networkState == NetworkState.LOGGED_IN && searchingGame == false)
+		{
+			searchingGame = true;
+			GameMessage joinRequest = new GameMessage();
+			joinRequest.playerID = Game.GetInstance().GetPlayer(1).GetID();
+			client.sendTCP(joinRequest);
+		}
 	}
+	
+	public void SendAction(int cardID, int mode, int modeNumber) {
+		if (networkState == NetworkState.IN_GAME)
+		{
+			ActionMessage amsg = new ActionMessage();
+			amsg.cardID = cardID;
+			amsg.mode = mode;
+			amsg.modeNumber = modeNumber;
+			amsg.playerID = Game.GetInstance().GetPlayer(1).GetID();
+			client.sendTCP(amsg);
+		}
+	}
+	
 	public void SendTextMessage(String text)
 	{
 		ChatMessage request = new ChatMessage();
@@ -155,6 +177,10 @@ public class NetworkManager extends Listener
 				networkState = NetworkState.LOGGED_IN;
 				Game.GetInstance().SetGameState(GameState.MAIN_MENU);
 			}
+			else //Recieved data is for opponent
+			{
+				Game.GetInstance().SetPlayer(2, new Player(pdm.playerID, pdm.name, pdm.deck));
+			}
 		}
 		else if (object instanceof CardDataMessage)
 		{
@@ -164,6 +190,73 @@ public class NetworkManager extends Listener
 				CardTemplate.LoadCardTemplate(s);
 			}
 		}
+		else if (object instanceof GameMessage)
+		{
+			GameMessage gmsg = (GameMessage)object;
+			if (gmsg.accepted)
+			{
+				Game.GetInstance().SetGameID(gmsg.gameID);
+				EntUtilities.SetSeed(gmsg.seed1, gmsg.seed2);
+				Game.GetInstance().StartGame();
+				networkState = NetworkState.IN_GAME;
+			}
+		}
+		else if(object instanceof ActionMessage)	//Recived action from opponent
+		{
+			ActionMessage amsg = (ActionMessage)object;
+			Player opponent = Game.GetInstance().GetPlayer(2);
+			Card card = opponent.GetDeck().GameGetCard(amsg.cardID);
+			if (card.GetGLMIndex() == -1)	//Returns the cards index in the render list and if it's -1 it was not already in the list
+			{
+				card.MoveToDeck(2);
+				Game.GetInstance().ShowCard(card);
+			}
+			switch(amsg.mode)
+			{
+			case 1:
+				switch(amsg.modeNumber)
+				{
+				case 1:
+					card.PlayToLife(Life.LIFE1, true);
+					break;
+				case 2:
+					card.PlayToLife(Life.LIFE2, true);
+					break;
+				case 3:
+					card.PlayToLife(Life.LIFE3, true);
+					break;
+				case 4:
+					card.PlayToLife(Life.LIFE4, true);
+					break;
+				}
+				break;
+			case 2:
+				card.PlayToLimbo(true);
+				break;
+			case 3:
+				switch(amsg.modeNumber)	//Note that zone numbers are reversed for the other player so they get reversed here
+				{
+				case 1:
+					card.PlayToZone(Zone.ZONE4, true);
+					break;
+				case 2:
+					card.PlayToZone(Zone.ZONE3, true);
+					break;
+				case 3:
+					card.PlayToZone(Zone.ZONE2, true);
+					break;
+				case 4:
+					card.PlayToZone(Zone.ZONE1, true);
+					break;
+				}
+				break;
+			case 4:
+				card.PlayToHand(amsg.modeNumber, true);
+				break;
+			}
+		}
 	}
+
+
 	
 }

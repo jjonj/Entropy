@@ -121,12 +121,13 @@ public class CardTemplate {
 	
 	
 	
-	public static CardTemplate GetTempalte(int id) throws IllegalAccessException
+	public static CardTemplate GetTemplate(int id) throws IllegalAccessException
 	{
 		if (allCardTemplates[id] == null)
 			throw new IllegalAccessException("Card template was refered but it was not loaded. Server should send and force a load of any cards before any card is used.");
 		return allCardTemplates[id];
 	}
+	
 	
 	//Takes an encoded card template and loads it
 	public static void LoadCardTemplate(String encodedTemplate) {
