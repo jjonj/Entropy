@@ -159,6 +159,8 @@ public class Game implements GLEventListener  {
     	gl = gLDrawable.getGL().getGL2();
     	System.out.println("init() called");
 
+    	TextureManager.LoadTextureList();	//Simply loads a string array of texturepaths from file.
+    	
    		try {
    			cardtestfront = TextureIO.newTexture(new File("resources/textures/card1.png"), true);
    			cardBackside = TextureIO.newTexture(new File("resources/textures/backside.png"), true);
@@ -264,7 +266,7 @@ public class Game implements GLEventListener  {
      				//Game.GetInstance().SetGameState(GameState.MAIN_MENU);
  				}
  			}
- 	));
+     	));
 
      	SetGameState(Const.INIT_GAMESTATE);
      	
