@@ -1,6 +1,7 @@
 package jjj.entropy;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -10,7 +11,8 @@ import jjj.entropy.*;
 import jjj.entropy.classes.EntUtilities;
 
 
-public class CardCollection {
+public class CardCollection implements Iterable<Card>
+{
 
 	
 	List<Card> cards;
@@ -47,6 +49,12 @@ public class CardCollection {
 	public int GetSize()
 	{
 		return cards.size();
+	}
+
+
+	@Override
+	public Iterator<Card> iterator() {
+		return cards.iterator();
 	}
 	
 }

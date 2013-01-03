@@ -66,7 +66,7 @@ public class NetworkManager extends Listener
 			  kryo.register(PlayerDataMessage.class);
 			  kryo.register(String[].class);
 			  kryo.register(int[].class);
-			  
+			  kryo.register(int[][].class);
 				
 			  client.addListener(this);
 				
@@ -173,13 +173,13 @@ public class NetworkManager extends Listener
 			PlayerDataMessage pdm = (PlayerDataMessage)object;
 			if (pdm.loginAccepted)
 			{
-				Game.GetInstance().SetPlayer(1, new Player(pdm.playerID, pdm.name, pdm.deck));
+				Game.GetInstance().SetPlayer(1, new Player(pdm.playerID, pdm.name, pdm.activeDeck, pdm.allCards, pdm.decks));
 				networkState = NetworkState.LOGGED_IN;
 				Game.GetInstance().SetGameState(GameState.MAIN_MENU);
 			}
 			else //Recieved data is for opponent
 			{
-				Game.GetInstance().SetPlayer(2, new Player(pdm.playerID, pdm.name, pdm.deck));
+				Game.GetInstance().SetPlayer(2, new Player(pdm.playerID, pdm.name, pdm.decks[0]));
 			}
 		}
 		else if (object instanceof CardDataMessage)
@@ -205,7 +205,9 @@ public class NetworkManager extends Listener
 		{
 			ActionMessage amsg = (ActionMessage)object;
 			Player opponent = Game.GetInstance().GetPlayer(2);
-			Card card = opponent.GetDeck().GameGetCard(amsg.cardID);
+			Card card = opponent.GetActiveDeck().GameGetCard(amsg.cardID);
+		
+
 			if (card.GetGLMIndex() == -1)	//Returns the cards index in the render list and if it's -1 it was not already in the list
 			{
 				card.MoveToDeck(2);

@@ -85,6 +85,7 @@ public class Game implements GLEventListener  {
     private List<EntUIComponent> IngameUIComponents;	
     private List<EntUIComponent> MainMenuUIComponents;	
     private List<EntUIComponent> LoginScreenUIComponents;	
+    private List<EntUIComponent> DeckScreenUIComponents;	
     private EntUIComponent focusedUIComponent;
     private EntLabel FPSLabel;
     private Set<Card> cardsToRender;
@@ -103,6 +104,7 @@ public class Game implements GLEventListener  {
     public Texture deckSideTexture;
     public Texture uiTexture;
     public Texture mainMenuTexture;
+    public Texture deckScreenTexture;
     public Texture loginScreenTexture;
     public Texture bigButtonTexture;
     public Texture textboxTexture;
@@ -147,6 +149,7 @@ public class Game implements GLEventListener  {
     	IngameUIComponents = new ArrayList<EntUIComponent>();
     	MainMenuUIComponents = new ArrayList<EntUIComponent>();
         LoginScreenUIComponents = new ArrayList<EntUIComponent>();
+        DeckScreenUIComponents = new ArrayList<EntUIComponent>();
     	
         neutralPlayer = new Player(0, "Neutral", null);
         
@@ -169,6 +172,7 @@ public class Game implements GLEventListener  {
    			deckSideTexture = TextureIO.newTexture(new File("resources/textures/deckside.png"), true);
    			uiTexture = TextureIO.newTexture(new File("resources/textures/bottomPanel.png"), true);
    			mainMenuTexture = TextureIO.newTexture(new File("resources/textures/MainMenu.png"), true);
+   			deckScreenTexture = TextureIO.newTexture(new File("resources/textures/DeckScreen.png"), true);
    			loginScreenTexture = TextureIO.newTexture(new File("resources/textures/LoginScreen.png"), true);
    			bigButtonTexture = TextureIO.newTexture(new File("resources/textures/BigButton.png"), true);
    			textboxTexture = TextureIO.newTexture(new File("resources/textures/Textbox.png"), true);
@@ -224,6 +228,7 @@ public class Game implements GLEventListener  {
      	GLHelper.InitTexture(gl, board);
      	GLHelper.InitTexture(gl, uiTexture);
      	GLHelper.InitTexture(gl, mainMenuTexture);
+     	GLHelper.InitTexture(gl, deckScreenTexture);
      	GLHelper.InitTexture(gl, loginScreenTexture);
      	GLHelper.InitTexture(gl, bigButtonTexture);
      	GLHelper.InitTexture(gl, textboxTexture);
@@ -249,7 +254,13 @@ public class Game implements GLEventListener  {
      				}
      			}
      	));
-     	
+
+     	MainMenuUIComponents.add(new EntButton(-0.16f, -0.05f, 60, 22, "My decks", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.orange), bigButtonTexture,
+     			new UIAction() {public void Activate(){
+	     				SetGameState(GameState.DECK_SCREEN);
+     				}
+     			}
+     	));
      	
      	
         usernameTextbox = new EntTextbox(-0.155f, 0.05f, 15, 8, "", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black), textboxTexture);
@@ -268,6 +279,9 @@ public class Game implements GLEventListener  {
  			}
      	));
 
+     	
+     
+     	
      	SetGameState(Const.INIT_GAMESTATE);
      	
      	int viewport[] = new int[4];
@@ -331,10 +345,85 @@ public class Game implements GLEventListener  {
 				 //     ---------------------------------         DRAW UI       ------------------------------------------
 		         for (EntUIComponent c : MainMenuUIComponents)
 		         {
-
 		         	c.Render(this);
 		         }
     			break;
+    		case DECK_SCREEN:
+    			
+
+    			//   -------------------------------------- LOAD ANY MISSING TEXTURES   ----------------------------------
+    			
+
+    			if (Const.INIT_GAMESTATE == GameState.LOGIN)	//Check that makes ingame debugging easier
+    			{
+	    			player1.GetAllCards().LoadTextures(gl);
+    			}
+    			
+    			gl.glLoadIdentity();   		
+	    		gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
+		    	gl.glLoadIdentity();
+		    	gl.glTranslatef(0,0,-1);
+	 	    	gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+	 	    	
+		 	  	 deckScreenTexture.bind(gl);
+				 gl.glBegin(GL2.GL_QUADS);
+				 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-0.74f,-0.415f, 0f);
+				 	gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(0.74f,-0.415f, 0f);
+				 	gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(0.74f,0.415f, 0f);
+				 	gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-0.74f,0.415f, 0f);
+				 gl.glEnd();
+		 	    	
+
+			//	 float xCounter = -0.1f;
+				gl.glPushMatrix();
+
+				 gl.glTranslatef(-0.6f, -0.15f, 0);
+				
+
+    			for (Deck de : Game.GetInstance().GetPlayer(1).GetAllDecks())
+				{
+    				 cardBackside.bind(gl);
+	   				 gl.glBegin(GL2.GL_QUADS);
+		   			    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f( CARD_WIDTH/15, -CARD_HEIGHT/15,  0.0f);
+					    gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-CARD_WIDTH/15, -CARD_HEIGHT/15,  0.0f);
+					    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-CARD_WIDTH/15,  CARD_HEIGHT/15, 0.0f);
+					    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f( CARD_WIDTH/15,  CARD_HEIGHT/15,  0.0f);
+	   				 gl.glEnd();
+				}
+    			
+    			 gl.glTranslatef(0f, 0.3f, 0);
+ 				
+
+				 
+			    for (Card ca : GetPlayer(1).GetAllCards())
+			    {
+			   // 	 ca.SetX(xCounter);
+			    	 
+					 
+					 ca.GetTemplate().GetTexture().bind(gl);
+
+					 gl.glTranslatef(0.15f, 0, 0);
+					
+					 
+				     gl.glBegin(GL2.GL_QUADS);
+
+			        gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f( CARD_WIDTH/15, -CARD_HEIGHT/15,  0.0f);
+				    gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-CARD_WIDTH/15, -CARD_HEIGHT/15,  0.0f);
+				    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-CARD_WIDTH/15,  CARD_HEIGHT/15, 0.0f);
+				    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f( CARD_WIDTH/15,  CARD_HEIGHT/15,  0.0f);
+				    
+					gl.glEnd();   
+					 
+			  // 	xCounter += 0.05f;
+			    }
+			    gl.glPopMatrix();
+			    
+	 	    	 //     ---------------------------------         DRAW UI       ------------------------------------------
+	 	    	for (EntUIComponent c : DeckScreenUIComponents)
+		        {
+		        	c.Render(this);
+		        }
+	 	    	break;
     		case IN_GAME:
     			
     			//   -------------------------------------- LOAD ANY MISSING TEXTURES   ----------------------------------
@@ -342,8 +431,8 @@ public class Game implements GLEventListener  {
     			
     			if (Const.INIT_GAMESTATE == GameState.LOGIN)	//Check that makes ingame debugging easier
     			{
-	    			player1.GetDeck().LoadTextures(gl);
-	    			player2.GetDeck().LoadTextures(gl);
+	    			player1.GetActiveDeck().LoadTextures(gl);
+	    			player2.GetActiveDeck().LoadTextures(gl);
     			}
     			
     			 //     ---------------------------------         INIT FRAME       ------------------------------------------
@@ -519,8 +608,8 @@ public class Game implements GLEventListener  {
     
 	public void StartGame()
 	{
-		player1.GetDeck().GameResetDeck();
-		player2.GetDeck().GameResetDeck();
+		player1.GetActiveDeck().GameResetDeck();
+		player2.GetActiveDeck().GameResetDeck();
 		SetGameState(GameState.IN_GAME);
 	}
 	

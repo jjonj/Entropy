@@ -124,7 +124,7 @@ public class CardTemplate {
 	public static CardTemplate GetTemplate(int id) throws IllegalAccessException
 	{
 		if (allCardTemplates[id] == null)
-			throw new IllegalAccessException("Card template was refered but it was not loaded. Server should send and force a load of any cards before any card is used.");
+			throw new IllegalAccessException("Card template was refered but it was not loaded. Server should send and force a load of any cards before any card is used. ID was: " + id);
 		return allCardTemplates[id];
 	}
 	

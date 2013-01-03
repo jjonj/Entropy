@@ -1,0 +1,28 @@
+create table accounts (account_id INT(8) AUTO_INCREMENT PRIMARY KEY, username varchar(50) UNIQUE NOT NULL, full_name varchar(50) NOT NULL, email varchar(50) UNIQUE NOT NULL, password varchar(50) NOT NULL, confirmcode varchar(32), creation_timestamp timestamp NOT NULL, active_deck_id INT(8));
+
+create table card_collections (collection_id INT(8) AUTO_INCREMENT PRIMARY KEY, collection_type INT(2), account_id INT(8));
+
+create table card_collection_relation (card_id INT(8), count INT(4), collection_id INT(8));
+
+
+insert into card_collections VALUES (NULL, 1, 1);
+insert into card_collection_relation VALUES (1, 1, 1);
+
+GET ALL DISTINCT CARD IDS FOR USER
+select distinct cards.* from cards 
+join card_collection_relation 
+on cards.card_id = card_collection_relation.card_id
+join card_collections
+on card_collection_relation.collection_id = card_collections.collection_id
+where account_id = 1;
+
+GET ALL CARD IDS IN THE ALL COLLECTION (type 1) FOR PLAYER
+select card_id, count from card_collection_relation
+where collection_id IN (select collection_id from card_collections where account_id = X AND collection_type = Y);	
+
+
+GET DECK IDS BY PLAYER
+select collection_id from card_collections where account_id = X AND collection_type = 2;
+
+GET CARDS IN DECK	
+select card_id, count from card_collections where collection_id = X;

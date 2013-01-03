@@ -145,6 +145,7 @@ public class GLHelper {
 		 
 		 
 		 card.GetTemplate().GetTexture().bind(gl);
+		 
 		 gl.glCallList(cardModel);
 		
 		 
@@ -152,7 +153,7 @@ public class GLHelper {
 	     gl.glGetIntegerv(GL2.GL_VIEWPORT, viewport, 0);
 	     gl.glGetDoublev(GL2.GL_MODELVIEW_MATRIX, mvmatrix, 0);
 	     gl.glGetDoublev(GL2.GL_PROJECTION_MATRIX, projmatrix, 0);
-
+	     
 	     glu.gluProject(0-HALF_CARD_WIDTH, 0-HALF_CARD_HEIGHT, 0, //
 	             mvmatrix, 0,
 	             projmatrix, 0, 

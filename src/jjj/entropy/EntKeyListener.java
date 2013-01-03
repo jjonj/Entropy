@@ -73,6 +73,9 @@ public class EntKeyListener implements KeyListener {
 	        	case IN_GAME:
 	        		Game.GetInstance().SetGameState(GameState.MAIN_MENU);
 	        		break;
+	        	case DECK_SCREEN:
+	        		Game.GetInstance().SetGameState(GameState.MAIN_MENU);
+	        		break;
 	        	}
 	        	
 	        	

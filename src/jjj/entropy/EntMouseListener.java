@@ -53,14 +53,12 @@ public class EntMouseListener implements MouseListener, MouseMotionListener, Mou
 				{
 				//	c = new Card(-3, 0.51f, 1.0f, 
 				//			Facing.DOWN, game.TinidQueen, Status.IN_ZONE, Game.GetInstance().GetPlayer(1));
-					c = game.GetPlayer(1).GetDeck().GameGetTopCard();
+					c = game.GetPlayer(1).GetActiveDeck().GameGetTopCard();
 					
 					if (c == null)	//If deck is empty
 						return;
-					
-					if (Game.GetInstance().GetPlayer(1).GetDeck() == Game.GetInstance().GetPlayer(2).GetDeck())
-						System.exit(1);
-					
+
+
 					c.MoveToDeck(1);
 					game.ShowCard(c);	//Show if not already shown (HashSet implementation makes sure that it isn't added twice)
 					
