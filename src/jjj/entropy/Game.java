@@ -165,7 +165,7 @@ public class Game implements GLEventListener  {
         neutralPlayer = new Player(0, "Neutral", null);
         
   //  	NetworkManager.Connect("10.0.0.5", 11759);
-    	NetworkManager.GetInstance().Connect("127.0.0.1", 54555);	//Temporary location
+    //	NetworkManager.GetInstance().Connect("127.0.0.1", 54555);	//Temporary location
     } 
 
     public void init(GLAutoDrawable gLDrawable) 
@@ -177,6 +177,7 @@ public class Game implements GLEventListener  {
     	
    		try {
    			cardtestfront = TextureIO.newTexture(new File("resources/textures/card1.png"), true);
+   			
    			cardBackside = TextureIO.newTexture(new File("resources/textures/backside.png"), true);
    			board = TextureIO.newTexture(new File("resources/textures/board.jpg"), true);
    			crawnidworkertexture = TextureIO.newTexture(new File("resources/textures/card2.png"), true);
@@ -202,9 +203,18 @@ public class Game implements GLEventListener  {
 				Facing.DOWN, TinidQueen, Status.IN_ZONE, neutralPlayer);
 		Card card1 = new Card(3, 0.51f, 10.0f, 
 				Facing.DOWN, TinidQueen, Status.IN_ZONE, neutralPlayer);
-		/*Card card1 = new Card(-0.5f, 0, 1.0f, 
-				Facing.UP, TinidQueen, Status.IN_ZONE);
 		
+		
+		String s = "1,Anid larvae swarm,2,0,1,1,0,1,0,3";
+		CardTemplate.LoadCardTemplate(s);
+		
+		
+		
+		player1 = new Player(0, "Ashie", new int[]{1});
+		Card card2 = new Card(-0.5f, 0, 1.0f, Facing.UP, TinidQueen, Status.IN_ZONE, player1);
+		
+		
+		/*
 		Card card2 = new Card(0.5f, 0f, 3.0f, Facing.UP, TinidQueen, Status.IN_ZONE);
 		Card card3 = new Card(1.5f, 0f, 3.0f, Facing.UP, CrawnidWorker, Status.IN_ZONE);
 		Card card4 = new Card(2.5f, 0f, 3.0f, Facing.UP, CrawnidWorker, Status.IN_ZONE);
@@ -218,7 +228,7 @@ public class Game implements GLEventListener  {
 
 		ShowCard(card0);
 		ShowCard(card1);
-       
+		ShowCard(card2);
         gl.glClearColor(0.9f, 0.78f, 0.6f, 1.0f);
         
     	gl.glEnable(GL.GL_BLEND);
@@ -264,7 +274,8 @@ public class Game implements GLEventListener  {
     	
      	MainMenuUIComponents.add(new EntButton(-0.16f, 0.05f, 48, 15, "Multiplayer", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.orange), bigButtonTexture,
      			new UIAction() {public void Activate(){
-	     				NetworkManager.GetInstance().JoinGame();
+     				
+     					Game.GetInstance().SetGameState(GameState.IN_GAME);
      				}
      			}
      	));
@@ -394,7 +405,7 @@ public class Game implements GLEventListener  {
 
     			if (Const.INIT_GAMESTATE == GameState.LOGIN)	//Check that makes ingame debugging easier
     			{
-	    			player1.GetAllCards().LoadTextures(gl);
+	    			
     			}
     			
     			gl.glLoadIdentity();   		
@@ -418,42 +429,9 @@ public class Game implements GLEventListener  {
 				 gl.glTranslatef(-0.6f, -0.15f, 0);
 				
 
-    			for (Deck de : Game.GetInstance().GetPlayer(1).GetAllDecks())
-				{
-    				 cardBackside.bind(gl);
-	   				 gl.glBegin(GL2.GL_QUADS);
-		   			    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f( CARD_WIDTH/15, -CARD_HEIGHT/15,  0.0f);
-					    gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-CARD_WIDTH/15, -CARD_HEIGHT/15,  0.0f);
-					    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-CARD_WIDTH/15,  CARD_HEIGHT/15, 0.0f);
-					    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f( CARD_WIDTH/15,  CARD_HEIGHT/15,  0.0f);
-	   				 gl.glEnd();
-				}
-    			
     			 gl.glTranslatef(0f, 0.3f, 0);
  				
 
-				 
-			    for (Card ca : GetPlayer(1).GetAllCards())
-			    {
-			   // 	 ca.SetX(xCounter);
-			    	 
-					 
-					 ca.GetTemplate().GetTexture().bind(gl);
-
-					 gl.glTranslatef(0.15f, 0, 0);
-					
-					 
-				     gl.glBegin(GL2.GL_QUADS);
-
-			        gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f( CARD_WIDTH/15, -CARD_HEIGHT/15,  0.0f);
-				    gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-CARD_WIDTH/15, -CARD_HEIGHT/15,  0.0f);
-				    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-CARD_WIDTH/15,  CARD_HEIGHT/15, 0.0f);
-				    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f( CARD_WIDTH/15,  CARD_HEIGHT/15,  0.0f);
-				    
-					gl.glEnd();   
-					 
-			  // 	xCounter += 0.05f;
-			    }
 			    gl.glPopMatrix();
 			    
 	 	    	 //     ---------------------------------         DRAW UI       ------------------------------------------
@@ -470,7 +448,6 @@ public class Game implements GLEventListener  {
     			if (Const.INIT_GAMESTATE == GameState.LOGIN)	//Check that makes ingame debugging easier
     			{
 	    			player1.GetActiveDeck().LoadTextures(gl);
-	    			player2.GetActiveDeck().LoadTextures(gl);
     			}
     			
     			 //     ---------------------------------         INIT FRAME       ------------------------------------------
