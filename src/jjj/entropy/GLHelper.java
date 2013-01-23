@@ -11,6 +11,7 @@ import javax.media.opengl.GLException;
 import javax.media.opengl.glu.GLU;
 
 import jjj.entropy.ui.EntButton;
+import jjj.entropy.ui.EntTable;
 import jjj.entropy.ui.EntTextbox;
 
 import com.jogamp.opengl.util.texture.Texture;
@@ -311,7 +312,39 @@ public class GLHelper {
 		 gl.glCallList(TextboxModel);
 		 gl.glPopMatrix();
 	}
+	
+	
 
+	
+	public static void DrawTable(GL2 gl, EntTable table)
+	{
+		 gl.glPushMatrix();
+
+		 gl.glTranslatef(table.GetX(), table.GetY(), 0);
+	
+		 gl.glBegin(GL2.GL_QUADS);
+		 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( 0, 0, 0);
+		    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(Game.TABLE_WIDTH, 0,  0);
+		    gl.glTexCoord2f(1.0f, (float)table.GetLineCountToRender()); gl.glVertex3f(Game.TABLE_WIDTH, -(float)table.GetLineCountToRender()*Game.TABLE_ROW_HEIGHT, 0 );
+		    gl.glTexCoord2f(0.0f, (float)table.GetLineCountToRender()); gl.glVertex3f(0, -(float)table.GetLineCountToRender()*Game.TABLE_ROW_HEIGHT,  0);
+		 gl.glEnd();
+		 
+		 if (table.DisplayScrollbar())
+		 {
+			 table.GetScrollHandleTexture().bind(gl);
+			 
+			 gl.glBegin(GL2.GL_QUADS);
+			 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(Game.TABLE_WIDTH-0.008f, -table.GetScrollHandleGLYOffset(), 0);
+			    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(Game.TABLE_WIDTH, -table.GetScrollHandleGLYOffset(),  0);
+			    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(Game.TABLE_WIDTH, -table.GetScrollHandleGLYOffset()-Game.SCROLL_HANDLE_HEIGHT, 0 );
+			    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(Game.TABLE_WIDTH-0.008f, -table.GetScrollHandleGLYOffset()-Game.SCROLL_HANDLE_HEIGHT,  0);
+			 gl.glEnd();
+		 }
+		 gl.glPopMatrix();
+	}
+	
+
+	
 	public static void DrawDeck(GL2 gl, float x,  float y, float z)
 	{
 		
@@ -375,6 +408,35 @@ public class GLHelper {
 		 gl.glEndList();
 	}
 	
+	private static int view[] = new int[4];
+	private static double model[] = new double[16];
+	private static double proj[] = new double[16];
+	private static double winPos[] = new double[4];
+	public static int[] ConvertGLFloatToGLScreen(double x, double y)
+	{
+		 // Resetting the matrices shouldn't be needed as nothing should be modifying them permanently, but code is provided in case
+		 Game.gl.glMatrixMode(GL2.GL_PROJECTION);	
+		 Game.gl.glLoadIdentity();
+		 Game.glu.gluPerspective(45, Game.GetInstance().GetAspectRatio(), 1, 100);
+		 Game.gl.glMatrixMode(GL2.GL_MODELVIEW);	
+		
+		 Game.gl.glLoadIdentity();   		
+		 Game.gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
+		 Game.gl.glLoadIdentity();
+		 Game.gl.glTranslatef(0,0,-1);
+		
+		 Game.gl.glGetIntegerv(GL2.GL_VIEWPORT, view, 0);
+		 Game.gl.glGetDoublev(GL2.GL_MODELVIEW_MATRIX, model, 0);
+		 Game.gl.glGetDoublev(GL2.GL_PROJECTION_MATRIX, proj, 0);
+
+         Game.glu.gluProject(x, y, 0f, //
+        		 model, 0,
+        		 proj, 0, 
+        		 view, 0, 
+        		 winPos, 0);
+        
+        return new int[] {(int) winPos[0], (int) winPos[1]};
+	}
 	
 
 }

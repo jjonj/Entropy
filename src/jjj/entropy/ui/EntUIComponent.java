@@ -39,10 +39,5 @@ public abstract class EntUIComponent {
 	public abstract void Render(Game game);
 
 
-
-	public void Activate() {}
-
-	public void OnResize(int[] view, double[] model , double[] proj) {}
-
 	
 	}

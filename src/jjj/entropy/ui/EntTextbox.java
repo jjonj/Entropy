@@ -13,18 +13,14 @@ import jjj.entropy.classes.Enums.GameState;
 import com.jogamp.opengl.util.awt.TextRenderer;
 import com.jogamp.opengl.util.texture.Texture;
 
-public class EntTextbox extends EntUIComponent{
+public class EntTextbox extends EntClickable{
 	
 
 	
 	private String text;
 	private EntFont  font;
-	private int w, h;
-	private int screenLeft,
-				screenRight,
-				screenBottom,
-				screenTop,
-				textOffsetX,
+	
+	private int textOffsetX,
 				textOffsetY;
 	private Texture texture;
 	
@@ -44,67 +40,18 @@ public class EntTextbox extends EntUIComponent{
 	
 	public EntTextbox(float x, float y, int xOffset, int yOffset, String startText, EntFont font, Texture texture )
 	{
-		super(x, y);
+		super(x, y, Game.TEXTBOX_WIDTH, Game.TEXTBOX_HEIGHT);
 		this.text = startText;
 		this.font = font;
 		this.texture = texture;
-		
-		Game.gl.glMatrixMode(GL2.GL_PROJECTION);	//Switch to camera adjustment mode
-		Game.gl.glLoadIdentity();
-		Game.glu.gluPerspective(45, Game.GetInstance().GetAspectRatio(), 1, 100);
-		Game.gl.glMatrixMode(GL2.GL_MODELVIEW);	//Switch to hand adjustment mode
-		
-		Game.gl.glLoadIdentity();   		
-		Game.gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
-		Game.gl.glLoadIdentity();
-		Game.gl.glTranslatef(0,0,-1);
-		 
-	
-		 
-		int view[] = new int[4];
-	    double model[] = new double[16];
-	    double proj[] = new double[16];
-	    double winPos[] = new double[4];// wx, wy, wz;// returned xyz coords
-	    
-		Game.gl.glGetIntegerv(GL2.GL_VIEWPORT, view, 0);
-		Game.gl.glGetDoublev(GL2.GL_MODELVIEW_MATRIX, model, 0);
-		Game.gl.glGetDoublev(GL2.GL_PROJECTION_MATRIX, proj, 0);
-        // note viewport[3] is height of window in pixels 
-   //     realy = view[3] - (int) y - 1;
-
-        Game.glu.gluProject((double) x, (double) y, 0f, //
-       		 model, 0,
-       		 proj, 0, 
-       		 view, 0, 
-       		 winPos, 0);
-       
-       this.screenLeft = (int) winPos[0];
-       this.screenTop = (int) winPos[1];
-       
-       this.textX = screenLeft;
-       this.textY = screenTop;
-       
-       
-       double right = 0, bottom = 0;
-		right = (double) x+Game.TEXTBOX_WIDTH;
-		bottom = (double) y-Game.TEXTBOX_HEIGHT;
-       
-       Game.glu.gluProject(right, bottom, 0f, //
-      		 model, 0,
-      		 proj, 0, 
-      		 view, 0, 
-      		 winPos, 0);
-      
-      this.screenRight = (int) winPos[0];
-      this.screenBottom =(int) winPos[1];
-      
-      this.w = this.screenRight - this.screenLeft;
-      this.h = this.screenTop - this.screenBottom ;
-      
-      textOffsetY = yOffset;
-      textOffsetX = xOffset;
+			
+	    textOffsetY = yOffset;
+	    textOffsetX = xOffset;
+	    this.textX = screenX;
+	    this.textY = screenY;
 	}
-	
+
+  
 	public void Render(Game game)
 	{
 		if (texture != null)
@@ -139,56 +86,10 @@ public class EntTextbox extends EntUIComponent{
 		RemoveFromEnd(1);
 	}
 
-	public int GetWidth() {
-		return w;
-	}
-	public int GetHeight() {
-		return h;
-	}
-	public float GetScreenX() {
-		return screenLeft;
-	}
-	public float GetScreenY() {
-		return screenTop;
-	}
 	@Override
-	public void Activate()
+	public void Activate(int mouseX, int mouseY)
 	{
 		Game.GetInstance().SetFocusedUIComponent(this);
-	}
-	
-	@Override
-	public void OnResize(int[] view, double[] model , double[] proj) 
-	{ 
-	
-	    double winPos[] = new double[4];// wx, wy, wz;// returned xyz coords
-	    
-
-        Game.glu.gluProject((double) x, (double) y, 0f, //
-       		 model, 0,
-       		 proj, 0, 
-       		 view, 0, 
-       		 winPos, 0);
-       
-       this.screenLeft = (int) winPos[0];
-       this.screenTop = (int) winPos[1];
-       
-       
-       double right = 0, bottom = 0;
-	   right = (double) x+Game.TEXTBOX_WIDTH;
-	   bottom = (double) y-Game.TEXTBOX_HEIGHT;
-       
-       Game.glu.gluProject(right, bottom, 0f, //
-      		 model, 0,
-      		 proj, 0, 
-      		 view, 0, 
-      		 winPos, 0);
-      
-      this.screenRight = (int) winPos[0];
-      this.screenBottom =(int) winPos[1];
-      
-      this.w = this.screenRight - this.screenLeft;
-      this.h = this.screenTop - this.screenBottom ;
 	}
 
 	

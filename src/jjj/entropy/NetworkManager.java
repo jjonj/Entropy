@@ -171,6 +171,7 @@ public class NetworkManager extends Listener
 		else if (object instanceof PlayerDataMessage)	//When logging in, a cardDataMessage should always be recieved first to load the players deck.
 		{
 			PlayerDataMessage pdm = (PlayerDataMessage)object;
+			System.out.println(pdm);
 			if (pdm.loginAccepted)
 			{
 				Game.GetInstance().SetPlayer(1, new Player(pdm.playerID, pdm.name, pdm.activeDeck, pdm.allCards, pdm.decks));
@@ -184,6 +185,7 @@ public class NetworkManager extends Listener
 		}
 		else if (object instanceof CardDataMessage)
 		{
+			System.out.println(((CardDataMessage) object));
 			System.out.println("CardMessage recieved!!! :)");
 			for (String s : ((CardDataMessage) object).cardTemplates) //Load each cardtype/template 
 			{
@@ -193,6 +195,7 @@ public class NetworkManager extends Listener
 		else if (object instanceof GameMessage)
 		{
 			GameMessage gmsg = (GameMessage)object;
+			System.out.println(gmsg);
 			if (gmsg.accepted)
 			{
 				Game.GetInstance().SetGameID(gmsg.gameID);
@@ -204,6 +207,7 @@ public class NetworkManager extends Listener
 		else if(object instanceof ActionMessage)	//Recived action from opponent
 		{
 			ActionMessage amsg = (ActionMessage)object;
+			System.out.println(amsg);
 			Player opponent = Game.GetInstance().GetPlayer(2);
 			Card card = opponent.GetActiveDeck().GameGetCard(amsg.cardID);
 		

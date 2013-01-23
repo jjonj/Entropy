@@ -13,6 +13,7 @@ import jjj.entropy.Card.Status;
 import jjj.entropy.classes.Enums.GameState;
 import jjj.entropy.classes.Enums.Life;
 import jjj.entropy.classes.Enums.Zone;
+import jjj.entropy.ui.EntClickable;
 import jjj.entropy.ui.EntUIComponent;
 
 public class EntMouseListener implements MouseListener, MouseMotionListener, MouseWheelListener {
@@ -37,13 +38,6 @@ public class EntMouseListener implements MouseListener, MouseMotionListener, Mou
 		
 		switch (game.GetGameState())
 		{
-		case LOGIN:
-			//Case will fall through to MAIN_MENU as intended
-		case MAIN_MENU:
-			EntUIComponent uicmm = game.CheckUICollision();
-			if (uicmm != null)
-				uicmm.Activate();
-			break;
 		case IN_GAME:
 			Card c = game.CheckCardCollision();
 			
@@ -70,7 +64,7 @@ public class EntMouseListener implements MouseListener, MouseMotionListener, Mou
 
 				}
 
-				NetworkManager.GetInstance().SendAction(c.GetID(), Game.mode, Game.modeNumber);
+				NetworkManager.GetInstance().SendAction(game.GetPlayer(1).GetActiveDeck().GetDeckIndex(c), Game.mode, Game.modeNumber);
 	
 				switch(Game.mode)
 				{
@@ -136,8 +130,18 @@ public class EntMouseListener implements MouseListener, MouseMotionListener, Mou
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
+		switch (Game.GetInstance().GetGameState())
+		{
+		case LOGIN:
+			//Case will fall through to MAIN_MENU as intended
+		case MAIN_MENU:
+			EntUIComponent uicmm = game.CheckUICollision();
+			if (uicmm != null && uicmm instanceof EntClickable)
+				((EntClickable)uicmm).Activate(MouseX, MouseY);
+			break;
+		default: 
+			break;
+		}
 	}
 
 	@Override
@@ -148,8 +152,8 @@ public class EntMouseListener implements MouseListener, MouseMotionListener, Mou
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
+		MouseX = e.getX();
+		MouseY = Game.GetInstance().GetRealGameHeight() - e.getY();
 	}
 
 	@Override

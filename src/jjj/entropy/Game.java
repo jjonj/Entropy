@@ -50,12 +50,23 @@ public class Game implements GLEventListener  {
     public static final float BIG_BUTTON_WIDTH = 0.25f,
     					      BIG_BUTTON_HEIGHT = 0.075f;
     
+    public static final float TABLE_WIDTH = 0.35f,
+    						  TABLE_ROW_HEIGHT = 0.023f;
+    
+    
+    public static final float SCROLL_HANDLE_HEIGHT = 0.035f;
+    public static final int SCROLL_HANDLE_HEIGHT_PX = 25;	// The height in pixels of the scrollbars handler
+    
+    public static final int TABLE_COLUMN_WIDTH_PX = 100;	//How much space each column has in a table. Should be editable FIX
+    
+    
     public static final int TEXTBOX_LINE_WIDTH = 205;
     
     public static final int CHAT_LINE_WIDTH = 240;
     public static final int CHAT_LINES = 5;
 	public static final float TEXTBOX_HEIGHT = 0.05f,
 							  TEXTBOX_WIDTH = 0.25f;
+	
     
     
 	public static int mode;
@@ -212,7 +223,10 @@ public class Game implements GLEventListener  {
         
     	gl.glEnable(GL.GL_BLEND);
         gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
-         
+        
+        gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_S, GL2.GL_REPEAT);
+        gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_T, GL2.GL_REPEAT);
+       
         gl.glEnable(GL2.GL_TEXTURE_2D);                            // Enable Texture Mapping ( NEW )
         gl.glDepthFunc(GL2.GL_LEQUAL);                             // The Type Of Depth Testing To Do
         gl.glHint(GL2.GL_PERSPECTIVE_CORRECTION_HINT, GL2.GL_NICEST);  // Really Nice Perspective Calculations
@@ -265,6 +279,30 @@ public class Game implements GLEventListener  {
      	
         usernameTextbox = new EntTextbox(-0.155f, 0.05f, 15, 8, "", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black), textboxTexture);
      	passwordTextbox = new EntTextbox(-0.155f, -0.06f, 15, 8, "", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black), textboxTexture);
+     	
+     	
+     	String[][] data = new String[8][];
+     	
+     	
+     	String[] row0 = {"LOL1", "IDD1", "IDD1"};
+     	String[] row1 = {"LOL2", "IDD2", "IDD2"};
+     	String[] row2 = {"LOL3", "IDD3", "IDD3"};
+     	String[] row3 = {"LOL4", "IDD4", "IDD4"};
+     	String[] row4 = {"LOL5", "IDD5", "IDD5"};
+     	String[] row5 = {"LOL6", "IDD3", "IDD3"};
+     	String[] row6 = {"LOL7", "IDD4", "IDD4"};
+     	String[] row7 = {"LOL8", "IDD5", "IDD5"};
+     	
+     	data[0] = row0;
+     	data[1] = row1;
+     	data[2] = row2;
+     	data[3] = row3;
+     	data[4] = row4;
+    	data[5] = row5;
+     	data[6] = row6;
+     	data[7] = row7;
+     	
+     	LoginScreenUIComponents.add(new EntTable<String>(0.1f, 0.2f, data,4));
      	
      	LoginScreenUIComponents.add(usernameTextbox);
      	LoginScreenUIComponents.add(passwordTextbox);
@@ -321,7 +359,7 @@ public class Game implements GLEventListener  {
 		         {
 		        	
 		         	c.Render(this);
-		         }
+		         }		     
 		         break;
     		case MAIN_MENU:
 
@@ -556,17 +594,20 @@ public class Game implements GLEventListener  {
 		gl.glGetDoublev(GL2.GL_MODELVIEW_MATRIX, model, 0);
 		gl.glGetDoublev(GL2.GL_PROJECTION_MATRIX, proj, 0);
         
-		for (EntUIComponent uic : LoginScreenUIComponents)
+		for (EntUIComponent uic : LoginScreenUIComponents)	//Should probably just let a static list handle every EntClickable resize call
         {
-    		uic.OnResize(view, model, proj);
+			if (uic instanceof EntClickable)
+				((EntClickable)uic).OnResize(view, model, proj);
         }
         for (EntUIComponent uic : MainMenuUIComponents)
         {
-    		uic.OnResize(view, model, proj);
+        	if (uic instanceof EntClickable)
+				((EntClickable)uic).OnResize(view, model, proj);
         }
         for (EntUIComponent uic : IngameUIComponents)
         {
-    		uic.OnResize(view, model, proj);
+        	if (uic instanceof EntClickable)
+				((EntClickable)uic).OnResize(view, model, proj);
         }
     }
  
@@ -698,7 +739,7 @@ public class Game implements GLEventListener  {
 		return rCard;	// Returns null if no card was hit
 	}
 	
-	public EntUIComponent CheckUICollision() 
+	public EntUIComponent CheckUICollision() 	//MOVE COLLISION DETECTION LOGIC TO EntUIComponent
 	{
 		if (gamestate == GameState.MAIN_MENU || gamestate == GameState.LOGIN)
 		{
@@ -716,7 +757,7 @@ public class Game implements GLEventListener  {
 				toIterate = IngameUIComponents;
 			}
 			
-			for (EntUIComponent uic : toIterate)
+			for (EntUIComponent uic : toIterate) //MOVE COLLISION DETECTION LOGIC TO EntUIComponent polymophism duh
 			{
 				if (uic instanceof EntButton) {
 					EntButton btn = (EntButton)uic;
@@ -724,11 +765,11 @@ public class Game implements GLEventListener  {
 					int my = EntMouseListener.MouseY; //720 - EntMouseListener.MouseY -1;
 					if ( mx > btn.GetScreenX() )
 					{
-						if ( mx < btn.GetWidth()+btn.GetScreenX() )
+						if ( mx < btn.GetScreenWidth()+btn.GetScreenX() )
 						{
 							if (my < btn.GetScreenY())
 							{
-								if (my > btn.GetScreenY() - btn.GetHeight())
+								if (my > btn.GetScreenY() - btn.GetScreenHeight())
 								{
 									return uic;
 								}
@@ -743,11 +784,30 @@ public class Game implements GLEventListener  {
 					int my = EntMouseListener.MouseY; //720 - EntMouseListener.MouseY -1;
 					if ( mx > tbx.GetScreenX() )
 					{
-						if ( mx < tbx.GetWidth()+tbx.GetScreenX() )
+						if ( mx < tbx.GetScreenWidth()+tbx.GetScreenX() )
 						{
 							if (my < tbx.GetScreenY())
 							{
-								if (my > tbx.GetScreenY() - tbx.GetHeight())
+								if (my > tbx.GetScreenY() - tbx.GetScreenHeight())
+								{
+									return uic;
+								}
+							}
+						}
+					}
+				}
+				else if (uic instanceof EntTable)
+				{
+					EntTable tbl = (EntTable)uic;
+					int mx = EntMouseListener.MouseX;
+					int my = EntMouseListener.MouseY; //720 - EntMouseListener.MouseY -1;
+					if ( mx > tbl.GetScreenX() )
+					{
+						if ( mx < tbl.GetScreenWidth()+tbl.GetScreenX() )
+						{
+							if (my < tbl.GetScreenY())
+							{
+								if (my > tbl.GetScreenY() - tbl.GetScreenHeight())
 								{
 									return uic;
 								}
@@ -850,6 +910,11 @@ public class Game implements GLEventListener  {
 	}
 	public void SetGameID(int gameID) {
 		this.gameID = gameID;
+	}
+
+	public GLCanvas GetCanvas()
+	{
+		return canvas;
 	}
 
 

@@ -112,5 +112,12 @@ public class Deck extends CardCollection {
 	}
 
 
+	//Gets the index of the argument card in the deck. This is used as the index of the card for the other players, identifying the card
+	public int GetDeckIndex(Card card) 
+	{
+		return cards.indexOf(card);
+	}
+
+
 	
 }
