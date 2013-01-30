@@ -51,7 +51,8 @@ public class Game implements GLEventListener  {
     					      BIG_BUTTON_HEIGHT = 0.075f;
     
     public static final float TABLE_WIDTH = 0.35f,
-    						  TABLE_ROW_HEIGHT = 0.023f;
+    						  TABLE_ROW_HEIGHT = 0.0233f,
+    						  TABLE_ROW_HEIGHT_PX = 19;
     
     
     public static final float SCROLL_HANDLE_HEIGHT = 0.035f;
@@ -98,6 +99,7 @@ public class Game implements GLEventListener  {
     private List<EntUIComponent> LoginScreenUIComponents;	
     private List<EntUIComponent> DeckScreenUIComponents;	
     private EntUIComponent focusedUIComponent;
+    EntTable playerCardTable;
     private EntLabel FPSLabel;
     private Set<Card> cardsToRender;
     private EntTextbox chatTextbox;
@@ -196,25 +198,15 @@ public class Game implements GLEventListener  {
    		}
    		
    		
+   		//Creating cards require a template, this is just an old template still used below
 		TinidQueen = new CardTemplate((short)1, "Tinid Queen", CardRace.CRAWNID, CardType.CREATURE, (short)0,(short)0,(short)0,(short)0,(short)0,(short)0,cardtestfront);
 
+		// Easiest way atm to detect clicks on the deck pile, is to just place to cards there that cant move.
 		Card card0 = new Card(-3, 0.51f, 1.0f, 
 				Facing.DOWN, TinidQueen, Status.IN_ZONE, neutralPlayer);
 		Card card1 = new Card(3, 0.51f, 10.0f, 
 				Facing.DOWN, TinidQueen, Status.IN_ZONE, neutralPlayer);
-		/*Card card1 = new Card(-0.5f, 0, 1.0f, 
-				Facing.UP, TinidQueen, Status.IN_ZONE);
-		
-		Card card2 = new Card(0.5f, 0f, 3.0f, Facing.UP, TinidQueen, Status.IN_ZONE);
-		Card card3 = new Card(1.5f, 0f, 3.0f, Facing.UP, CrawnidWorker, Status.IN_ZONE);
-		Card card4 = new Card(2.5f, 0f, 3.0f, Facing.UP, CrawnidWorker, Status.IN_ZONE);
 
-		Card card5 = new Card(0f, 2, 1.0f, 
-				Facing.FRONT, TinidQueen, Status.IN_ZONE);
-		Card card6 = new Card(1f, 2, 0.8f, 
-				Facing.FRONT, CrawnidWorker, Status.IN_ZONE);
-		Card card7 = new Card(-1f, 2, 0.8f, 
-				Facing.FRONT, CrawnidWorker, Status.IN_ZONE);*/
 
 		ShowCard(card0);
 		ShowCard(card1);
@@ -227,7 +219,7 @@ public class Game implements GLEventListener  {
         gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_S, GL2.GL_REPEAT);
         gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_T, GL2.GL_REPEAT);
        
-        gl.glEnable(GL2.GL_TEXTURE_2D);                            // Enable Texture Mapping ( NEW )
+        gl.glEnable(GL2.GL_TEXTURE_2D);                            
         gl.glDepthFunc(GL2.GL_LEQUAL);                             // The Type Of Depth Testing To Do
         gl.glHint(GL2.GL_PERSPECTIVE_CORRECTION_HINT, GL2.GL_NICEST);  // Really Nice Perspective Calculations
          
@@ -247,6 +239,8 @@ public class Game implements GLEventListener  {
      	GLHelper.InitTexture(gl, bigButtonTexture);
      	GLHelper.InitTexture(gl, textboxTexture);
 
+     	
+     	//Calling generate methods that initiate the displaylists in openGL for fast rendering
      	GLHelper.GenerateTable(gl, BOARD_WIDTH, BOARD_LENGTH, BOARD_THICKNESS);
      	GLHelper.GenerateButtons(gl, bigButtonTexture);
      	GLHelper.GenerateUI(gl, 0, 0, 0, uiTexture);
@@ -254,6 +248,8 @@ public class Game implements GLEventListener  {
        	GLHelper.GenerateTextbox(gl, textboxTexture);
      	GLHelper.GenerateCard(gl, cardBackside, CARD_WIDTH, CARD_HEIGHT, CARD_THICKNESS);
         
+     	
+     	
     	chatWindow = new EntLabel(129, 116,  Game.CHAT_LINES, "", new EntFont(EntFont.FontTypes.MainParagraph, Font.BOLD, 12, Color.BLUE));
     	chatTextbox = new EntTextbox(-0.59f, -0.389f, 5,  10, "", new EntFont(EntFont.FontTypes.MainParagraph, Font.BOLD, 12, Color.BLUE), null);
      	
@@ -280,7 +276,7 @@ public class Game implements GLEventListener  {
         usernameTextbox = new EntTextbox(-0.155f, 0.05f, 15, 8, "", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black), textboxTexture);
      	passwordTextbox = new EntTextbox(-0.155f, -0.06f, 15, 8, "", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black), textboxTexture);
      	
-     	
+     	/*
      	String[][] data = new String[8][];
      	
      	
@@ -300,9 +296,16 @@ public class Game implements GLEventListener  {
      	data[4] = row4;
     	data[5] = row5;
      	data[6] = row6;
-     	data[7] = row7;
+     	data[7] = row7;*/
      	
-     	LoginScreenUIComponents.add(new EntTable<String>(0.1f, 0.2f, data,4));
+     	
+     	
+     	//Initiate the player card table UI element with an empty list of data. The players cards are added once logged in.
+     	List table = new ArrayList<IEntTableRow>();
+     	playerCardTable = new EntTable(-0.73f, 0.4f, table, 20, GameState.DECK_SCREEN);
+     	DeckScreenUIComponents.add(playerCardTable);
+     	
+     	//LoginScreenUIComponents.add(new EntTable<String>(0.1f, 0.2f, data,4));
      	
      	LoginScreenUIComponents.add(usernameTextbox);
      	LoginScreenUIComponents.add(passwordTextbox);
@@ -605,6 +608,11 @@ public class Game implements GLEventListener  {
 				((EntClickable)uic).OnResize(view, model, proj);
         }
         for (EntUIComponent uic : IngameUIComponents)
+        {
+        	if (uic instanceof EntClickable)
+				((EntClickable)uic).OnResize(view, model, proj);
+        }
+        for (EntUIComponent uic : DeckScreenUIComponents)
         {
         	if (uic instanceof EntClickable)
 				((EntClickable)uic).OnResize(view, model, proj);
@@ -915,6 +923,13 @@ public class Game implements GLEventListener  {
 	public GLCanvas GetCanvas()
 	{
 		return canvas;
+	}
+
+	
+	//Returns the UI EntTable object that manages the players cards
+	public EntTable GetCardTable() 
+	{
+		return playerCardTable;
 	}
 
 

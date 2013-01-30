@@ -11,6 +11,7 @@ import jjj.entropy.classes.Enums.GameState;
 import jjj.entropy.classes.Enums.Life;
 import jjj.entropy.classes.Enums.Zone;
 import jjj.entropy.messages.*;
+import jjj.entropy.ui.IEntTableRow;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
@@ -156,7 +157,7 @@ public class NetworkManager extends Listener
 		System.out.println("SOMEONE DISCONNECTING!");
 		
 	}
-	
+
 	@Override
 	public void received (Connection connection, Object object) {
 		System.out.println("Message recieved!");
@@ -174,9 +175,24 @@ public class NetworkManager extends Listener
 			System.out.println(pdm);
 			if (pdm.loginAccepted)
 			{
-				Game.GetInstance().SetPlayer(1, new Player(pdm.playerID, pdm.name, pdm.activeDeck, pdm.allCards, pdm.decks));
+				Player p = new Player(pdm.playerID, pdm.name, pdm.activeDeck, pdm.allCards, pdm.decks);
+				Game.GetInstance().SetPlayer(1, p);
+				
+				//Create a new two dimensional list for the card table
+				List<IEntTableRow> playerCards = new ArrayList<IEntTableRow>();
+				//Add the newly created players cards to it
+				
+				for (Card c : p.GetAllCards().GetList())
+				{
+					playerCards.add(c);
+				}
+
+				
+				Game.GetInstance().GetCardTable().SetDataSource(playerCards);
 				networkState = NetworkState.LOGGED_IN;
 				Game.GetInstance().SetGameState(GameState.MAIN_MENU);
+			 	
+		     	
 			}
 			else //Recieved data is for opponent
 			{

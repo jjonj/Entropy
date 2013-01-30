@@ -53,8 +53,17 @@ public class CardCollection implements Iterable<Card>
 
 
 	@Override
-	public Iterator<Card> iterator() {
+	public Iterator<Card> iterator() 
+	{
 		return cards.iterator();
+	}
+
+	
+	
+	//Returns the internal list for use with table
+	public List<Card> GetList() 
+	{
+		return cards;
 	}
 	
 }

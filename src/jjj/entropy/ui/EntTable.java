@@ -7,31 +7,39 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import javax.media.opengl.GLException;
 
+import jjj.entropy.Card;
 import jjj.entropy.EntMouseListener;
 import jjj.entropy.GLHelper;
 import jjj.entropy.Game;
+import jjj.entropy.classes.Enums.GameState;
 
 import com.jogamp.opengl.util.awt.TextRenderer;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureIO;
 
-public class EntTable<T> extends EntClickable implements MouseListener, MouseMotionListener
+//MISSING: Add parameter for text offset coordinates or even better automatize it
+public class EntTable extends EntClickable implements MouseListener, MouseMotionListener
 {
 	
 	
 	private EntFont  font;
-	T[][] dataSource;	//Two dimensional array of data
-	
+	private List<IEntTableRow> dataSource;	//Two dimensional array of data
+	private String[][] data;
 	
 	private Texture texture;
-	private Texture scrollHandleTexture; 
+	private Texture scrollHandleTexture,
+					selectedFieldTexture;
 	private float lineHeight,	//The height of the font used
 				  scrollHandleYOffsetGLFloat;	//The offset of the scroll handle in GL float coordinates
-	private int textX,
+	private GameState activeGameState;
+	private int fontLineHeight,
+				textX,
 				textY,
+				selectedIndex = 2,
 				scrollHandleY,
 				maxLines,
 				displayLineCount,
@@ -40,49 +48,74 @@ public class EntTable<T> extends EntClickable implements MouseListener, MouseMot
 				lineOffset = 0;	// Used for scrolling
 	private boolean scrolling = false;
 
-	public EntTable(float x, float y,  T[][] dataSource)
+	public EntTable(float x, float y,  List<IEntTableRow> dataSource, GameState activeGameState)
 	{
-		this(x, y, dataSource, dataSource.length);
+		this(x, y, dataSource, dataSource.size(), activeGameState);
 	}
-	public EntTable(float x, float y,  T[][] dataSource, int maxLines)
+	public EntTable(float x, float y,  List<IEntTableRow> dataSource, int maxLines, GameState activeGameState)
 	{
 		//Width should be adjustable, probably like button size "is"
 		super(x, y, Game.TABLE_WIDTH, Game.TABLE_ROW_HEIGHT*maxLines);
 		this.maxLines = maxLines;
 		this.font = new EntFont(EntFont.FontTypes.MainParagraph, Font.PLAIN, 16);
-		lineHeight = font.getSize2D()+4;
+		lineHeight = Game.TABLE_ROW_HEIGHT_PX;
 		this.dataSource = dataSource;
-	
+		this.activeGameState = activeGameState;
+		
+		int[] temp =  GLHelper.ConvertGLFloatToGLScreen(0, 0);
+		float zeroOnScreen = temp[1];
+		
+		temp =  GLHelper.ConvertGLFloatToGLScreen(0, Game.TABLE_ROW_HEIGHT);
+		lineHeight = temp[1] - zeroOnScreen;
+		
+		fontLineHeight = (int)lineHeight+1;
+		//selectedIndex = -1;
 		try {
 			texture = TextureIO.newTexture(new File("resources/textures/TableEntry.png"), true);
 			scrollHandleTexture = TextureIO.newTexture(new File("resources/textures/ScrollHandle.png"), true);
+			selectedFieldTexture = TextureIO.newTexture(new File("resources/textures/SelectedTableEntry.png"), true);
 		} catch (GLException | IOException e) {
 			e.printStackTrace();
 			System.exit(1);
 		}
 		GLHelper.InitTexture(Game.gl, texture);
 		GLHelper.InitTexture(Game.gl, scrollHandleTexture);
-		
-		int[] temp = GLHelper.ConvertGLFloatToGLScreen(x, y);
+		GLHelper.InitTexture(Game.gl, selectedFieldTexture);
+		temp = GLHelper.ConvertGLFloatToGLScreen(x, y);
 		this.textX = temp[0] + 20;
-	    this.textY = temp[1] + 13;
+	    this.textY = temp[1] + 30;
 		
 	    scrollHandleY = screenY;
 	    scrollHandleYOffsetGLFloat = 0;
-		if (dataSource.length < maxLines)
-			displayLineCount = dataSource.length;
+		if (dataSource.size() < maxLines)
+			displayLineCount = dataSource.size();
 		else
 			displayLineCount =  maxLines;
+		
+		UpdateData();
 		
 		 Game.GetInstance().GetCanvas().addMouseListener(this);
 		 Game.GetInstance().GetCanvas().addMouseMotionListener(this);
 	}
 	
+	//Method to update the internal data structure with the current data source
+	public void UpdateData()
+	{
+		if (data == null || data.length != dataSource.size())
+			data = new String[dataSource.size()][];
+		
+		for (int i = 0; i < dataSource.size(); i++)
+		{
+			data[i] = dataSource.get(i).GenRow();
+		}
+		
+	}
+	
 	public void Render(Game game)
 	{
 		int i,
-			xOffset = (int)textX,
-			yOffset = (int)textY;
+			xOffset = textX,
+			yOffset = textY;
 		
 		
 		if (texture != null)
@@ -95,13 +128,13 @@ public class EntTable<T> extends EntClickable implements MouseListener, MouseMot
 		for (int k = lineOffset; k < displayLineCount+lineOffset; k++)
 		{
 			i = 0;
-			for (T cell : dataSource[k])
+			for (String cell : data[k])
 			{
 				xOffset = (int)textX + i * Game.TABLE_COLUMN_WIDTH_PX;
-				font.Render(game, xOffset, yOffset, cell.toString());
+				font.Render(game, xOffset, yOffset, cell);
 				++i;
 			}
-			yOffset -= lineHeight;
+			yOffset -= fontLineHeight;
 		}
 	}
 	
@@ -115,9 +148,20 @@ public class EntTable<T> extends EntClickable implements MouseListener, MouseMot
 	}*/
 	
 	
+	public void SetDataSource(List<IEntTableRow> dataSource) 
+	{
+		this.dataSource = dataSource;
+		if (dataSource.size() < maxLines)
+			displayLineCount = dataSource.size();
+		else
+			displayLineCount =  maxLines;
+		UpdateData();
+	} 
+	
+	
 	public int GetLineCount() 
 	{
-		return dataSource.length;
+		return dataSource.size();
 	}
 	
 	public int GetLineCountToRender() 
@@ -136,14 +180,20 @@ public class EntTable<T> extends EntClickable implements MouseListener, MouseMot
 	}
 	public boolean DisplayScrollbar() 
 	{
-		return displayLineCount < dataSource.length;
+		return displayLineCount < dataSource.size();
 	}
 	
 	@Override
 	public void OnResize(int[] view, double[] model , double[] proj) 
 	{
+		System.out.println("RESIZE!!!");
 		UpdateScreenCoords();
 		scrollHandleY = screenY - mouseOffSetFromTaTop;
+		int[] temp =  GLHelper.ConvertGLFloatToGLScreen(0, 0);
+		float zeroOnScreen = temp[1];
+		
+		temp =  GLHelper.ConvertGLFloatToGLScreen(0, Game.TABLE_ROW_HEIGHT);
+		lineHeight = temp[1] - zeroOnScreen;
 	}
 	
 	
@@ -155,13 +205,25 @@ public class EntTable<T> extends EntClickable implements MouseListener, MouseMot
 	public void mouseExited(MouseEvent e) {}
 	
 	@Override
-	public void mousePressed(MouseEvent e) {
-		if (e.getButton() == MouseEvent.BUTTON1 && (screenX+w - EntMouseListener.MouseX) < 7 && EntMouseListener.MouseY > scrollHandleY - Game.SCROLL_HANDLE_HEIGHT_PX && EntMouseListener.MouseY < scrollHandleY)
+	public void mousePressed(MouseEvent e) 
+	{
+		if ( Game.GetInstance().GetGameState() == activeGameState)	
 		{
-			offsetScrollHandleTop = scrollHandleY - EntMouseListener.MouseY;
-			scrolling = true;
+			if (e.getButton() == MouseEvent.BUTTON1 && screenX < EntMouseListener.MouseX && screenX+w > EntMouseListener.MouseX && screenY > EntMouseListener.MouseY && screenY-(displayLineCount*lineHeight) < EntMouseListener.MouseY)
+			{
+				if (screenX+w - EntMouseListener.MouseX < 7 && EntMouseListener.MouseY > scrollHandleY - Game.SCROLL_HANDLE_HEIGHT_PX && EntMouseListener.MouseY < scrollHandleY)
+				{
+					offsetScrollHandleTop = scrollHandleY - EntMouseListener.MouseY;
+					selectedIndex = (int) (offsetScrollHandleTop % lineHeight);
+					scrolling = true;
+				}
+				else
+					selectedIndex = (int) ((scrollHandleY - EntMouseListener.MouseY) / (int)lineHeight);
+			}
 		}
 	}
+	
+	
 	@Override
 	public void mouseReleased(MouseEvent e) 
 	{
@@ -181,7 +243,7 @@ public class EntTable<T> extends EntClickable implements MouseListener, MouseMot
 			else if (mouseOffSetFromTaTop > adjH)
 				mouseOffSetFromTaTop = adjH;
 			scrollHandleY = screenY - mouseOffSetFromTaTop;
-			lineOffset = (int) ((float)(mouseOffSetFromTaTop)/(adjH)*(dataSource.length-displayLineCount));
+			lineOffset = (int) ((float)(mouseOffSetFromTaTop)/(adjH)*(dataSource.size()-displayLineCount));
 			scrollHandleYOffsetGLFloat = (Game.TABLE_ROW_HEIGHT*displayLineCount - Game.SCROLL_HANDLE_HEIGHT) * ((float)(mouseOffSetFromTaTop)/(adjH));
 			
 		}
@@ -191,6 +253,14 @@ public class EntTable<T> extends EntClickable implements MouseListener, MouseMot
 		// TODO Auto-generated method stub
 		
 	}
+	public int GetSelectedIndex() {
+		return selectedIndex;
+	}
+	public Texture GetSelectedTexture() {
+		return selectedFieldTexture;
+	}
+	
+
 
 	
 

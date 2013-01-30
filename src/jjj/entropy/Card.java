@@ -6,9 +6,11 @@ import jjj.entropy.classes.EntUtilities;
 import jjj.entropy.classes.Enums;
 import jjj.entropy.classes.Enums.Life;
 import jjj.entropy.classes.Enums.Zone;
+import jjj.entropy.ui.IEntTableRow;
 
 
-public class Card {
+public class Card implements IEntTableRow
+{
 
 
 	public enum Status{
@@ -392,6 +394,11 @@ public class Card {
 			rotY = 180;
 			Move(3f, 0.51f, 10.0f);
 		}
+	}
+
+	@Override
+	public String[] GenRow() {
+		return new String[] {template.Title};
 	}
 
 	

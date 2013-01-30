@@ -328,7 +328,16 @@ public class GLHelper {
 		    gl.glTexCoord2f(1.0f, (float)table.GetLineCountToRender()); gl.glVertex3f(Game.TABLE_WIDTH, -(float)table.GetLineCountToRender()*Game.TABLE_ROW_HEIGHT, 0 );
 		    gl.glTexCoord2f(0.0f, (float)table.GetLineCountToRender()); gl.glVertex3f(0, -(float)table.GetLineCountToRender()*Game.TABLE_ROW_HEIGHT,  0);
 		 gl.glEnd();
-		 
+		 if (table.GetSelectedIndex() != -1)
+		 {
+			 table.GetSelectedTexture().bind(gl);
+			 gl.glBegin(GL2.GL_QUADS);
+			 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( 0, -table.GetSelectedIndex()*Game.TABLE_ROW_HEIGHT, 0);
+			    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(Game.TABLE_WIDTH, -table.GetSelectedIndex()*Game.TABLE_ROW_HEIGHT,  0);
+			    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(Game.TABLE_WIDTH, -(table.GetSelectedIndex()+1)*Game.TABLE_ROW_HEIGHT, 0 );
+			    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(0, -(table.GetSelectedIndex()+1)*Game.TABLE_ROW_HEIGHT,  0);
+			 gl.glEnd();
+		 }
 		 if (table.DisplayScrollbar())
 		 {
 			 table.GetScrollHandleTexture().bind(gl);
@@ -341,6 +350,8 @@ public class GLHelper {
 			 gl.glEnd();
 		 }
 		 gl.glPopMatrix();
+		 
+		 
 	}
 	
 
