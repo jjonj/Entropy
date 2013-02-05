@@ -46,52 +46,7 @@ public abstract class EntClickable extends EntUIComponent
         
         w = screenRight - screenX;
         h = screenTop - screenY;
-		/*		Remove this as soon as functionality is confirmed
-		int view[] = new int[4];
-	    double model[] = new double[16];
-	    double proj[] = new double[16];
-	    double winPos[] = new double[4];// wx, wy, wz;// returned xyz coords
-	    
-		 Game.gl.glGetIntegerv(GL2.GL_VIEWPORT, view, 0);
-		 Game.gl.glGetDoublev(GL2.GL_MODELVIEW_MATRIX, model, 0);
-		 Game.gl.glGetDoublev(GL2.GL_PROJECTION_MATRIX, proj, 0);
-
-         Game.glu.gluProject((double) x, (double) y, 0f, //
-        		 model, 0,
-        		 proj, 0, 
-        		 view, 0, 
-        		 winPos, 0);
-        
-        this.screenLeft = (int) winPos[0];
-        this.screenTop =(int) winPos[1];
-        
-        this.textX = screenLeft;
-        this.textY = screenTop;
-        
-        double right = 0, bottom = 0;
-		switch (buttonSize)
-		{
-		case BIG:
-			right = (double) x+Game.BIG_BUTTON_WIDTH;
-			bottom = (double) y-Game.BIG_BUTTON_HEIGHT;
-			break;
-		default:
-			break;
-		}
-        
-        Game.glu.gluProject(right, bottom, 0f, //
-       		 model, 0,
-       		 proj, 0, 
-       		 view, 0, 
-       		 winPos, 0);
-       
-       this.screenRight = (int) winPos[0];
-       this.screenBottom =(int) winPos[1];
-       
-       this.w = this.screenRight - this.screenLeft;
-       this.h = this.screenTop - this.screenBottom ;
-       */
-       
+	
     
          
          
@@ -150,6 +105,29 @@ public abstract class EntClickable extends EntUIComponent
 	}
 	
 
+	public void SetGLWidth(float w)
+	{
+
+		glW = w;
+		int[] temp = GLHelper.ConvertGLFloatToGLScreen(x+glW, y+glH);
+
+
+        int screenRight = temp[0];
+        
+        w = screenRight - screenX;
+	}
+	
+	public void SetGLHeight(float h)
+	{
+		glH = h;
+		int[] temp = GLHelper.ConvertGLFloatToGLScreen(x+glW, y+glH);
+
+
+	    int screenTop = temp[1];	// Note: OpenGL screen coordinates are from bottom to top so screenY = bottom
+	        
+	    h = screenTop - screenY;
+	}
+	
 	
 	public int GetScreenWidth() {
 		return w;

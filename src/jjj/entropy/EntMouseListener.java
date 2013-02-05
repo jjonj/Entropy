@@ -132,6 +132,7 @@ public class EntMouseListener implements MouseListener, MouseMotionListener, Mou
 	public void mousePressed(MouseEvent e) {
 		switch (Game.GetInstance().GetGameState())
 		{
+		case DECK_SCREEN:
 		case LOGIN:
 			//Case will fall through to MAIN_MENU as intended
 		case MAIN_MENU:
@@ -139,7 +140,7 @@ public class EntMouseListener implements MouseListener, MouseMotionListener, Mou
 			if (uicmm != null && uicmm instanceof EntClickable)
 				((EntClickable)uicmm).Activate(MouseX, MouseY);
 			break;
-		default: 
+		default:
 			break;
 		}
 	}

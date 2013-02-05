@@ -50,6 +50,23 @@ public class EntButton extends EntClickable
 		this(x, y, xOffset, yOffset, text, new EntFont(EntFont.FontTypes.MainParagraph, Font.BOLD, 24), size, texture, action);
 	}
 	
+	public EntButton(float x, float y, int xOffset,int yOffset, String text, EntFont font, ButtonSize size, Texture texture, UIAction action)
+	{
+		super(x, y, GetButtonWidth(size),  GetButtonHeight(size));	//Using static methods as a "hack" to give conditional parameters to super class
+		this.text = text;
+		this.font = font;
+		this.buttonSize = size;
+		this.onClick = action;
+
+		this.texture = texture;
+
+		textOffsetX = xOffset;
+	    textOffsetY = yOffset;
+        
+        this.textX = screenX;
+        this.textY = screenY;
+	}
+	
 	
 	//Following two methods are used as a "hack" to get some conditional parameters to the super class constructor
 	private static float GetButtonWidth(ButtonSize size)
@@ -73,22 +90,7 @@ public class EntButton extends EntClickable
 		}
 	}
 	
-	public EntButton(float x, float y, int xOffset,int yOffset, String text, EntFont font, ButtonSize size, Texture texture, UIAction action)
-	{
-		super(x, y, GetButtonWidth(size),  GetButtonHeight(size));	//Using static methods as a "hack" to give conditional parameters to super class
-		this.text = text;
-		this.font = font;
-		this.buttonSize = size;
-		this.onClick = action;
-
-		this.texture = texture;
-
-		textOffsetX = xOffset;
-	    textOffsetY = yOffset;
-        
-        this.textX = screenX;
-        this.textY = screenY;
-	}
+	
 	
 	public void Render(Game game)
 	{
@@ -101,7 +103,7 @@ public class EntButton extends EntClickable
 			if (texture != null)
 			{
 				texture.bind(Game.gl);
-				GLHelper.DrawBigButton(Game.gl, this);
+				GLHelper.DrawUIBigButton(Game.gl, this);
 			}
 			font.Render(game, textX + textOffsetX, textY - textOffsetY, text);
 			break;

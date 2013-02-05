@@ -11,6 +11,7 @@ import jjj.entropy.classes.Enums.GameState;
 import jjj.entropy.classes.Enums.Life;
 import jjj.entropy.classes.Enums.Zone;
 import jjj.entropy.messages.*;
+import jjj.entropy.ui.EntDropdown;
 import jjj.entropy.ui.IEntTableRow;
 
 import com.esotericsoftware.kryo.Kryo;
@@ -189,6 +190,23 @@ public class NetworkManager extends Listener
 
 				
 				Game.GetInstance().GetCardTable().SetDataSource(playerCards);
+				
+				List<Object> decks = new ArrayList<Object>();
+				for (int i = 0; i < pdm.decks.length; i++)
+				{
+					decks.add("Deck " + (i+1));
+				}
+				
+
+				
+				Game.GetInstance().AddPlayerDeckDropdown(new EntDropdown(-0.35f,0.39f,12,20, decks));
+				
+
+		     	
+				
+				//Game.GetInstance().GetDeckDropdown().SetDataSource(decks);
+				
+				
 				networkState = NetworkState.LOGGED_IN;
 				Game.GetInstance().SetGameState(GameState.MAIN_MENU);
 			 	

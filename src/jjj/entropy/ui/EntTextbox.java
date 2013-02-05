@@ -59,7 +59,7 @@ public class EntTextbox extends EntClickable{
 			Game.gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 			if (texture != null)
 				texture.bind(Game.gl);
-			 GLHelper.DrawTextbox(Game.gl, this);
+			 GLHelper.DrawUITextbox(Game.gl, this);
 		}
 		font.RenderBox(game, textX + textOffsetX, textY - textOffsetY, 1, Game.TEXTBOX_LINE_WIDTH, text);
 	}

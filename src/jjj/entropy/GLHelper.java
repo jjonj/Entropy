@@ -11,6 +11,7 @@ import javax.media.opengl.GLException;
 import javax.media.opengl.glu.GLU;
 
 import jjj.entropy.ui.EntButton;
+import jjj.entropy.ui.EntDropdown;
 import jjj.entropy.ui.EntTable;
 import jjj.entropy.ui.EntTextbox;
 
@@ -292,7 +293,7 @@ public class GLHelper {
 	}
 	
 	
-	public static void DrawBigButton(GL2 gl, EntButton button)
+	public static void DrawUIBigButton(GL2 gl, EntButton button)
 	{
 		 gl.glPushMatrix();
 		 
@@ -303,7 +304,7 @@ public class GLHelper {
 		 gl.glPopMatrix();
 	}
 	
-	public static void DrawTextbox(GL2 gl, EntTextbox textbox)
+	public static void DrawUITextbox(GL2 gl, EntTextbox textbox)
 	{
 		 gl.glPushMatrix();
 
@@ -313,10 +314,50 @@ public class GLHelper {
 		 gl.glPopMatrix();
 	}
 	
-	
+	public static void DrawUIDropdown(GL2 gl, EntDropdown dropdown) 
+	{
+		 gl.glPushMatrix();
+
+		 gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+		 gl.glTranslatef(dropdown.GetX(), dropdown.GetY(), 0);
+
+		 if (dropdown.IsSelecting())
+		 {
+			 dropdown.GetTexture().bind(Game.gl);
+			 gl.glBegin(GL2.GL_QUADS);
+			 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( 0, 0, 0);
+			    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(Game.DROPDOWN_WIDTH, 0,  0);
+			    gl.glTexCoord2f(1.0f, (float)dropdown.GetDataSize()); gl.glVertex3f(Game.DROPDOWN_WIDTH, -(float)dropdown.GetDataSize()*Game.TABLE_ROW_HEIGHT, 0 );
+			    gl.glTexCoord2f(0.0f, (float)dropdown.GetDataSize()); gl.glVertex3f(0, -(float)dropdown.GetDataSize()*Game.TABLE_ROW_HEIGHT, 0);
+			 gl.glEnd();
+			 
+			 //Showing the selected element
+			 dropdown.GetSelectedTexture().bind(gl);
+		
+			 gl.glBegin(GL2.GL_QUADS);
+			 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( 0, -dropdown.GetSelectedIndex()*Game.DROPDOWN_ROW_HEIGHT, 0);
+			    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(Game.DROPDOWN_WIDTH, -dropdown.GetSelectedIndex()*Game.DROPDOWN_ROW_HEIGHT,  0);
+			    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(Game.DROPDOWN_WIDTH, -(dropdown.GetSelectedIndex()+1)*Game.DROPDOWN_ROW_HEIGHT, 0 );
+			    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(0, -(dropdown.GetSelectedIndex()+1)*Game.DROPDOWN_ROW_HEIGHT,  0);
+			 gl.glEnd();
+		 }
+		 else
+		 {
+			 dropdown.GetTexture().bind(Game.gl);
+			 gl.glBegin(GL2.GL_QUADS);
+			 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( 0, 0, 0);
+			    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(Game.DROPDOWN_WIDTH, 0,  0);
+			    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(Game.DROPDOWN_WIDTH, -Game.TABLE_ROW_HEIGHT, 0 );
+			    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(0, -Game.TABLE_ROW_HEIGHT,  0);
+			 gl.glEnd();
+		 }
+		 gl.glPopMatrix();
+		 
+
+	}
 
 	
-	public static void DrawTable(GL2 gl, EntTable table)
+	public static void DrawUITable(GL2 gl, EntTable table)
 	{
 		 gl.glPushMatrix();
 
@@ -331,12 +372,16 @@ public class GLHelper {
 		 if (table.GetSelectedIndex() != -1)
 		 {
 			 table.GetSelectedTexture().bind(gl);
-			 gl.glBegin(GL2.GL_QUADS);
-			 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( 0, -table.GetSelectedIndex()*Game.TABLE_ROW_HEIGHT, 0);
-			    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(Game.TABLE_WIDTH, -table.GetSelectedIndex()*Game.TABLE_ROW_HEIGHT,  0);
-			    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(Game.TABLE_WIDTH, -(table.GetSelectedIndex()+1)*Game.TABLE_ROW_HEIGHT, 0 );
-			    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(0, -(table.GetSelectedIndex()+1)*Game.TABLE_ROW_HEIGHT,  0);
-			 gl.glEnd();
+			 int selectedIndexShown = table.GetSelectedIndex() - table.GetLineOffset();	//Ensures that the correct index is drawn when scrolled
+			 if (selectedIndexShown < table.GetLineCountToRender() && selectedIndexShown >= 0)
+			 {
+				 gl.glBegin(GL2.GL_QUADS);
+				 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( 0, -selectedIndexShown*Game.TABLE_ROW_HEIGHT, 0);
+				    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(Game.TABLE_WIDTH, -selectedIndexShown*Game.TABLE_ROW_HEIGHT,  0);
+				    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(Game.TABLE_WIDTH, -(selectedIndexShown+1)*Game.TABLE_ROW_HEIGHT, 0 );
+				    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(0, -(selectedIndexShown+1)*Game.TABLE_ROW_HEIGHT,  0);
+				 gl.glEnd();
+			 }
 		 }
 		 if (table.DisplayScrollbar())
 		 {
@@ -448,6 +493,8 @@ public class GLHelper {
         
         return new int[] {(int) winPos[0], (int) winPos[1]};
 	}
+
+	
 	
 
 }

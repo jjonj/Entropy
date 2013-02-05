@@ -52,15 +52,17 @@ public class Game implements GLEventListener  {
     
     public static final float TABLE_WIDTH = 0.35f,
     						  TABLE_ROW_HEIGHT = 0.0233f,
-    						  TABLE_ROW_HEIGHT_PX = 19;
+    						  TABLE_ROW_HEIGHT_PX = 19;		//Might want to calculate this instead
+    public static final int TABLE_COLUMN_WIDTH_PX = 100;	//How much space each column has in a table. Should be editable FIX
+    
+    public static final float  DROPDOWN_ROW_HEIGHT = 0.0233f;
+    public static final float  DROPDOWN_WIDTH = 0.2f;	
+    
     
     
     public static final float SCROLL_HANDLE_HEIGHT = 0.035f;
-    public static final int SCROLL_HANDLE_HEIGHT_PX = 25;	// The height in pixels of the scrollbars handler
-    
-    public static final int TABLE_COLUMN_WIDTH_PX = 100;	//How much space each column has in a table. Should be editable FIX
-    
-    
+    public static final float SCROLL_HANDLE_WIDHT = 0.009f;
+
     public static final int TEXTBOX_LINE_WIDTH = 205;
     
     public static final int CHAT_LINE_WIDTH = 240;
@@ -100,6 +102,7 @@ public class Game implements GLEventListener  {
     private List<EntUIComponent> DeckScreenUIComponents;	
     private EntUIComponent focusedUIComponent;
     EntTable playerCardTable;
+    EntDropdown playerDeckDropdown;
     private EntLabel FPSLabel;
     private Set<Card> cardsToRender;
     private EntTextbox chatTextbox;
@@ -302,10 +305,18 @@ public class Game implements GLEventListener  {
      	
      	//Initiate the player card table UI element with an empty list of data. The players cards are added once logged in.
      	List table = new ArrayList<IEntTableRow>();
-     	playerCardTable = new EntTable(-0.73f, 0.4f, table, 20, GameState.DECK_SCREEN);
+     	playerCardTable = new EntTable(-0.73f, 0.4f, 20, 21, table, 5, GameState.DECK_SCREEN);
      	DeckScreenUIComponents.add(playerCardTable);
      	
+     	
+     	List<Object> dropdown = new ArrayList<Object>();
+   
+     	playerDeckDropdown = null;
+     	
+     	
+     	
      	//LoginScreenUIComponents.add(new EntTable<String>(0.1f, 0.2f, data,4));
+     	
      	
      	LoginScreenUIComponents.add(usernameTextbox);
      	LoginScreenUIComponents.add(passwordTextbox);
@@ -749,7 +760,7 @@ public class Game implements GLEventListener  {
 	
 	public EntUIComponent CheckUICollision() 	//MOVE COLLISION DETECTION LOGIC TO EntUIComponent
 	{
-		if (gamestate == GameState.MAIN_MENU || gamestate == GameState.LOGIN)
+		if (gamestate != GameState.IN_GAME)
 		{
 			List<EntUIComponent> toIterate = null;
 			
@@ -763,59 +774,24 @@ public class Game implements GLEventListener  {
 				break;
 			case IN_GAME:
 				toIterate = IngameUIComponents;
+			case DECK_SCREEN:
+				toIterate = DeckScreenUIComponents;
 			}
 			
 			for (EntUIComponent uic : toIterate) //MOVE COLLISION DETECTION LOGIC TO EntUIComponent polymophism duh
 			{
-				if (uic instanceof EntButton) {
-					EntButton btn = (EntButton)uic;
-					int mx = EntMouseListener.MouseX;
-					int my = EntMouseListener.MouseY; //720 - EntMouseListener.MouseY -1;
-					if ( mx > btn.GetScreenX() )
-					{
-						if ( mx < btn.GetScreenWidth()+btn.GetScreenX() )
-						{
-							if (my < btn.GetScreenY())
-							{
-								if (my > btn.GetScreenY() - btn.GetScreenHeight())
-								{
-									return uic;
-								}
-							}
-						}
-					}
-				}
-				else if (uic instanceof EntTextbox)
+				if (uic instanceof EntClickable) 
 				{
-					EntTextbox tbx = (EntTextbox)uic;
+					EntClickable ecl = (EntClickable)uic;
 					int mx = EntMouseListener.MouseX;
 					int my = EntMouseListener.MouseY; //720 - EntMouseListener.MouseY -1;
-					if ( mx > tbx.GetScreenX() )
+					if ( mx > ecl.GetScreenX() )
 					{
-						if ( mx < tbx.GetScreenWidth()+tbx.GetScreenX() )
+						if ( mx < ecl.GetScreenWidth()+ecl.GetScreenX() )
 						{
-							if (my < tbx.GetScreenY())
+							if (my < ecl.GetScreenY())
 							{
-								if (my > tbx.GetScreenY() - tbx.GetScreenHeight())
-								{
-									return uic;
-								}
-							}
-						}
-					}
-				}
-				else if (uic instanceof EntTable)
-				{
-					EntTable tbl = (EntTable)uic;
-					int mx = EntMouseListener.MouseX;
-					int my = EntMouseListener.MouseY; //720 - EntMouseListener.MouseY -1;
-					if ( mx > tbl.GetScreenX() )
-					{
-						if ( mx < tbl.GetScreenWidth()+tbl.GetScreenX() )
-						{
-							if (my < tbl.GetScreenY())
-							{
-								if (my > tbl.GetScreenY() - tbl.GetScreenHeight())
+								if (my > ecl.GetScreenY() - ecl.GetScreenHeight())
 								{
 									return uic;
 								}
@@ -930,6 +906,13 @@ public class Game implements GLEventListener  {
 	public EntTable GetCardTable() 
 	{
 		return playerCardTable;
+	}
+
+	
+
+	public void AddPlayerDeckDropdown(EntDropdown entDropdown) {
+		playerDeckDropdown = entDropdown;
+     	DeckScreenUIComponents.add(playerDeckDropdown);
 	}
 
 

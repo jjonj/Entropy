@@ -41,6 +41,8 @@ public class EntTable extends EntClickable implements MouseListener, MouseMotion
 				textY,
 				selectedIndex = 2,
 				scrollHandleY,
+				scrollHandleWidth,
+				scrollHandleHeight,
 				maxLines,
 				displayLineCount,
 				offsetScrollHandleTop,
@@ -48,11 +50,11 @@ public class EntTable extends EntClickable implements MouseListener, MouseMotion
 				lineOffset = 0;	// Used for scrolling
 	private boolean scrolling = false;
 
-	public EntTable(float x, float y,  List<IEntTableRow> dataSource, GameState activeGameState)
+	public EntTable(float x, float y,  int offsetX, int offsetY,  List<IEntTableRow> dataSource, GameState activeGameState)
 	{
-		this(x, y, dataSource, dataSource.size(), activeGameState);
+		this(x, y, offsetX, offsetY, dataSource, dataSource.size(), activeGameState);
 	}
-	public EntTable(float x, float y,  List<IEntTableRow> dataSource, int maxLines, GameState activeGameState)
+	public EntTable(float x, float y, int offsetX, int offsetY, List<IEntTableRow> dataSource, int maxLines, GameState activeGameState)
 	{
 		//Width should be adjustable, probably like button size "is"
 		super(x, y, Game.TABLE_WIDTH, Game.TABLE_ROW_HEIGHT*maxLines);
@@ -63,10 +65,18 @@ public class EntTable extends EntClickable implements MouseListener, MouseMotion
 		this.activeGameState = activeGameState;
 		
 		int[] temp =  GLHelper.ConvertGLFloatToGLScreen(0, 0);
-		float zeroOnScreen = temp[1];
+		float zeroOnScreenX = temp[0],
+		      zeroOnScreenY = temp[1];
 		
 		temp =  GLHelper.ConvertGLFloatToGLScreen(0, Game.TABLE_ROW_HEIGHT);
-		lineHeight = temp[1] - zeroOnScreen;
+		lineHeight = temp[1] - zeroOnScreenY;
+		
+		temp = GLHelper.ConvertGLFloatToGLScreen(Game.SCROLL_HANDLE_WIDHT, 0);
+		scrollHandleWidth = (int) (temp[0] - zeroOnScreenX);
+		
+		temp = GLHelper.ConvertGLFloatToGLScreen(0, Game.SCROLL_HANDLE_HEIGHT);
+		scrollHandleHeight = (int) (temp[1] - zeroOnScreenY);
+		
 		
 		fontLineHeight = (int)lineHeight+1;
 		//selectedIndex = -1;
@@ -82,8 +92,8 @@ public class EntTable extends EntClickable implements MouseListener, MouseMotion
 		GLHelper.InitTexture(Game.gl, scrollHandleTexture);
 		GLHelper.InitTexture(Game.gl, selectedFieldTexture);
 		temp = GLHelper.ConvertGLFloatToGLScreen(x, y);
-		this.textX = temp[0] + 20;
-	    this.textY = temp[1] + 30;
+		this.textX = temp[0] + offsetX;
+	    this.textY = temp[1] + offsetY;
 		
 	    scrollHandleY = screenY;
 	    scrollHandleYOffsetGLFloat = 0;
@@ -121,7 +131,7 @@ public class EntTable extends EntClickable implements MouseListener, MouseMotion
 		if (texture != null)
 		{
 			texture.bind(Game.gl);
-			GLHelper.DrawTable(Game.gl, this);
+			GLHelper.DrawUITable(Game.gl, this);
 		}
 		
 		
@@ -190,10 +200,22 @@ public class EntTable extends EntClickable implements MouseListener, MouseMotion
 		UpdateScreenCoords();
 		scrollHandleY = screenY - mouseOffSetFromTaTop;
 		int[] temp =  GLHelper.ConvertGLFloatToGLScreen(0, 0);
-		float zeroOnScreen = temp[1];
+		float zeroOnScreenX = temp[0],
+		      zeroOnScreenY = temp[1];
 		
 		temp =  GLHelper.ConvertGLFloatToGLScreen(0, Game.TABLE_ROW_HEIGHT);
-		lineHeight = temp[1] - zeroOnScreen;
+		lineHeight = temp[1] - zeroOnScreenY;
+		
+		temp = GLHelper.ConvertGLFloatToGLScreen(Game.SCROLL_HANDLE_WIDHT, 0);
+		scrollHandleWidth = (int) (temp[0] - zeroOnScreenX);
+		
+		temp = GLHelper.ConvertGLFloatToGLScreen(0, Game.SCROLL_HANDLE_HEIGHT);
+		scrollHandleHeight = (int) (temp[1] - zeroOnScreenY);
+		
+		//Resetting the scrollbar position on resize simplifies problems with pixel calculations done in one window size transfering to another. It could be done with converting to GL coordinates before resize then recalculating the new pixel values using GLHelperConvert
+		scrollHandleY = screenY;
+	    lineOffset = 0;
+	    scrollHandleYOffsetGLFloat = 0;
 	}
 	
 	
@@ -210,15 +232,16 @@ public class EntTable extends EntClickable implements MouseListener, MouseMotion
 		if ( Game.GetInstance().GetGameState() == activeGameState)	
 		{
 			if (e.getButton() == MouseEvent.BUTTON1 && screenX < EntMouseListener.MouseX && screenX+w > EntMouseListener.MouseX && screenY > EntMouseListener.MouseY && screenY-(displayLineCount*lineHeight) < EntMouseListener.MouseY)
-			{
-				if (screenX+w - EntMouseListener.MouseX < 7 && EntMouseListener.MouseY > scrollHandleY - Game.SCROLL_HANDLE_HEIGHT_PX && EntMouseListener.MouseY < scrollHandleY)
+			{																	
+				if (screenX+w - EntMouseListener.MouseX < scrollHandleWidth && EntMouseListener.MouseY > scrollHandleY - scrollHandleHeight  && EntMouseListener.MouseY < scrollHandleY)
 				{
 					offsetScrollHandleTop = scrollHandleY - EntMouseListener.MouseY;
-					selectedIndex = (int) (offsetScrollHandleTop % lineHeight);
 					scrolling = true;
 				}
 				else
-					selectedIndex = (int) ((scrollHandleY - EntMouseListener.MouseY) / (int)lineHeight);
+				{
+					selectedIndex = (int) ((screenY - EntMouseListener.MouseY) / (int)lineHeight)+lineOffset;
+				}
 			}
 		}
 	}
@@ -236,7 +259,7 @@ public class EntTable extends EntClickable implements MouseListener, MouseMotion
 		if (scrolling)
 		{
 			//Subtracting the height of a scroll handle allows mouse offset on the handle to be taken into account for positioning the handle. This also require the handle offset be added to the mouse Y coordinate
-			int adjH = h -  Game.SCROLL_HANDLE_HEIGHT_PX;	
+			int adjH = h -  scrollHandleHeight;	//Adjusted height
 			mouseOffSetFromTaTop = screenY - (EntMouseListener.MouseY+offsetScrollHandleTop);
 			if (mouseOffSetFromTaTop < 0 )
 				mouseOffSetFromTaTop = 0;
@@ -253,11 +276,22 @@ public class EntTable extends EntClickable implements MouseListener, MouseMotion
 		// TODO Auto-generated method stub
 		
 	}
-	public int GetSelectedIndex() {
+	public int GetSelectedIndex() 
+	{
 		return selectedIndex;
+	}
+	
+	//Assumes UpdateData has been called before the last change to the dataSource
+	public IEntTableRow GetSelectedObject()
+	{
+		return dataSource.get(selectedIndex);
 	}
 	public Texture GetSelectedTexture() {
 		return selectedFieldTexture;
+	}
+	public int GetLineOffset() 
+	{
+		return lineOffset;
 	}
 	
 

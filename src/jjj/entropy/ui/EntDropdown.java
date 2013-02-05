@@ -1,0 +1,174 @@
+package jjj.entropy.ui;
+
+import java.awt.Font;
+import java.awt.Color;
+import java.io.File;
+import java.io.IOException;
+import java.nio.DoubleBuffer;
+import java.nio.IntBuffer;
+import java.util.List;
+
+import javax.media.opengl.GL2;
+import javax.media.opengl.GLException;
+
+import jjj.entropy.GLHelper;
+import jjj.entropy.Game;
+import jjj.entropy.NetworkManager;
+import jjj.entropy.Game.*;
+import jjj.entropy.classes.Enums.*;
+
+import com.jogamp.opengl.util.awt.TextRenderer;
+import com.jogamp.opengl.util.texture.Texture;
+import com.jogamp.opengl.util.texture.TextureIO;
+
+public class EntDropdown extends EntClickable
+{
+	
+	
+	private List<Object> dataSource;	//The data in the list 	
+	private String[] data;				//The internal data, preventing side effects. UpdateData must be called to update it
+	
+	
+	
+	private EntFont  font;
+	private Texture texture,
+					selectedFieldTexture;
+	private boolean selecting;	// True if menu is open/dropped down
+	
+	private int textX,
+				textY,
+				fontLineHeight,
+				selectedIndex;
+	private float lineHeight;
+	
+
+	public EntDropdown(float x, float y, int xOffset,int yOffset, List<Object> dataSource)
+	{
+		super(x, y, Game.DROPDOWN_WIDTH, Game.DROPDOWN_ROW_HEIGHT * dataSource.size());	//Set the height to the height it would be at when selecting
+		this.dataSource = dataSource;
+		this.font = new EntFont(EntFont.FontTypes.MainParagraph, Font.PLAIN, 16);
+
+		
+		data = null;
+		UpdateData();
+		
+
+		this.textX = screenX+xOffset;
+        this.textY = screenY+yOffset;
+        
+        selecting = false;
+        selectedIndex = 0;
+
+		int[] temp =  GLHelper.ConvertGLFloatToGLScreen(0, 0);
+		float zeroOnScreenX = temp[0],
+		      zeroOnScreenY = temp[1];
+		
+		temp =  GLHelper.ConvertGLFloatToGLScreen(0, Game.DROPDOWN_ROW_HEIGHT);
+		lineHeight = temp[1] - zeroOnScreenY;
+		fontLineHeight = (int)lineHeight+1;
+        
+		
+		try {	//Temporarily just using the textures from EntTable
+			texture = TextureIO.newTexture(new File("resources/textures/TableEntry.png"), true);
+			selectedFieldTexture = TextureIO.newTexture(new File("resources/textures/SelectedTableEntry.png"), true);
+		} catch (GLException | IOException e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
+		
+	}
+	
+	
+	
+	public void Render(Game game)
+	{
+		if (texture != null)
+		{
+			texture.bind(Game.gl);
+			GLHelper.DrawUIDropdown(Game.gl, this);
+		}
+		
+	
+		if (selecting)
+		{		
+			int yOffset = textY;
+			for (Object o : dataSource)
+			{
+				font.Render(game, textX, yOffset, o.toString());
+				yOffset -= fontLineHeight;
+			}
+		}
+		else
+			font.Render(game, textX, textY, dataSource.get(selectedIndex).toString());
+				
+	}
+	
+	
+	
+	public void UpdateData()
+	{
+		if (data == null || data.length != dataSource.size())
+			data = new String[dataSource.size()];
+		
+		for (int i = 0; i < dataSource.size(); i++)
+		{
+			data[i] = dataSource.get(i).toString();
+		}
+	
+	}
+
+
+	@Override
+	public void Activate(int mouseX, int mouseY)
+	{
+		if (!selecting)
+		{
+			if (mouseY > screenY - h/data.length)	//Only accept clicks on the visible element when not selecting
+				selecting = true;
+		}
+		else
+		{
+			selectedIndex = (screenY - mouseY) / (h/data.length); 
+			selecting = false;
+		}
+	}
+
+	public Texture GetSelectedTexture() 
+	{
+		return selectedFieldTexture;
+	}
+
+	public int GetSelectedIndex() 
+	{
+		return selectedIndex;
+	}
+	
+	//Assumes UpdateData has been called before the last change to the dataSource
+	public Object GetSelectedObject()
+	{
+		return dataSource.get(selectedIndex);
+	}
+
+	public float GetDataSize() {
+		return data.length;
+	}
+
+	public boolean IsSelecting() {
+		return selecting;
+	}
+
+
+
+	public Texture GetTexture() {
+		return texture;
+	}
+
+/*	//The dimensions of the dropdown cant be adjusted on event thread, so disabling this functionality
+
+	public void SetDataSource(List<Object> dataSource) 
+	{
+		this.dataSource = dataSource;
+		data = null;
+		UpdateData();
+	}*/
+}
