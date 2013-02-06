@@ -48,49 +48,13 @@ public class NetworkManager extends Listener
 	{
 		if (networkState == NetworkState.OFFLINE)
 		{
-			client = new Client();
-			
-			client.addListener(new Listener() {
-				   public void received (Connection connection, Object object) {
-				      if (object instanceof ChatMessage) {
-				    	  ChatMessage response = (ChatMessage)object;
-				         System.out.println(response.message);
-				      }
-				   }
-				});
-	
-			  Kryo kryo = client.getKryo();
-			  kryo.register(ChatMessage.class);
-			  kryo.register(GameMessage.class);
-			  kryo.register(ActionMessage.class);
-			  kryo.register(CardDataMessage.class);
-			  kryo.register(LoginMessage.class);
-			  kryo.register(PlayerDataMessage.class);
-			  kryo.register(String[].class);
-			  kryo.register(int[].class);
-			  kryo.register(int[][].class);
-				
-			  client.addListener(this);
-				
-			  
-			  
-			  client.start();
-			  try {
-				  client.connect(5000, IP, port);
-			  } catch (IOException e) {
-					System.out.println("FAILED TO CONNECT TO SERVER: " + IP + " ON PORT "+port );
-					e.printStackTrace();
-					System.exit(1);
-			  }
-				
-			  networkState = NetworkState.CONNECTED;
+			 networkState = NetworkState.CONNECTED;
 		}
 	}
 	
 
 	public void Disconnect() {
-		client.close();
-		searchingGame = false;
+
 		networkState = NetworkState.OFFLINE;
 	}
 	
@@ -98,10 +62,7 @@ public class NetworkManager extends Listener
 	{
 		if (networkState == NetworkState.CONNECTED)
 		{
-			LoginMessage logMsg = new LoginMessage();
-			logMsg.username = username;
-			logMsg.password = password;
-			client.sendTCP(logMsg);
+
 			networkState = NetworkState.LOGGING_IN;
 		}
 	}
@@ -110,29 +71,20 @@ public class NetworkManager extends Listener
 	{
 		if (networkState == NetworkState.LOGGED_IN && searchingGame == false)
 		{
-			searchingGame = true;
-			GameMessage joinRequest = new GameMessage();
-			joinRequest.playerID = Game.GetInstance().GetPlayer(1).GetID();
-			client.sendTCP(joinRequest);
+
 		}
 	}
 	
 	public void SendAction(int cardID, int mode, int modeNumber) {
 		if (networkState == NetworkState.IN_GAME)
 		{
-			ActionMessage amsg = new ActionMessage();
-			amsg.cardID = cardID;
-			amsg.mode = mode;
-			amsg.modeNumber = modeNumber;
-			amsg.playerID = Game.GetInstance().GetPlayer(1).GetID();
-			client.sendTCP(amsg);
+
 		}
 	}
 	
 	public void SendTextMessage(String text)
 	{
-		ChatMessage request = new ChatMessage();
-		client.sendTCP(request);
+
 	}
 	
 	public void QueueCardTemplateLoad(CardTemplate template)
@@ -148,28 +100,19 @@ public class NetworkManager extends Listener
 	
 	@Override
 	public void connected (Connection connection) {
-		
-		System.out.println(connection.getRemoteAddressTCP().toString() + " CONNECTING!");
-		
+
 	}
 	
 	@Override
 	public void disconnected (Connection connection) {
-		System.out.println("SOMEONE DISCONNECTING!");
 		
 	}
 
 	@Override
 	public void received (Connection connection, Object object) {
-		System.out.println("Message recieved!");
-		if(object instanceof LoginMessage) {	//Assert: Only recieved when login was denied
-			if (networkState == NetworkState.LOGGING_IN && ((LoginMessage)object).rejected)
-			{
-				// MISSING: Notify user
-				networkState = NetworkState.CONNECTED;
-			}
-			
-		}
+
+
+		
 		else if (object instanceof PlayerDataMessage)	//When logging in, a cardDataMessage should always be recieved first to load the players deck.
 		{
 			PlayerDataMessage pdm = (PlayerDataMessage)object;
