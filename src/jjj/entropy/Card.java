@@ -146,9 +146,9 @@ public class Card implements IEntTableRow
 	public void PlayToLife(Life life, boolean enemy)
 	{
 		if (!enemy)	
-			SetTarget(Life.GetXLoc(life), 0, 1, -90, 0, 0);
+			SetTarget(Life.GetXLoc(life), 0, 1, -90, 0, 180);
 		else
-			SetTarget(Life.GetXLoc(life), 0, 10, -90, 0, 180);
+			SetTarget(Life.GetXLoc(life), 0, 10, -90, 0, 0);
 	}
 	public void PlayToHand(int cardsOnHand){PlayToHand(cardsOnHand, false);}
 	public void PlayToHand(int cardsOnHand, boolean enemy)

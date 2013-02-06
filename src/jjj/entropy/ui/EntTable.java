@@ -60,7 +60,6 @@ public class EntTable extends EntClickable implements MouseListener, MouseMotion
 		super(x, y, Game.TABLE_WIDTH, Game.TABLE_ROW_HEIGHT*maxLines);
 		this.maxLines = maxLines;
 		this.font = new EntFont(EntFont.FontTypes.MainParagraph, Font.PLAIN, 16);
-		lineHeight = Game.TABLE_ROW_HEIGHT_PX;
 		this.dataSource = dataSource;
 		this.activeGameState = activeGameState;
 		
@@ -70,8 +69,7 @@ public class EntTable extends EntClickable implements MouseListener, MouseMotion
 		
 		temp =  GLHelper.ConvertGLFloatToGLScreen(0, Game.TABLE_ROW_HEIGHT);
 		lineHeight = temp[1] - zeroOnScreenY;
-		
-		temp = GLHelper.ConvertGLFloatToGLScreen(Game.SCROLL_HANDLE_WIDHT, 0);
+	
 		scrollHandleWidth = (int) (temp[0] - zeroOnScreenX);
 		
 		temp = GLHelper.ConvertGLFloatToGLScreen(0, Game.SCROLL_HANDLE_HEIGHT);
@@ -206,7 +204,7 @@ public class EntTable extends EntClickable implements MouseListener, MouseMotion
 		temp =  GLHelper.ConvertGLFloatToGLScreen(0, Game.TABLE_ROW_HEIGHT);
 		lineHeight = temp[1] - zeroOnScreenY;
 		
-		temp = GLHelper.ConvertGLFloatToGLScreen(Game.SCROLL_HANDLE_WIDHT, 0);
+	
 		scrollHandleWidth = (int) (temp[0] - zeroOnScreenX);
 		
 		temp = GLHelper.ConvertGLFloatToGLScreen(0, Game.SCROLL_HANDLE_HEIGHT);

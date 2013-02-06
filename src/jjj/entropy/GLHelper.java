@@ -209,10 +209,10 @@ public class GLHelper {
 		backSideTexture.bind(gl);
 		gl.glBegin(GL2.GL_QUADS);
 		// Back Face
-	    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f( CARD_WIDTH/2,  CARD_HEIGHT/2, CARD_THICKNESS);
-	    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f( CARD_WIDTH/2,  -CARD_HEIGHT/2, CARD_THICKNESS);
-	    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f( -CARD_WIDTH/2, -CARD_HEIGHT/2, CARD_THICKNESS);
-	    gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-CARD_WIDTH/2,  CARD_HEIGHT/2, CARD_THICKNESS);
+	    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f( CARD_WIDTH/2,  -CARD_HEIGHT/2, CARD_THICKNESS);
+	    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f( CARD_WIDTH/2,  CARD_HEIGHT/2, CARD_THICKNESS);
+	    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f( -CARD_WIDTH/2, CARD_HEIGHT/2, CARD_THICKNESS);
+	    gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-CARD_WIDTH/2,  -CARD_HEIGHT/2, CARD_THICKNESS);
 	    gl.glEnd();   
 	    /*tpTexture2.destroy(gl);
 		gl.glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
@@ -314,48 +314,6 @@ public class GLHelper {
 		 gl.glPopMatrix();
 	}
 	
-	public static void DrawUIDropdown(GL2 gl, EntDropdown dropdown) 
-	{
-		 gl.glPushMatrix();
-
-		 gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-		 gl.glTranslatef(dropdown.GetX(), dropdown.GetY(), 0);
-
-		 if (dropdown.IsSelecting())
-		 {
-			 dropdown.GetTexture().bind(Game.gl);
-			 gl.glBegin(GL2.GL_QUADS);
-			 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( 0, 0, 0);
-			    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(Game.DROPDOWN_WIDTH, 0,  0);
-			    gl.glTexCoord2f(1.0f, (float)dropdown.GetDataSize()); gl.glVertex3f(Game.DROPDOWN_WIDTH, -(float)dropdown.GetDataSize()*Game.TABLE_ROW_HEIGHT, 0 );
-			    gl.glTexCoord2f(0.0f, (float)dropdown.GetDataSize()); gl.glVertex3f(0, -(float)dropdown.GetDataSize()*Game.TABLE_ROW_HEIGHT, 0);
-			 gl.glEnd();
-			 
-			 //Showing the selected element
-			 dropdown.GetSelectedTexture().bind(gl);
-		
-			 gl.glBegin(GL2.GL_QUADS);
-			 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( 0, -dropdown.GetSelectedIndex()*Game.DROPDOWN_ROW_HEIGHT, 0);
-			    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(Game.DROPDOWN_WIDTH, -dropdown.GetSelectedIndex()*Game.DROPDOWN_ROW_HEIGHT,  0);
-			    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(Game.DROPDOWN_WIDTH, -(dropdown.GetSelectedIndex()+1)*Game.DROPDOWN_ROW_HEIGHT, 0 );
-			    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(0, -(dropdown.GetSelectedIndex()+1)*Game.DROPDOWN_ROW_HEIGHT,  0);
-			 gl.glEnd();
-		 }
-		 else
-		 {
-			 dropdown.GetTexture().bind(Game.gl);
-			 gl.glBegin(GL2.GL_QUADS);
-			 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( 0, 0, 0);
-			    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(Game.DROPDOWN_WIDTH, 0,  0);
-			    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(Game.DROPDOWN_WIDTH, -Game.TABLE_ROW_HEIGHT, 0 );
-			    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(0, -Game.TABLE_ROW_HEIGHT,  0);
-			 gl.glEnd();
-		 }
-		 gl.glPopMatrix();
-		 
-
-	}
-
 	
 	public static void DrawUITable(GL2 gl, EntTable table)
 	{

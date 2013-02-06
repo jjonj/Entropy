@@ -21,7 +21,7 @@ import com.jogamp.opengl.util.awt.TextRenderer;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureIO;
 
-public class EntDropdown extends EntClickable
+public class EntDropdown
 {
 	
 	
@@ -41,53 +41,11 @@ public class EntDropdown extends EntClickable
 				selectedIndex;
 	private float lineHeight;
 	
-
-	public EntDropdown(float x, float y, int xOffset,int yOffset, List<Object> dataSource)
-	{
-		super(x, y, Game.DROPDOWN_WIDTH, Game.DROPDOWN_ROW_HEIGHT * dataSource.size());	//Set the height to the height it would be at when selecting
-		this.dataSource = dataSource;
-		this.font = new EntFont(EntFont.FontTypes.MainParagraph, Font.PLAIN, 16);
-
-		
-		data = null;
-		UpdateData();
-		
-
-		this.textX = screenX+xOffset;
-        this.textY = screenY+yOffset;
-        
-        selecting = false;
-        selectedIndex = 0;
-
-		int[] temp =  GLHelper.ConvertGLFloatToGLScreen(0, 0);
-		float zeroOnScreenX = temp[0],
-		      zeroOnScreenY = temp[1];
-		
-		temp =  GLHelper.ConvertGLFloatToGLScreen(0, Game.DROPDOWN_ROW_HEIGHT);
-		lineHeight = temp[1] - zeroOnScreenY;
-		fontLineHeight = (int)lineHeight+1;
-        
-		
-		try {	//Temporarily just using the textures from EntTable
-			texture = TextureIO.newTexture(new File("resources/textures/TableEntry.png"), true);
-			selectedFieldTexture = TextureIO.newTexture(new File("resources/textures/SelectedTableEntry.png"), true);
-		} catch (GLException | IOException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
-		
-	}
-	
 	
 	
 	public void Render(Game game)
 	{
-		if (texture != null)
-		{
-			texture.bind(Game.gl);
-			GLHelper.DrawUIDropdown(Game.gl, this);
-		}
-		
+	
 	
 		if (selecting)
 		{		
@@ -118,20 +76,7 @@ public class EntDropdown extends EntClickable
 	}
 
 
-	@Override
-	public void Activate(int mouseX, int mouseY)
-	{
-		if (!selecting)
-		{
-			if (mouseY > screenY - h/data.length)	//Only accept clicks on the visible element when not selecting
-				selecting = true;
-		}
-		else
-		{
-			selectedIndex = (screenY - mouseY) / (h/data.length); 
-			selecting = false;
-		}
-	}
+
 
 	public Texture GetSelectedTexture() 
 	{
