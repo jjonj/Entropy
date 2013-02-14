@@ -84,6 +84,7 @@ public class Game implements GLEventListener  {
 	private float aspectRatio;
 	private boolean fullscreen = false;
 	private boolean showFPS = false;
+	private boolean loggedIn = false;
     private int realGameHeight;	//Used for calculating the real Y values
 	
 	public static GL2 gl;				//These are made 'public static' as they can be accessed that way regardless.
@@ -101,7 +102,8 @@ public class Game implements GLEventListener  {
     private List<EntUIComponent> LoginScreenUIComponents;	
     private List<EntUIComponent> DeckScreenUIComponents;	
     private EntUIComponent focusedUIComponent;
-    EntTable playerCardTable;
+    EntTable playerCardTable,
+    		 playerDeckTable;
     EntDropdown playerDeckDropdown;
     private EntLabel FPSLabel;
     private Set<Card> cardsToRender;
@@ -109,6 +111,8 @@ public class Game implements GLEventListener  {
     private EntLabel chatWindow;
     private EntTextbox usernameTextbox,
     				   passwordTextbox;
+    
+    Deck buildingDeck;
     
     private int c = 0;
     private float rotator = 0.0f;
@@ -304,9 +308,14 @@ public class Game implements GLEventListener  {
      	
      	
      	//Initiate the player card table UI element with an empty list of data. The players cards are added once logged in.
-     	List table = new ArrayList<IEntTableRow>();
-     	playerCardTable = new EntTable(-0.73f, 0.4f, 20, 21, table, 5, GameState.DECK_SCREEN);
+     	List tempTable = new ArrayList<IEntTableRow>();
+     	playerCardTable = new EntTable(-0.73f, 0.4f, 20, 21, tempTable, 20, GameState.DECK_SCREEN);
      	DeckScreenUIComponents.add(playerCardTable);
+     	
+     	//The card table for the current deck
+     	playerDeckTable = new EntTable(-0.35f, 0.0f, 20, 1, tempTable, 20, GameState.DECK_SCREEN);
+     	DeckScreenUIComponents.add(playerDeckTable);
+     	
      	
      	
      	List<Object> dropdown = new ArrayList<Object>();
@@ -351,6 +360,7 @@ public class Game implements GLEventListener  {
     	switch (gamestate)
     	{
     		case LOGIN:
+    			
 	    		gl.glLoadIdentity();   		
 	    		gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
 		    	gl.glLoadIdentity();
@@ -377,6 +387,12 @@ public class Game implements GLEventListener  {
 		         break;
     		case MAIN_MENU:
 
+    			if (!loggedIn)	//If a player has just logged in
+    			{
+    				loggedIn = true;
+    				OnLogin();
+    			}
+    			
 	    		gl.glLoadIdentity();   		
 	    		gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
 		    	gl.glLoadIdentity();
@@ -402,7 +418,9 @@ public class Game implements GLEventListener  {
     			break;
     		case DECK_SCREEN:
     			
-
+    		
+    			
+    			
     			//   -------------------------------------- LOAD ANY MISSING TEXTURES   ----------------------------------
     			
 
@@ -425,50 +443,6 @@ public class Game implements GLEventListener  {
 				 	gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-0.74f,0.415f, 0f);
 				 gl.glEnd();
 		 	    	
-
-			//	 float xCounter = -0.1f;
-				gl.glPushMatrix();
-
-				 gl.glTranslatef(-0.6f, -0.15f, 0);
-				
-
-    			for (Deck de : Game.GetInstance().GetPlayer(1).GetAllDecks())
-				{
-    				 cardBackside.bind(gl);
-	   				 gl.glBegin(GL2.GL_QUADS);
-		   			    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f( CARD_WIDTH/15, -CARD_HEIGHT/15,  0.0f);
-					    gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-CARD_WIDTH/15, -CARD_HEIGHT/15,  0.0f);
-					    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-CARD_WIDTH/15,  CARD_HEIGHT/15, 0.0f);
-					    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f( CARD_WIDTH/15,  CARD_HEIGHT/15,  0.0f);
-	   				 gl.glEnd();
-				}
-    			
-    			 gl.glTranslatef(0f, 0.3f, 0);
- 				
-
-				 
-			    for (Card ca : GetPlayer(1).GetAllCards())
-			    {
-			   // 	 ca.SetX(xCounter);
-			    	 
-					 
-					 ca.GetTemplate().GetTexture().bind(gl);
-
-					 gl.glTranslatef(0.15f, 0, 0);
-					
-					 
-				     gl.glBegin(GL2.GL_QUADS);
-
-			        gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f( CARD_WIDTH/15, -CARD_HEIGHT/15,  0.0f);
-				    gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-CARD_WIDTH/15, -CARD_HEIGHT/15,  0.0f);
-				    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-CARD_WIDTH/15,  CARD_HEIGHT/15, 0.0f);
-				    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f( CARD_WIDTH/15,  CARD_HEIGHT/15,  0.0f);
-				    
-					gl.glEnd();   
-					 
-			  // 	xCounter += 0.05f;
-			    }
-			    gl.glPopMatrix();
 			    
 	 	    	 //     ---------------------------------         DRAW UI       ------------------------------------------
 	 	    	for (EntUIComponent c : DeckScreenUIComponents)
@@ -521,7 +495,6 @@ public class Game implements GLEventListener  {
     			 	gl.glVertex3f(0.0f,0.0f,10.0f);
     			 gl.glEnd();
     			   gl.glColor4f(1.0f, 1.0f, 1.0f, 1f);
-    			   
     			 gl.glEnable(GL2.GL_TEXTURE_2D);     
     			 
     			 //     ---------------------------------         DRAW OTHERS       ------------------------------------------
@@ -821,6 +794,10 @@ public class Game implements GLEventListener  {
 		case IN_GAME:
 			SetFocusedUIComponent(IngameUIComponents.get(0));
 			break;
+		case DECK_SCREEN:
+			SetFocusedUIComponent(DeckScreenUIComponents.get(0));
+			OnDeckScreen();	//Call the method for 
+			break;
 		}
 	}
 
@@ -907,15 +884,53 @@ public class Game implements GLEventListener  {
 	{
 		return playerCardTable;
 	}
-
 	
+	//Returns the UI EntTable object that manages the players cards
+	public EntTable GetDeckTable() 
+	{
+		return playerDeckTable;
+	}
+	
+	
+	
+	public void OnDeckScreen()
+	{
+		buildingDeck = GetPlayer(1).GetActiveDeck();
+		
+		
+		
+		List<IEntTableRow> deckCards = new ArrayList<IEntTableRow>();
+		//Add the newly created players cards to it
+		
+		for (Card c : buildingDeck)
+		{
+		
+			deckCards.add(c);
+		
+		}
+		playerDeckTable.SetDataSource(deckCards);
+		
+	}
 
-	public void AddPlayerDeckDropdown(EntDropdown entDropdown) {
+	public void OnLogin()
+	{
+		//Add the players deck to the dropdown of decks
+		Game.GetInstance().AddPlayerDeckDropdown(new EntDropdown<Deck>(-0.35f,0.39f,12,20, GetPlayer(1).GetAllDecks()));
+
+	}
+	
+	
+	public void AddPlayerDeckDropdown(EntDropdown<Deck> entDropdown) 
+	{
 		playerDeckDropdown = entDropdown;
      	DeckScreenUIComponents.add(playerDeckDropdown);
 	}
 
 
+	
+	
+	
+	
 	
 }
 

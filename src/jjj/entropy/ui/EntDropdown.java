@@ -21,11 +21,11 @@ import com.jogamp.opengl.util.awt.TextRenderer;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureIO;
 
-public class EntDropdown extends EntClickable
+public class EntDropdown <T> extends EntClickable
 {
 	
 	
-	private List<Object> dataSource;	//The data in the list 	
+	private List<T> dataSource;	//The data in the list 	
 	private String[] data;				//The internal data, preventing side effects. UpdateData must be called to update it
 	
 	
@@ -42,7 +42,7 @@ public class EntDropdown extends EntClickable
 	private float lineHeight;
 	
 
-	public EntDropdown(float x, float y, int xOffset,int yOffset, List<Object> dataSource)
+	public EntDropdown(float x, float y, int xOffset,int yOffset, List<T> dataSource)
 	{
 		super(x, y, Game.DROPDOWN_WIDTH, Game.DROPDOWN_ROW_HEIGHT * dataSource.size());	//Set the height to the height it would be at when selecting
 		this.dataSource = dataSource;
@@ -144,7 +144,7 @@ public class EntDropdown extends EntClickable
 	}
 	
 	//Assumes UpdateData has been called before the last change to the dataSource
-	public Object GetSelectedObject()
+	public T GetSelectedObject()
 	{
 		return dataSource.get(selectedIndex);
 	}
@@ -163,12 +163,11 @@ public class EntDropdown extends EntClickable
 		return texture;
 	}
 
-/*	//The dimensions of the dropdown cant be adjusted on event thread, so disabling this functionality
 
-	public void SetDataSource(List<Object> dataSource) 
+	public void SetDataSource(List<T> dataSource) 
 	{
 		this.dataSource = dataSource;
 		data = null;
 		UpdateData();
-	}*/
+	}
 }

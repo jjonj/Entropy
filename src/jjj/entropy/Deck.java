@@ -13,12 +13,13 @@ public class Deck extends CardCollection {
 
 	
 	private Player owner;
-	
+	private String name;
 	private List<Card> remainingCards;	//Cards unplayed in the deck in a given game
 	
-	public Deck(Player owner)
+	public Deck(Player owner, String name)
 	{
 		super();
+		this.name = name;
 		remainingCards = new ArrayList<Card>();
 		this.owner = owner;
 	}
@@ -96,8 +97,9 @@ public class Deck extends CardCollection {
 		return null;
 	}
 	
-	public static Deck LoadDeck(Player owner, int[] deck) {
-		Deck rDeck = new Deck(owner);
+	public static Deck LoadDeck(Player owner, String deckName, int[] deck) 
+	{
+		Deck rDeck = new Deck(owner, deckName);
 	
 		try {
 			for (int c : deck)
@@ -119,5 +121,12 @@ public class Deck extends CardCollection {
 	}
 
 
+	
+	@Override 
+	public String toString() 
+	{
+	    return name;
+	}
+	
 	
 }

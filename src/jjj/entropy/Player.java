@@ -37,9 +37,9 @@ public class Player {
 		
 		if (decks != null)
 		{
-			for ( int[] d : decks )              
+			for (int i = 0; i < decks.length; i++)
 			{
-				this.decks.add(Deck.LoadDeck(this, d));
+				this.decks.add(Deck.LoadDeck(this, "Deck "+(i+1), decks[i]));	//Temporary deck names
 			}
 			this.activeDeck = this.decks.get(activeDeck);
 		}
@@ -54,7 +54,7 @@ public class Player {
 		this.name = name;
 		
 		if (activeDeck != null)
-			this.activeDeck = Deck.LoadDeck(this, activeDeck);
+			this.activeDeck = Deck.LoadDeck(this, "Default deck",activeDeck);
 
 	}
 
@@ -67,6 +67,7 @@ public class Player {
 		return activeDeck;
 	}
 	
+
 	public List<Deck> GetAllDecks()
 	{
 		return decks;

@@ -133,8 +133,7 @@ public class EntTable extends EntClickable implements MouseListener, MouseMotion
 			texture.bind(Game.gl);
 			GLHelper.DrawUITable(Game.gl, this);
 		}
-		
-		
+
 		for (int k = lineOffset; k < displayLineCount+lineOffset; k++)
 		{
 			i = 0;

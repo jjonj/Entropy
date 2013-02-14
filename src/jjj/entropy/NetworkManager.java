@@ -191,19 +191,9 @@ public class NetworkManager extends Listener
 				
 				Game.GetInstance().GetCardTable().SetDataSource(playerCards);
 				
-				List<Object> decks = new ArrayList<Object>();
-				for (int i = 0; i < pdm.decks.length; i++)
-				{
-					decks.add("Deck " + (i+1));
-				}
 				
-
 				
-				Game.GetInstance().AddPlayerDeckDropdown(new EntDropdown(-0.35f,0.39f,12,20, decks));
-				
-
-		     	
-				
+			
 				//Game.GetInstance().GetDeckDropdown().SetDataSource(decks);
 				
 				
