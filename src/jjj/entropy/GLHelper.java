@@ -10,10 +10,11 @@ import javax.media.opengl.GL2;
 import javax.media.opengl.GLException;
 import javax.media.opengl.glu.GLU;
 
-import jjj.entropy.ui.EntButton;
-import jjj.entropy.ui.EntDropdown;
-import jjj.entropy.ui.EntTable;
-import jjj.entropy.ui.EntTextbox;
+import jjj.entropy.classes.Const;
+import jjj.entropy.ui.Button;
+import jjj.entropy.ui.Dropdown;
+import jjj.entropy.ui.Table;
+import jjj.entropy.ui.Textbox;
 
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureIO;
@@ -30,6 +31,7 @@ public class GLHelper {
 				BigButtonModel,
 				MediumButtonModel,
 				SmallButtonModel,
+				TinySquareButtonModel,
 				TextboxModel;
 	
 	private static float HALF_CARD_HEIGHT;
@@ -47,6 +49,33 @@ public class GLHelper {
 		texture.setTexParameteri(gl, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
 		texture.setTexParameteri(gl, GL2.GL_TEXTURE_MIN_FILTER,
 				GL.GL_LINEAR_MIPMAP_LINEAR);
+	}
+	
+	public static void InitOpenGL() {
+		Game.gl.glClearColor(0.9f, 0.78f, 0.6f, 1.0f);
+        
+		Game.gl.glEnable(GL.GL_BLEND);
+    	Game.gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+        
+        Game.gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_S, GL2.GL_REPEAT);
+        Game.gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_T, GL2.GL_REPEAT);
+       
+        Game.gl.glEnable(GL2.GL_TEXTURE_2D);                            
+        Game.gl.glDepthFunc(GL2.GL_LEQUAL);                             		// The Type Of Depth Testing To Do
+        Game.gl.glHint(GL2.GL_PERSPECTIVE_CORRECTION_HINT, GL2.GL_NICEST);  // Really Nice Perspective Calculations
+         
+         
+        Game.gl.glShadeModel(GL2.GL_SMOOTH);
+        Game.gl.glEnable(GL2.GL_DEPTH_TEST);
+     	
+     	//Calling generate methods that initiate the displaylists in openGL for fast rendering
+     	GLHelper.GenerateTable(Game.gl, Const.BOARD_WIDTH, Const.BOARD_LENGTH, Const.BOARD_THICKNESS);
+     	GLHelper.GenerateButtons(Game.gl, TextureManager.bigButtonTexture);
+     	GLHelper.GenerateUI(Game.gl, 0, 0, 0, TextureManager.uiTexture);
+     	GLHelper.GenerateDeck(Game.gl, TextureManager.cardBackside, TextureManager.deckSideTexture, Const.CARD_WIDTH, Const.CARD_HEIGHT, 0.5f);
+       	GLHelper.GenerateTextbox(Game.gl, TextureManager.textboxTexture);
+     	GLHelper.GenerateCard(Game.gl, TextureManager.cardBackside, Const.CARD_WIDTH, Const.CARD_HEIGHT, Const.CARD_THICKNESS);
+        
 	}
 	
 	public static void DrawTable(GL2 gl, float x, float BOARD_HEIGHT )
@@ -267,9 +296,21 @@ public class GLHelper {
 
 		 gl.glBegin(GL2.GL_QUADS);
 		 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(0, 0, 0f );
-		    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(Game.BIG_BUTTON_WIDTH, 0, 0f );
-		    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(Game.BIG_BUTTON_WIDTH, -Game.BIG_BUTTON_HEIGHT, 0f  );
-		    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(0, -Game.BIG_BUTTON_HEIGHT, 0f  );
+		    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(Const.BIG_BUTTON_WIDTH, 0, 0f );
+		    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(Const.BIG_BUTTON_WIDTH, -Const.BIG_BUTTON_HEIGHT, 0f  );
+		    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(0, -Const.BIG_BUTTON_HEIGHT, 0f  );
+		 gl.glEnd();
+		 
+		 gl.glEndList();
+		 
+		TinySquareButtonModel = gl.glGenLists(1);
+        gl.glNewList(TinySquareButtonModel, GL2.GL_COMPILE);
+
+		 gl.glBegin(GL2.GL_QUADS);
+		 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(0, 0, 0f );
+		    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(Const.TINY_SQUARE_BUTTON_WIDTH, 0, 0f );
+		    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(Const.TINY_SQUARE_BUTTON_WIDTH, -Const.TINY_SQUARE_BUTTON_HEIGHT, 0f  );
+		    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(0, -Const.TINY_SQUARE_BUTTON_HEIGHT, 0f  );
 		 gl.glEnd();
 		 
 		 gl.glEndList();
@@ -284,27 +325,40 @@ public class GLHelper {
 
 		 gl.glBegin(GL2.GL_QUADS);
 		 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(0, 0, 0f );
-		    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(Game.TEXTBOX_WIDTH, 0, 0f );
-		    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(Game.TEXTBOX_WIDTH, -Game.TEXTBOX_HEIGHT, 0f  );
-		    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(0, -Game.TEXTBOX_HEIGHT, 0f  );		    
+		    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(Const.TEXTBOX_WIDTH, 0, 0f );
+		    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(Const.TEXTBOX_WIDTH, -Const.TEXTBOX_HEIGHT, 0f  );
+		    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(0, -Const.TEXTBOX_HEIGHT, 0f  );		    
 		 gl.glEnd();
 		 
 		 gl.glEndList();
 	}
 	
 	
-	public static void DrawUIBigButton(GL2 gl, EntButton button)
+	
+	public static void DrawUIButton(GL2 gl, Button button)
 	{
 		 gl.glPushMatrix();
 		 
 
 		 gl.glTranslatef(button.GetX(), button.GetY(), 0);
 		 
-		 gl.glCallList(BigButtonModel);
+		 switch ( button.GetButtonSize() )
+		 {
+		 case TINY_SQUARE:
+			 gl.glCallList(TinySquareButtonModel);
+			 break;
+		 case BIG:
+			 gl.glCallList(BigButtonModel);
+			 break;
+		 default:
+			 
+		 }
+		 
+		
 		 gl.glPopMatrix();
 	}
 	
-	public static void DrawUITextbox(GL2 gl, EntTextbox textbox)
+	public static void DrawUITextbox(GL2 gl, Textbox textbox)
 	{
 		 gl.glPushMatrix();
 
@@ -315,7 +369,7 @@ public class GLHelper {
 	}
 	
 	@SuppressWarnings("rawtypes")	//The fact that EntDropdown is generic, is not important for the rendering method
-	public static void DrawUIDropdown(GL2 gl, EntDropdown dropdown) 
+	public static void DrawUIDropdown(GL2 gl, Dropdown dropdown) 
 	{
 		
 		 gl.glPushMatrix();
@@ -329,18 +383,18 @@ public class GLHelper {
 			
 			 gl.glBegin(GL2.GL_QUADS);
 			 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( 0, 0, 0);
-			    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(Game.DROPDOWN_WIDTH, 0,  0);
-			    gl.glTexCoord2f(1.0f, (float)dropdown.GetDataSize()); gl.glVertex3f(Game.DROPDOWN_WIDTH, -(float)dropdown.GetDataSize()*Game.TABLE_ROW_HEIGHT, 0 );
-			    gl.glTexCoord2f(0.0f, (float)dropdown.GetDataSize()); gl.glVertex3f(0, -(float)dropdown.GetDataSize()*Game.TABLE_ROW_HEIGHT, 0);
+			    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(Const.DROPDOWN_WIDTH, 0,  0);
+			    gl.glTexCoord2f(1.0f, (float)dropdown.GetDataSize()); gl.glVertex3f(Const.DROPDOWN_WIDTH, -(float)dropdown.GetDataSize()*Const.TABLE_ROW_HEIGHT, 0 );
+			    gl.glTexCoord2f(0.0f, (float)dropdown.GetDataSize()); gl.glVertex3f(0, -(float)dropdown.GetDataSize()*Const.TABLE_ROW_HEIGHT, 0);
 			 gl.glEnd();
 			 //Showing the selected element
 			 dropdown.GetSelectedTexture().bind(gl);
 		
 			 gl.glBegin(GL2.GL_QUADS);
-			 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( 0, -dropdown.GetSelectedIndex()*Game.DROPDOWN_ROW_HEIGHT, 0);
-			    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(Game.DROPDOWN_WIDTH, -dropdown.GetSelectedIndex()*Game.DROPDOWN_ROW_HEIGHT,  0);
-			    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(Game.DROPDOWN_WIDTH, -(dropdown.GetSelectedIndex()+1)*Game.DROPDOWN_ROW_HEIGHT, 0 );
-			    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(0, -(dropdown.GetSelectedIndex()+1)*Game.DROPDOWN_ROW_HEIGHT,  0);
+			 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( 0, -dropdown.GetSelectedIndex()*Const.DROPDOWN_ROW_HEIGHT, 0);
+			    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(Const.DROPDOWN_WIDTH, -dropdown.GetSelectedIndex()*Const.DROPDOWN_ROW_HEIGHT,  0);
+			    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(Const.DROPDOWN_WIDTH, -(dropdown.GetSelectedIndex()+1)*Const.DROPDOWN_ROW_HEIGHT, 0 );
+			    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(0, -(dropdown.GetSelectedIndex()+1)*Const.DROPDOWN_ROW_HEIGHT,  0);
 			 gl.glEnd();
 		 }
 		 else
@@ -348,9 +402,9 @@ public class GLHelper {
 		//	 dropdown.GetTexture().bind(Game.gl);
 			 gl.glBegin(GL2.GL_QUADS);
 			 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( 0, 0, 0);
-			    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(Game.DROPDOWN_WIDTH, 0,  0);
-			    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(Game.DROPDOWN_WIDTH, -Game.TABLE_ROW_HEIGHT, 0 );
-			    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(0, -Game.TABLE_ROW_HEIGHT,  0);
+			    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(Const.DROPDOWN_WIDTH, 0,  0);
+			    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(Const.DROPDOWN_WIDTH, -Const.TABLE_ROW_HEIGHT, 0 );
+			    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(0, -Const.TABLE_ROW_HEIGHT,  0);
 			 gl.glEnd();
 		 }
 		 gl.glPopMatrix();
@@ -359,7 +413,7 @@ public class GLHelper {
 	}
 
 	
-	public static void DrawUITable(GL2 gl, EntTable table)
+	public static void DrawUITable(GL2 gl, Table table)
 	{
 		 gl.glPushMatrix();
 
@@ -367,9 +421,9 @@ public class GLHelper {
 		 gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 		 gl.glBegin(GL2.GL_QUADS);
 		 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( 0, 0, 0);
-		    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(Game.TABLE_WIDTH, 0,  0);
-		    gl.glTexCoord2f(1.0f, (float)table.GetLineCountToRender()); gl.glVertex3f(Game.TABLE_WIDTH, -(float)table.GetLineCountToRender()*Game.TABLE_ROW_HEIGHT, 0 );
-		    gl.glTexCoord2f(0.0f, (float)table.GetLineCountToRender()); gl.glVertex3f(0, -(float)table.GetLineCountToRender()*Game.TABLE_ROW_HEIGHT,  0);
+		    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(Const.TABLE_WIDTH, 0,  0);
+		    gl.glTexCoord2f(1.0f, (float)table.GetLineCountToRender()); gl.glVertex3f(Const.TABLE_WIDTH, -(float)table.GetLineCountToRender()*Const.TABLE_ROW_HEIGHT, 0 );
+		    gl.glTexCoord2f(0.0f, (float)table.GetLineCountToRender()); gl.glVertex3f(0, -(float)table.GetLineCountToRender()*Const.TABLE_ROW_HEIGHT,  0);
 		 gl.glEnd();
 		 if (table.GetSelectedIndex() != -1)
 		 {
@@ -378,10 +432,10 @@ public class GLHelper {
 			 if (selectedIndexShown < table.GetLineCountToRender() && selectedIndexShown >= 0)
 			 {
 				 gl.glBegin(GL2.GL_QUADS);
-				 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( 0, -selectedIndexShown*Game.TABLE_ROW_HEIGHT, 0);
-				    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(Game.TABLE_WIDTH, -selectedIndexShown*Game.TABLE_ROW_HEIGHT,  0);
-				    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(Game.TABLE_WIDTH, -(selectedIndexShown+1)*Game.TABLE_ROW_HEIGHT, 0 );
-				    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(0, -(selectedIndexShown+1)*Game.TABLE_ROW_HEIGHT,  0);
+				 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( 0, -selectedIndexShown*Const.TABLE_ROW_HEIGHT, 0);
+				    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(Const.TABLE_WIDTH, -selectedIndexShown*Const.TABLE_ROW_HEIGHT,  0);
+				    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(Const.TABLE_WIDTH, -(selectedIndexShown+1)*Const.TABLE_ROW_HEIGHT, 0 );
+				    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(0, -(selectedIndexShown+1)*Const.TABLE_ROW_HEIGHT,  0);
 				 gl.glEnd();
 			 }
 		 }
@@ -390,10 +444,10 @@ public class GLHelper {
 			 table.GetScrollHandleTexture().bind(gl);
 			 
 			 gl.glBegin(GL2.GL_QUADS);
-			 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(Game.TABLE_WIDTH-0.008f, -table.GetScrollHandleGLYOffset(), 0);
-			    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(Game.TABLE_WIDTH, -table.GetScrollHandleGLYOffset(),  0);
-			    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(Game.TABLE_WIDTH, -table.GetScrollHandleGLYOffset()-Game.SCROLL_HANDLE_HEIGHT, 0 );
-			    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(Game.TABLE_WIDTH-0.008f, -table.GetScrollHandleGLYOffset()-Game.SCROLL_HANDLE_HEIGHT,  0);
+			 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(Const.TABLE_WIDTH-0.008f, -table.GetScrollHandleGLYOffset(), 0);
+			    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(Const.TABLE_WIDTH, -table.GetScrollHandleGLYOffset(),  0);
+			    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(Const.TABLE_WIDTH, -table.GetScrollHandleGLYOffset()-Const.SCROLL_HANDLE_HEIGHT, 0 );
+			    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(Const.TABLE_WIDTH-0.008f, -table.GetScrollHandleGLYOffset()-Const.SCROLL_HANDLE_HEIGHT,  0);
 			 gl.glEnd();
 		 }
 		 gl.glPopMatrix();
@@ -495,6 +549,10 @@ public class GLHelper {
         
         return new int[] {(int) winPos[0], (int) winPos[1]};
 	}
+
+
+
+	
 
 	
 	

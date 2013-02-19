@@ -14,9 +14,9 @@ import com.jogamp.opengl.util.texture.TextureIO;
 
 import jjj.entropy.classes.Enums.GameState;
 import jjj.entropy.ui.EntFont;
-import jjj.entropy.ui.EntLabel;
-import jjj.entropy.ui.EntTextbox;
-import jjj.entropy.ui.EntUIComponent;
+import jjj.entropy.ui.Label;
+import jjj.entropy.ui.Textbox;
+import jjj.entropy.ui.UIComponent;
 
 public class EntKeyListener implements KeyListener {
 
@@ -51,15 +51,15 @@ public class EntKeyListener implements KeyListener {
 	            break;
 	        case KeyEvent.VK_ENTER:
 	        	
-	        	EntTextbox chatTextbox = Game.GetInstance().GetChatTextbox();
+	        	Textbox chatTextbox = Game.GetInstance().GetChatTextbox();
 	        	if (chatTextbox.GetText() != "")
 	        		Game.GetInstance().GetChatWindowlabel().AppendText("You:\u00A0" + chatTextbox.GetText() + '\n');	// \f is replaced with a space
 	        	chatTextbox.SetText("");
 	            break;
 	        case KeyEvent.VK_BACK_SPACE:
-	        	EntUIComponent ui = Game.GetInstance().GetFocusedUIComponent();
-				if (ui instanceof EntTextbox)
-					((EntTextbox) ui).RemoveFromEnd();
+	        	UIComponent ui = Game.GetInstance().GetFocusedUIComponent();
+				if (ui instanceof Textbox)
+					((Textbox) ui).RemoveFromEnd();
 	        	break;
 	        case KeyEvent.VK_ESCAPE:
 	        	switch (Game.GetInstance().GetGameState())
@@ -102,9 +102,9 @@ public class EntKeyListener implements KeyListener {
 		//System.out.print(Character.toString(e.getKeyChar()).replace('\n', 'å'));
 		if (e.getKeyChar() != '\n' && e.getKeyChar() != '\b')
 		{
-			EntUIComponent ui = Game.GetInstance().GetFocusedUIComponent();
-			if (ui instanceof EntTextbox)
-				((EntTextbox) ui).AppendText(Character.toString(e.getKeyChar()));
+			UIComponent ui = Game.GetInstance().GetFocusedUIComponent();
+			if (ui instanceof Textbox)
+				((Textbox) ui).AppendText(Character.toString(e.getKeyChar()));
 		}
 		
 	}

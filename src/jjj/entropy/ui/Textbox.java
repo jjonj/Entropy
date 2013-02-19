@@ -8,12 +8,13 @@ import javax.media.opengl.GL2;
 import jjj.entropy.GLHelper;
 import jjj.entropy.Game;
 import jjj.entropy.NetworkManager;
+import jjj.entropy.classes.Const;
 import jjj.entropy.classes.Enums.GameState;
 
 import com.jogamp.opengl.util.awt.TextRenderer;
 import com.jogamp.opengl.util.texture.Texture;
 
-public class EntTextbox extends EntClickable{
+public class Textbox extends Clickable{
 	
 
 	
@@ -29,18 +30,18 @@ public class EntTextbox extends EntClickable{
 
 	
 	
-	public EntTextbox(float x, float y, int xOffset, int yOffset, Texture texture)
+	public Textbox(float x, float y, int xOffset, int yOffset, Texture texture)
 	{
 		this(x, y, xOffset, yOffset, "", new EntFont(EntFont.FontTypes.MainParagraph, Font.PLAIN, 16), texture);
 	}
-	public EntTextbox(float x, float y, int xOffset, int yOffset, String text, Texture texture)
+	public Textbox(float x, float y, int xOffset, int yOffset, String text, Texture texture)
 	{
 		this(x, y, xOffset, yOffset, text, new EntFont(EntFont.FontTypes.MainParagraph, Font.PLAIN, 16), texture);
 	}
 	
-	public EntTextbox(float x, float y, int xOffset, int yOffset, String startText, EntFont font, Texture texture )
+	public Textbox(float x, float y, int xOffset, int yOffset, String startText, EntFont font, Texture texture )
 	{
-		super(x, y, Game.TEXTBOX_WIDTH, Game.TEXTBOX_HEIGHT);
+		super(x, y, Const.TEXTBOX_WIDTH, Const.TEXTBOX_HEIGHT);
 		this.text = startText;
 		this.font = font;
 		this.texture = texture;
@@ -61,7 +62,7 @@ public class EntTextbox extends EntClickable{
 				texture.bind(Game.gl);
 			 GLHelper.DrawUITextbox(Game.gl, this);
 		}
-		font.RenderBox(game, textX + textOffsetX, textY - textOffsetY, 1, Game.TEXTBOX_LINE_WIDTH, text);
+		font.RenderBox(game, textX + textOffsetX, textY - textOffsetY, 1, Const.TEXTBOX_LINE_WIDTH, text);
 	}
 	
 	public String GetText()
@@ -86,11 +87,7 @@ public class EntTextbox extends EntClickable{
 		RemoveFromEnd(1);
 	}
 
-	@Override
-	public void Activate(int mouseX, int mouseY)
-	{
-		Game.GetInstance().SetFocusedUIComponent(this);
-	}
+
 
 	
 } 

@@ -7,7 +7,7 @@ import jjj.entropy.GLHelper;
  * @version     1.0a                 (current version number of program)
  * @since       2013-01-01          (the version of the package this class was first added to)
  */
-public abstract class EntClickable extends EntUIComponent
+public abstract class Clickable extends UIComponent
 {
 	
 	//Optional virtual method for action when activated
@@ -27,7 +27,7 @@ public abstract class EntClickable extends EntUIComponent
 	
 	protected float glW, glH;	//OpenGL width & Height
 	
-	public EntClickable(float x, float y, float width, float height)
+	public Clickable(float x, float y, float width, float height)
 	{
 		super(x, y);
 		glW = width;
@@ -114,18 +114,21 @@ public abstract class EntClickable extends EntUIComponent
 
         int screenRight = temp[0];
         
-        w = screenRight - screenX;
+        this.w = screenRight - screenX;
 	}
 	
 	public void SetGLHeight(float h)
 	{
+		
+		
 		glH = h;
 		int[] temp = GLHelper.ConvertGLFloatToGLScreen(x+glW, y+glH);
 
 
 	    int screenTop = temp[1];	// Note: OpenGL screen coordinates are from bottom to top so screenY = bottom
 	        
-	    h = screenTop - screenY;
+	    this.h = screenTop - screenY;
+
 	}
 	
 	
@@ -134,6 +137,7 @@ public abstract class EntClickable extends EntUIComponent
 	}
 	public int GetScreenHeight() {
 		return h;
+		
 	}
 	
 	public float GetScreenX() {

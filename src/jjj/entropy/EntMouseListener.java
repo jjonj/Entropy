@@ -1,6 +1,5 @@
 package jjj.entropy;
 
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -8,13 +7,11 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
 
-import jjj.entropy.Card.Facing;
-import jjj.entropy.Card.Status;
 import jjj.entropy.classes.Enums.GameState;
 import jjj.entropy.classes.Enums.Life;
 import jjj.entropy.classes.Enums.Zone;
-import jjj.entropy.ui.EntClickable;
-import jjj.entropy.ui.EntUIComponent;
+import jjj.entropy.ui.Clickable;
+import jjj.entropy.ui.UIComponent;
 
 public class EntMouseListener implements MouseListener, MouseMotionListener, MouseWheelListener {
 
@@ -136,9 +133,12 @@ public class EntMouseListener implements MouseListener, MouseMotionListener, Mou
 		case LOGIN:
 			//Case will fall through to MAIN_MENU as intended
 		case MAIN_MENU:
-			EntUIComponent uicmm = game.CheckUICollision();
-			if (uicmm != null && uicmm instanceof EntClickable)
-				((EntClickable)uicmm).Activate(MouseX, MouseY);
+			UIComponent uicmm = game.CheckUICollision();
+			if (uicmm != null && uicmm instanceof Clickable)
+			{
+				Game.GetInstance().SetFocusedUIComponent(uicmm);
+				((Clickable)uicmm).Activate(MouseX, MouseY);
+			}
 			break;
 		default:
 			break;

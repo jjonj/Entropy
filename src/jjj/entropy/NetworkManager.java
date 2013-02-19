@@ -11,8 +11,8 @@ import jjj.entropy.classes.Enums.GameState;
 import jjj.entropy.classes.Enums.Life;
 import jjj.entropy.classes.Enums.Zone;
 import jjj.entropy.messages.*;
-import jjj.entropy.ui.EntDropdown;
-import jjj.entropy.ui.IEntTableRow;
+import jjj.entropy.ui.Dropdown;
+import jjj.entropy.ui.TableRow;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
@@ -180,7 +180,7 @@ public class NetworkManager extends Listener
 				Game.GetInstance().SetPlayer(1, p);
 				
 				//Create a new two dimensional list for the card table
-				List<IEntTableRow> playerCards = new ArrayList<IEntTableRow>();
+				List<TableRow> playerCards = new ArrayList<TableRow>();
 				//Add the newly created players cards to it
 				
 				for (Card c : p.GetAllCards().GetList())

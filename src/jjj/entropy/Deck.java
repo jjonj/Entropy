@@ -100,7 +100,6 @@ public class Deck extends CardCollection {
 	public static Deck LoadDeck(Player owner, String deckName, int[] deck) 
 	{
 		Deck rDeck = new Deck(owner, deckName);
-	
 		try {
 			for (int c : deck)
 			{

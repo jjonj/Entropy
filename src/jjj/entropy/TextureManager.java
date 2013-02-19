@@ -26,17 +26,63 @@ public class TextureManager
 	
 	private static String[] texturePaths = new String[100];
 	
-/*
-	private static String[] texturePaths = {	//Load from file instead! (Which probably means singleton, which probably means all statics = singleton
-		"resources/textures/templates/Crawnid/AnidQueen.png",
-		"resources/textures/templates/Crawnid/CrawnidWorker.png",
-		"resources/textures/templates/Crawnid/AnidLarvaeSwarm.png",
-		"resources/textures/templates/Crawnid/DarwinisticInnihilation.png"		
-	};
-	*/
 	
+	
+	public static Texture   cardtestfront,
+							crawnidworkertexture, 
+						    cardBackside, 
+						    board,
+						    deckSideTexture,
+						    uiTexture,
+						    mainMenuTexture,
+						    deckScreenTexture,
+						    loginScreenTexture,
+						    bigButtonTexture,
+						    arrow1ButtonTexture,
+						    arrow2ButtonTexture,
+						    textboxTexture;
 	
 	//private static HashMap<String, Texture> textureMap = new HashMap<String, Texture>();
+	
+	public static void InitTextures()
+	{
+		try {
+   			cardtestfront = TextureIO.newTexture(new File("resources/textures/card1.png"), true);
+   			cardBackside = TextureIO.newTexture(new File("resources/textures/backside.png"), true);
+   			board = TextureIO.newTexture(new File("resources/textures/board.jpg"), true);
+   			crawnidworkertexture = TextureIO.newTexture(new File("resources/textures/card2.png"), true);
+   			deckSideTexture = TextureIO.newTexture(new File("resources/textures/deckside.png"), true);
+   			uiTexture = TextureIO.newTexture(new File("resources/textures/bottomPanel.png"), true);
+   			mainMenuTexture = TextureIO.newTexture(new File("resources/textures/MainMenu.png"), true);
+   			deckScreenTexture = TextureIO.newTexture(new File("resources/textures/DeckScreen.png"), true);
+   			loginScreenTexture = TextureIO.newTexture(new File("resources/textures/LoginScreen.png"), true);
+   			bigButtonTexture = TextureIO.newTexture(new File("resources/textures/BigButton.png"), true);
+   			arrow1ButtonTexture = TextureIO.newTexture(new File("resources/textures/ArrowButton1.png"), true);
+   			arrow2ButtonTexture = TextureIO.newTexture(new File("resources/textures/ArrowButton2.png"), true);
+   			textboxTexture = TextureIO.newTexture(new File("resources/textures/Textbox.png"), true);
+   		} catch (GLException e) {
+   			e.printStackTrace();
+   			System.exit(1);
+   		} catch (IOException e) {
+   			e.printStackTrace();
+   			System.exit(1);
+   		}
+		
+		GLHelper.InitTexture(Game.gl, cardBackside);
+     	GLHelper.InitTexture(Game.gl, cardtestfront);
+     	GLHelper.InitTexture(Game.gl, crawnidworkertexture);
+     	GLHelper.InitTexture(Game.gl, deckSideTexture);
+     	GLHelper.InitTexture(Game.gl, board);
+     	GLHelper.InitTexture(Game.gl, uiTexture);
+     	GLHelper.InitTexture(Game.gl, mainMenuTexture);
+     	GLHelper.InitTexture(Game.gl, deckScreenTexture);
+     	GLHelper.InitTexture(Game.gl, loginScreenTexture);
+     	GLHelper.InitTexture(Game.gl, bigButtonTexture);
+     	GLHelper.InitTexture(Game.gl, arrow1ButtonTexture);
+     	GLHelper.InitTexture(Game.gl, arrow2ButtonTexture);
+     	GLHelper.InitTexture(Game.gl, textboxTexture);
+	}
+	
 	
 	public static void LoadTextureList()
 	{

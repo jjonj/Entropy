@@ -6,10 +6,10 @@ import jjj.entropy.classes.EntUtilities;
 import jjj.entropy.classes.Enums;
 import jjj.entropy.classes.Enums.Life;
 import jjj.entropy.classes.Enums.Zone;
-import jjj.entropy.ui.IEntTableRow;
+import jjj.entropy.ui.TableRow;
 
 
-public class Card implements IEntTableRow
+public class Card implements TableRow
 {
 
 

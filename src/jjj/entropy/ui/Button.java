@@ -11,15 +11,18 @@ import jjj.entropy.GLHelper;
 import jjj.entropy.Game;
 import jjj.entropy.NetworkManager;
 import jjj.entropy.Game.*;
+import jjj.entropy.classes.Const;
 import jjj.entropy.classes.Enums.*;
 
 import com.jogamp.opengl.util.awt.TextRenderer;
 import com.jogamp.opengl.util.texture.Texture;
 
-public class EntButton extends EntClickable
+public class Button extends Clickable
 {
 	
 	public enum ButtonSize{
+		
+		TINY_SQUARE,
 		SMALL, MEDIUM, BIG
 	}
 	
@@ -37,20 +40,20 @@ public class EntButton extends EntClickable
 				textY;
 	
 	
-	public EntButton(float x, float y, int xOffset, int yOffset, String text, Texture texture, UIAction action)
+	public Button(float x, float y, int xOffset, int yOffset, String text, Texture texture, UIAction action)
 	{
 		this(x, y, xOffset, yOffset, text, new EntFont(EntFont.FontTypes.MainParagraph, Font.BOLD, 24), ButtonSize.BIG, texture, action);
 	}
-	public EntButton(float x, float y, int xOffset, int yOffset, String text, EntFont font, Texture texture, UIAction action)
+	public Button(float x, float y, int xOffset, int yOffset, String text, EntFont font, Texture texture, UIAction action)
 	{
 		this(x, y, xOffset, yOffset, text, font, ButtonSize.BIG, texture, action);
 	}
-	public EntButton(float x, float y, int xOffset, int yOffset, String text, ButtonSize size, Texture texture, UIAction action)
+	public Button(float x, float y, int xOffset, int yOffset, String text, ButtonSize size, Texture texture, UIAction action)
 	{
 		this(x, y, xOffset, yOffset, text, new EntFont(EntFont.FontTypes.MainParagraph, Font.BOLD, 24), size, texture, action);
 	}
 	
-	public EntButton(float x, float y, int xOffset,int yOffset, String text, EntFont font, ButtonSize size, Texture texture, UIAction action)
+	public Button(float x, float y, int xOffset,int yOffset, String text, EntFont font, ButtonSize size, Texture texture, UIAction action)
 	{
 		super(x, y, GetButtonWidth(size),  GetButtonHeight(size));	//Using static methods as a "hack" to give conditional parameters to super class
 		this.text = text;
@@ -73,8 +76,10 @@ public class EntButton extends EntClickable
 	{
 	 	switch (size)
 		{
+	 	case TINY_SQUARE:
+	 		return Const.TINY_SQUARE_BUTTON_WIDTH;
 		case BIG:
-			return Game.BIG_BUTTON_WIDTH;
+			return Const.BIG_BUTTON_WIDTH;
 		default:
 			return 0.0f;
 		}
@@ -83,8 +88,10 @@ public class EntButton extends EntClickable
 	{
 	 	switch (size)
 		{
+		case TINY_SQUARE:
+	 		return Const.TINY_SQUARE_BUTTON_HEIGHT;
 		case BIG:
-			return Game.BIG_BUTTON_HEIGHT;
+			return Const.BIG_BUTTON_HEIGHT;
 		default:
 			return 0.0f;
 		}
@@ -99,11 +106,17 @@ public class EntButton extends EntClickable
 	    	
 		switch (buttonSize)
 		{
+		case TINY_SQUARE:
+			if (texture != null)
+			{
+				texture.bind(Game.gl);
+				GLHelper.DrawUIButton(Game.gl, this);
+			}
 		case BIG:
 			if (texture != null)
 			{
 				texture.bind(Game.gl);
-				GLHelper.DrawUIBigButton(Game.gl, this);
+				GLHelper.DrawUIButton(Game.gl, this);
 			}
 			font.Render(game, textX + textOffsetX, textY - textOffsetY, text);
 			break;
@@ -167,5 +180,10 @@ public class EntButton extends EntClickable
 	public void Activate(int mouseX, int mouseY)
 	{
 		onClick.Activate();
+	}
+	
+	public ButtonSize GetButtonSize() 
+	{
+		return buttonSize;
 	}
 }

@@ -27,7 +27,7 @@ public class Main
 		GLCapabilities capabilities = new GLCapabilities(profile);
 		GLCanvas canvas = new GLCanvas(capabilities);
 		
-		final JFrame jframe = new JFrame( "One Triangle Swing GLCanvas" ); 
+		final JFrame jframe = new JFrame( "Entropy ALPHA" ); 
 		
 		Container contentPane = jframe.getContentPane();
 		

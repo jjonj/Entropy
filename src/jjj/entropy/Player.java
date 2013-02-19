@@ -82,6 +82,11 @@ public class Player {
 	{
 		return NextCardID++;	//Increment after returning
 	}
+
+	public void SetActiveDeck(Deck activeDeck) 
+	{
+		this.activeDeck = activeDeck;
+	}
 	
 	
 }

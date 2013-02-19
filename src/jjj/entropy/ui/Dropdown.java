@@ -15,13 +15,14 @@ import jjj.entropy.GLHelper;
 import jjj.entropy.Game;
 import jjj.entropy.NetworkManager;
 import jjj.entropy.Game.*;
+import jjj.entropy.classes.Const;
 import jjj.entropy.classes.Enums.*;
 
 import com.jogamp.opengl.util.awt.TextRenderer;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureIO;
 
-public class EntDropdown <T> extends EntClickable
+public class Dropdown <T> extends Clickable
 {
 	
 	
@@ -29,6 +30,7 @@ public class EntDropdown <T> extends EntClickable
 	private String[] data;				//The internal data, preventing side effects. UpdateData must be called to update it
 	
 	
+	private UIAction onSelection;
 	
 	private EntFont  font;
 	private Texture texture,
@@ -42,12 +44,15 @@ public class EntDropdown <T> extends EntClickable
 	private float lineHeight;
 	
 
-	public EntDropdown(float x, float y, int xOffset,int yOffset, List<T> dataSource)
+	
+	public Dropdown(float x, float y, int xOffset,int yOffset, List<T> dataSource, UIAction onSelection)
 	{
-		super(x, y, Game.DROPDOWN_WIDTH, Game.DROPDOWN_ROW_HEIGHT * dataSource.size());	//Set the height to the height it would be at when selecting
+		super(x, y, Const.DROPDOWN_WIDTH, Const.DROPDOWN_ROW_HEIGHT * dataSource.size());	//Set the height to the height it would be at when selecting
 		this.dataSource = dataSource;
 		this.font = new EntFont(EntFont.FontTypes.MainParagraph, Font.PLAIN, 16);
 
+		
+		this.onSelection = onSelection;
 		
 		data = null;
 		UpdateData();
@@ -63,7 +68,7 @@ public class EntDropdown <T> extends EntClickable
 		float zeroOnScreenX = temp[0],
 		      zeroOnScreenY = temp[1];
 		
-		temp =  GLHelper.ConvertGLFloatToGLScreen(0, Game.DROPDOWN_ROW_HEIGHT);
+		temp =  GLHelper.ConvertGLFloatToGLScreen(0, Const.DROPDOWN_ROW_HEIGHT);
 		lineHeight = temp[1] - zeroOnScreenY;
 		fontLineHeight = (int)lineHeight+1;
         
@@ -121,6 +126,7 @@ public class EntDropdown <T> extends EntClickable
 	@Override
 	public void Activate(int mouseX, int mouseY)
 	{
+		System.out.println("SSS");
 		if (!selecting)
 		{
 			if (mouseY > screenY - h/data.length)	//Only accept clicks on the visible element when not selecting
@@ -130,6 +136,8 @@ public class EntDropdown <T> extends EntClickable
 		{
 			selectedIndex = (screenY - mouseY) / (h/data.length); 
 			selecting = false;
+			if (onSelection != null)
+				onSelection.Activate();
 		}
 	}
 
@@ -169,5 +177,7 @@ public class EntDropdown <T> extends EntClickable
 		this.dataSource = dataSource;
 		data = null;
 		UpdateData();
+		SetGLHeight(Const.DROPDOWN_ROW_HEIGHT * dataSource.size());
+		
 	}
 }

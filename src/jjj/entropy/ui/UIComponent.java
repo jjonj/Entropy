@@ -2,13 +2,13 @@ package jjj.entropy.ui;
 
 import jjj.entropy.Game;
 
-public abstract class EntUIComponent {
+public abstract class UIComponent {
 
 	
 	protected float x;
 	protected float y;
 	
-	public EntUIComponent(float x, float y)
+	public UIComponent(float x, float y)
 	{
 		this.x = x;
 		this.y = y;

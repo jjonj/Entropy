@@ -1,6 +1,6 @@
 package jjj.entropy.ui;
 
-public interface IEntTableRow 
+public interface TableRow 
 {
 
 	public String[] GenRow();

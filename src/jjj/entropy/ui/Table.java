@@ -15,6 +15,7 @@ import jjj.entropy.Card;
 import jjj.entropy.EntMouseListener;
 import jjj.entropy.GLHelper;
 import jjj.entropy.Game;
+import jjj.entropy.classes.Const;
 import jjj.entropy.classes.Enums.GameState;
 
 import com.jogamp.opengl.util.awt.TextRenderer;
@@ -22,12 +23,12 @@ import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureIO;
 
 //MISSING: Add parameter for text offset coordinates or even better automatize it
-public class EntTable extends EntClickable implements MouseListener, MouseMotionListener
+public class Table extends Clickable implements MouseListener, MouseMotionListener
 {
 	
 	
 	private EntFont  font;
-	private List<IEntTableRow> dataSource;	//Two dimensional array of data
+	private List<TableRow> dataSource;	//Two dimensional array of data
 	private String[][] data;
 	
 	private Texture texture;
@@ -50,17 +51,17 @@ public class EntTable extends EntClickable implements MouseListener, MouseMotion
 				lineOffset = 0;	// Used for scrolling
 	private boolean scrolling = false;
 
-	public EntTable(float x, float y,  int offsetX, int offsetY,  List<IEntTableRow> dataSource, GameState activeGameState)
+	public Table(float x, float y,  int offsetX, int offsetY,  List<TableRow> dataSource, GameState activeGameState)
 	{
 		this(x, y, offsetX, offsetY, dataSource, dataSource.size(), activeGameState);
 	}
-	public EntTable(float x, float y, int offsetX, int offsetY, List<IEntTableRow> dataSource, int maxLines, GameState activeGameState)
+	public Table(float x, float y, int offsetX, int offsetY, List<TableRow> dataSource, int maxLines, GameState activeGameState)
 	{
 		//Width should be adjustable, probably like button size "is"
-		super(x, y, Game.TABLE_WIDTH, Game.TABLE_ROW_HEIGHT*maxLines);
+		super(x, y, Const.TABLE_WIDTH, Const.TABLE_ROW_HEIGHT*maxLines);
 		this.maxLines = maxLines;
 		this.font = new EntFont(EntFont.FontTypes.MainParagraph, Font.PLAIN, 16);
-		lineHeight = Game.TABLE_ROW_HEIGHT_PX;
+		lineHeight = Const.TABLE_ROW_HEIGHT_PX;
 		this.dataSource = dataSource;
 		this.activeGameState = activeGameState;
 		
@@ -68,13 +69,13 @@ public class EntTable extends EntClickable implements MouseListener, MouseMotion
 		float zeroOnScreenX = temp[0],
 		      zeroOnScreenY = temp[1];
 		
-		temp =  GLHelper.ConvertGLFloatToGLScreen(0, Game.TABLE_ROW_HEIGHT);
+		temp =  GLHelper.ConvertGLFloatToGLScreen(0, Const.TABLE_ROW_HEIGHT);
 		lineHeight = temp[1] - zeroOnScreenY;
 		
-		temp = GLHelper.ConvertGLFloatToGLScreen(Game.SCROLL_HANDLE_WIDHT, 0);
+		temp = GLHelper.ConvertGLFloatToGLScreen(Const.SCROLL_HANDLE_WIDHT, 0);
 		scrollHandleWidth = (int) (temp[0] - zeroOnScreenX);
 		
-		temp = GLHelper.ConvertGLFloatToGLScreen(0, Game.SCROLL_HANDLE_HEIGHT);
+		temp = GLHelper.ConvertGLFloatToGLScreen(0, Const.SCROLL_HANDLE_HEIGHT);
 		scrollHandleHeight = (int) (temp[1] - zeroOnScreenY);
 		
 		
@@ -139,7 +140,7 @@ public class EntTable extends EntClickable implements MouseListener, MouseMotion
 			i = 0;
 			for (String cell : data[k])
 			{
-				xOffset = (int)textX + i * Game.TABLE_COLUMN_WIDTH_PX;
+				xOffset = (int)textX + i * Const.TABLE_COLUMN_WIDTH_PX;
 				font.Render(game, xOffset, yOffset, cell);
 				++i;
 			}
@@ -157,7 +158,7 @@ public class EntTable extends EntClickable implements MouseListener, MouseMotion
 	}*/
 	
 	
-	public void SetDataSource(List<IEntTableRow> dataSource) 
+	public void SetDataSource(List<TableRow> dataSource) 
 	{
 		this.dataSource = dataSource;
 		if (dataSource.size() < maxLines)
@@ -202,13 +203,13 @@ public class EntTable extends EntClickable implements MouseListener, MouseMotion
 		float zeroOnScreenX = temp[0],
 		      zeroOnScreenY = temp[1];
 		
-		temp =  GLHelper.ConvertGLFloatToGLScreen(0, Game.TABLE_ROW_HEIGHT);
+		temp =  GLHelper.ConvertGLFloatToGLScreen(0, Const.TABLE_ROW_HEIGHT);
 		lineHeight = temp[1] - zeroOnScreenY;
 		
-		temp = GLHelper.ConvertGLFloatToGLScreen(Game.SCROLL_HANDLE_WIDHT, 0);
+		temp = GLHelper.ConvertGLFloatToGLScreen(Const.SCROLL_HANDLE_WIDHT, 0);
 		scrollHandleWidth = (int) (temp[0] - zeroOnScreenX);
 		
-		temp = GLHelper.ConvertGLFloatToGLScreen(0, Game.SCROLL_HANDLE_HEIGHT);
+		temp = GLHelper.ConvertGLFloatToGLScreen(0, Const.SCROLL_HANDLE_HEIGHT);
 		scrollHandleHeight = (int) (temp[1] - zeroOnScreenY);
 		
 		//Resetting the scrollbar position on resize simplifies problems with pixel calculations done in one window size transfering to another. It could be done with converting to GL coordinates before resize then recalculating the new pixel values using GLHelperConvert
@@ -266,7 +267,7 @@ public class EntTable extends EntClickable implements MouseListener, MouseMotion
 				mouseOffSetFromTaTop = adjH;
 			scrollHandleY = screenY - mouseOffSetFromTaTop;
 			lineOffset = (int) ((float)(mouseOffSetFromTaTop)/(adjH)*(dataSource.size()-displayLineCount));
-			scrollHandleYOffsetGLFloat = (Game.TABLE_ROW_HEIGHT*displayLineCount - Game.SCROLL_HANDLE_HEIGHT) * ((float)(mouseOffSetFromTaTop)/(adjH));
+			scrollHandleYOffsetGLFloat = (Const.TABLE_ROW_HEIGHT*displayLineCount - Const.SCROLL_HANDLE_HEIGHT) * ((float)(mouseOffSetFromTaTop)/(adjH));
 			
 		}
 	}
@@ -281,7 +282,7 @@ public class EntTable extends EntClickable implements MouseListener, MouseMotion
 	}
 	
 	//Assumes UpdateData has been called before the last change to the dataSource
-	public IEntTableRow GetSelectedObject()
+	public TableRow GetSelectedObject()
 	{
 		return dataSource.get(selectedIndex);
 	}
