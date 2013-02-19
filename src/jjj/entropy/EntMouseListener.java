@@ -12,6 +12,7 @@ import jjj.entropy.classes.Enums.Life;
 import jjj.entropy.classes.Enums.Zone;
 import jjj.entropy.ui.Clickable;
 import jjj.entropy.ui.UIComponent;
+import jjj.entropy.ui.UIManager;
 
 public class EntMouseListener implements MouseListener, MouseMotionListener, MouseWheelListener {
 
@@ -133,10 +134,10 @@ public class EntMouseListener implements MouseListener, MouseMotionListener, Mou
 		case LOGIN:
 			//Case will fall through to MAIN_MENU as intended
 		case MAIN_MENU:
-			UIComponent uicmm = game.CheckUICollision();
+			UIComponent uicmm = UIManager.GetInstance().CheckUICollision();
 			if (uicmm != null && uicmm instanceof Clickable)
 			{
-				Game.GetInstance().SetFocusedUIComponent(uicmm);
+				UIManager.GetInstance().SetFocusedUIComponent(uicmm);
 				((Clickable)uicmm).Activate(MouseX, MouseY);
 			}
 			break;

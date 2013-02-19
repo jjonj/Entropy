@@ -64,20 +64,9 @@ public class Game implements GLEventListener
 			       player2;
 
     private GLCanvas canvas;
-    private List<UIComponent> IngameUIComponents;	
-    private List<UIComponent> MainMenuUIComponents;	
-    private List<UIComponent> LoginScreenUIComponents;	
-    private List<UIComponent> DeckScreenUIComponents;	
-    private UIComponent focusedUIComponent;
-    Table playerCardTable,
-    		 playerDeckTable;
-    Dropdown<Deck> playerDeckDropdown;
-    private Label FPSLabel;
+
     private Set<Card> cardsToRender;
-    private Textbox chatTextbox;
-    private Label chatWindow;
-    private Textbox usernameTextbox,
-    				   passwordTextbox;
+   
     
     Deck buildingDeck;
     
@@ -123,10 +112,7 @@ public class Game implements GLEventListener
         animator.start();
 
         cardsToRender = new HashSet<Card>();
-    	IngameUIComponents = new ArrayList<UIComponent>();
-    	MainMenuUIComponents = new ArrayList<UIComponent>();
-        LoginScreenUIComponents = new ArrayList<UIComponent>();
-        DeckScreenUIComponents = new ArrayList<UIComponent>();
+    	
     	
         neutralPlayer = new Player(0, "Neutral", null);
         
@@ -160,101 +146,7 @@ public class Game implements GLEventListener
         GLHelper.InitOpenGL();
      	
         
-        //Ingame UI components
-     	
-    	chatWindow = new Label(129, 116,  Const.CHAT_LINES, "", new EntFont(EntFont.FontTypes.MainParagraph, Font.BOLD, 12, Color.BLUE));
-    	chatTextbox = new Textbox(-0.59f, -0.389f, 5,  10, "", new EntFont(EntFont.FontTypes.MainParagraph, Font.BOLD, 12, Color.BLUE), null);
-    	IngameUIComponents.add(chatWindow);
-    	IngameUIComponents.add(chatTextbox);
-    	
-    	FPSLabel = new Label(50, 150, "0", new EntFont(EntFont.FontTypes.MainParagraph, Font.BOLD, 14));
-    	IngameUIComponents.add(FPSLabel);
-    	
-    	
-    	//Main menu UI components
-    	
-     	MainMenuUIComponents.add(new Button(-0.16f, 0.05f, 48, 15, "Multiplayer", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.orange), TextureManager.bigButtonTexture,
-     			new UIAction() {public void Activate(){
-	     				NetworkManager.GetInstance().JoinGame();
-     				}
-     			}
-     	));
-
-     	MainMenuUIComponents.add(new Button(-0.16f, -0.05f, 60, 22, "My decks", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.orange), TextureManager.bigButtonTexture,
-     			new UIAction() {public void Activate(){
-	     				SetGameState(GameState.DECK_SCREEN);
-     				}
-     			}
-     	));
-     	
-     	
-     	//Deck screen UI components
-     	
-
-       
-     	
-     	
-     	//Initiate the player card table UI element with an empty list of data. The players cards are added once logged in.
-     	List<TableRow> tempTable = new ArrayList<TableRow>();
-     	playerCardTable = new Table(-0.715f, 0.39f, 20, 21, tempTable, 20, GameState.DECK_SCREEN);
-     	DeckScreenUIComponents.add(playerCardTable);
-     	
-     	//The card table for the current deck
-     	playerDeckTable = new Table(-0.283f, 0.16f, 20, 12, tempTable, 20, GameState.DECK_SCREEN);
-     	DeckScreenUIComponents.add(playerDeckTable);
-     	
-    	//Dropdown initiated with a temporary data source that is updated on login ( game.OnLogin(); )
-     	playerDeckDropdown = new Dropdown<Deck>(-0.275f, 0.21f, 12, 14, new ArrayList<Deck>(),
-				new UIAction() {public void Activate(){
-					Deck newActiveDeck = playerDeckDropdown.GetSelectedObject();
-     				GetPlayer(1).SetActiveDeck(newActiveDeck);
-     				
-     				
-     				List<TableRow> deckCards = new ArrayList<TableRow>();
-     				//Add the newly created players cards to it
-     				for (Card c : newActiveDeck)
-     				{
-     					deckCards.add(c);
-     					System.out.println(c);
-     				}
-     				playerDeckTable.SetDataSource(deckCards);
- 				}});
-		
-     	DeckScreenUIComponents.add(playerDeckDropdown);
-     	
-     	DeckScreenUIComponents.add(new Button(-0.35f, -0.05f, 0, 0, "", ButtonSize.TINY_SQUARE, TextureManager.arrow1ButtonTexture,
-     			new UIAction() {public void Activate(){
-	     				
-     				}
-     			}
-     	));
-     	DeckScreenUIComponents.add(new Button(-0.35f, -0.12f, 0, 0, "", ButtonSize.TINY_SQUARE, TextureManager.arrow2ButtonTexture,
-     			new UIAction() {public void Activate(){
-	     				
-     				}
-     			}
-     	));
-     	
-     	
-
-     	
-     	//Login screen UI components
-     	
-     	
-        usernameTextbox = new Textbox(-0.155f, 0.05f, 15, 8, "", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black), TextureManager.textboxTexture);
-     	passwordTextbox = new Textbox(-0.155f, -0.06f, 15, 8, "", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black), TextureManager.textboxTexture);
-     	LoginScreenUIComponents.add(usernameTextbox);
-     	LoginScreenUIComponents.add(passwordTextbox);
-     	LoginScreenUIComponents.add(new Label(555, 415, "Username", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black)));
-     	LoginScreenUIComponents.add(new Label(555, 320, "Password", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black)));
-     	
-     	LoginScreenUIComponents.add(new Button(-0.155f, -0.155f, 85, 28, "Login", new EntFont(FontTypes.MainParagraph, Font.BOLD, 22, Color.black), TextureManager.bigButtonTexture,
-     			new UIAction() {public void Activate(){
-     				NetworkManager.GetInstance().Login(usernameTextbox.GetText(), passwordTextbox.GetText());
-     				//Game.GetInstance().SetGameState(GameState.MAIN_MENU);
- 				}
- 			}
-     	));
+        UIManager.GetInstance().InitUIComponents();
 
 
      	SetGameState(Const.INIT_GAMESTATE);
@@ -293,13 +185,7 @@ public class Game implements GLEventListener
 				 	gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(0.74f,0.415f, 0f);
 				 	gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-0.74f,0.415f, 0f);
 				 gl.glEnd();
-
-				 //     ---------------------------------         DRAW UI       ------------------------------------------
-		         for (UIComponent c : LoginScreenUIComponents)
-		         {
-		        	
-		         	c.Render(this);
-		         }		     
+				 
 		         break;
     		case MAIN_MENU:
 
@@ -326,15 +212,8 @@ public class Game implements GLEventListener
 				 	gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-0.74f,0.415f, 0f);
 				 gl.glEnd();
 
-				 //     ---------------------------------         DRAW UI       ------------------------------------------
-		         for (UIComponent c : MainMenuUIComponents)
-		         {
-		         	c.Render(this);
-		         }
     			break;
     		case DECK_SCREEN:
-    			
-    		
     			
     			
     			//   -------------------------------------- LOAD ANY MISSING TEXTURES   ----------------------------------
@@ -360,11 +239,6 @@ public class Game implements GLEventListener
 				 gl.glEnd();
 		 	    	
 			    
-	 	    	 //     ---------------------------------         DRAW UI       ------------------------------------------
-	 	    	for (UIComponent c : DeckScreenUIComponents)
-		        {
-		        	c.Render(this);
-		        }
 	 	    	break;
     		case IN_GAME:
     			
@@ -445,14 +319,11 @@ public class Game implements GLEventListener
     	 		 
     			 
     	    	 c++;
-    	         for (UIComponent ui : IngameUIComponents)
-    	         {
-    	         	 ui.Render(this);
-    	         }
+   
     	         if (c == 120)
     	 		 {
     	 			try {
-    	 	    		FPSLabel.SetText(FPSCounter.toString("UTF8"));
+    	 	    		UIManager.GetInstance().GetFPSLabel().SetText(FPSCounter.toString("UTF8"));
     	 			} catch (UnsupportedEncodingException e) {
     	 				// TODO Auto-generated catch block
     	 				e.printStackTrace();
@@ -470,6 +341,12 @@ public class Game implements GLEventListener
     	        gl.glEnable(GL2.GL_TEXTURE_2D);     
     			break;
     	}
+    	
+    	 //     ------------------------------------------          RENDER UI      ------------------------------------------------
+    	
+    	UIManager.GetInstance().RenderUI(this);
+    	
+    	
     	gl.glFlush();		
 	}
     
@@ -496,27 +373,11 @@ public class Game implements GLEventListener
 		gl.glGetIntegerv(GL2.GL_VIEWPORT, view, 0);
 		gl.glGetDoublev(GL2.GL_MODELVIEW_MATRIX, model, 0);
 		gl.glGetDoublev(GL2.GL_PROJECTION_MATRIX, proj, 0);
-        
-		for (UIComponent uic : LoginScreenUIComponents)	//Should probably just let a static list handle every EntClickable resize call
-        {
-			if (uic instanceof Clickable)
-				((Clickable)uic).OnResize(view, model, proj);
-        }
-        for (UIComponent uic : MainMenuUIComponents)
-        {
-        	if (uic instanceof Clickable)
-				((Clickable)uic).OnResize(view, model, proj);
-        }
-        for (UIComponent uic : IngameUIComponents)
-        {
-        	if (uic instanceof Clickable)
-				((Clickable)uic).OnResize(view, model, proj);
-        }
-        for (UIComponent uic : DeckScreenUIComponents)
-        {
-        	if (uic instanceof Clickable)
-				((Clickable)uic).OnResize(view, model, proj);
-        }
+    
+		
+		UIManager.GetInstance().OnResize(view, model, proj);
+		
+
     }
  
     //openGL specific cleanup code
@@ -647,90 +508,31 @@ public class Game implements GLEventListener
 		return rCard;	// Returns null if no card was hit
 	}
 	
-	public UIComponent CheckUICollision() 	//MOVE COLLISION DETECTION LOGIC TO EntUIComponent
-	{
-		if (gamestate != GameState.IN_GAME)
-		{
-			List<UIComponent> toIterate = null;
-			
-			switch (gamestate)
-			{
-			case MAIN_MENU:
-				toIterate = MainMenuUIComponents;
-				break;
-			case LOGIN:
-				toIterate = LoginScreenUIComponents;
-				break;
-			case IN_GAME:
-				toIterate = IngameUIComponents;
-			case DECK_SCREEN:
-				toIterate = DeckScreenUIComponents;
-			}
-			
-			//First test for collision with the focused UI component, this helps as caching and also fixes a problem with clicking dropdown overlapping other clickable
-			Clickable ecl = (Clickable)focusedUIComponent;
-			int mx = EntMouseListener.MouseX;
-			int my = EntMouseListener.MouseY; //720 - EntMouseListener.MouseY -1;
-			if ( mx > ecl.GetScreenX() )
-			{
-				if ( mx < ecl.GetScreenWidth()+ecl.GetScreenX() )
-				{
-					if (my < ecl.GetScreenY())
-					{
-						if (my > ecl.GetScreenY() - ecl.GetScreenHeight())
-						{
-							return focusedUIComponent;
-						}
-					}
-				}
-			}
-			//After check for collision with all components in the current context (toIterate)
-			for (UIComponent uic : toIterate)
-			{
-				if (uic instanceof Clickable) 
-				{
-					ecl = (Clickable)uic;
-					if ( mx > ecl.GetScreenX() )
-					{
-						if ( mx < ecl.GetScreenWidth()+ecl.GetScreenX() )
-						{
-							if (my < ecl.GetScreenY())
-							{
-								if (my > ecl.GetScreenY() - ecl.GetScreenHeight())
-								{
-									return uic;
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		return null;
-	}
+	
 
 	public GameState GetGameState() {
 		return gamestate;
 	}
 	
 	public void SetGameState(GameState state) {
-		gamestate = state;		
+			
+		gamestate = state;
+		
+		UIManager.GetInstance().SetFocusOnGameState(this);
+
 		switch (gamestate)
 		{
 		case LOGIN:
-			SetFocusedUIComponent(LoginScreenUIComponents.get(0));
 			break;
 		case MAIN_MENU:
-			SetFocusedUIComponent(MainMenuUIComponents.get(0));
 			break;
 		case IN_GAME:
-			SetFocusedUIComponent(IngameUIComponents.get(0));
 			break;
 		case DECK_SCREEN:
-			SetFocusedUIComponent(DeckScreenUIComponents.get(0));
 			OnDeckScreen();	//Call the method for 
 			break;
 		}
+
 	}
 
 	public int GetRealGameHeight() {
@@ -778,23 +580,7 @@ public class Game implements GLEventListener
     	return aspectRatio;
     }
     
-	public Textbox GetChatTextbox() {
-		return chatTextbox;
-	}
 	
-	public Label GetChatWindowlabel() {
-		return chatWindow;
-	}
-	
-	public void SetFocusedUIComponent(UIComponent newFocus)
-	{
-		focusedUIComponent = newFocus;
-	}
-		
-	public UIComponent GetFocusedUIComponent()
-	{
-		return focusedUIComponent;
-	}
 
 	
 	public int GetGameID()
@@ -811,20 +597,6 @@ public class Game implements GLEventListener
 	}
 
 	
-	//Returns the UI EntTable object that manages the players cards
-	public Table GetCardTable() 
-	{
-		return playerCardTable;
-	}
-	
-	//Returns the UI EntTable object that manages the players cards
-	public Table GetDeckTable() 
-	{
-		return playerDeckTable;
-	}
-	
-	
-	
 	public void OnDeckScreen()
 	{
 		buildingDeck = GetPlayer(1).GetActiveDeck();
@@ -835,18 +607,17 @@ public class Game implements GLEventListener
 		
 		for (Card c : buildingDeck)
 		{
-		
 			deckCards.add(c);
-		
 		}
-		playerDeckTable.SetDataSource(deckCards);
+		UIManager.GetInstance().GetPlayerDeckTable().SetDataSource(deckCards);
+
 		
 	}
 
 	public void OnLogin()
 	{
 		//Add the players deck to the dropdown of decks
-		playerDeckDropdown.SetDataSource(GetPlayer(1).GetAllDecks());
+		UIManager.GetInstance().GetPlayerDeckDropdown().SetDataSource(GetPlayer(1).GetAllDecks());
 	}
 	
 }

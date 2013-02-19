@@ -13,6 +13,7 @@ import jjj.entropy.classes.Enums.Zone;
 import jjj.entropy.messages.*;
 import jjj.entropy.ui.Dropdown;
 import jjj.entropy.ui.TableRow;
+import jjj.entropy.ui.UIManager;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
@@ -189,7 +190,7 @@ public class NetworkManager extends Listener
 				}
 
 				
-				Game.GetInstance().GetCardTable().SetDataSource(playerCards);
+				UIManager.GetInstance().GetCardTable().SetDataSource(playerCards);
 				
 				
 				
