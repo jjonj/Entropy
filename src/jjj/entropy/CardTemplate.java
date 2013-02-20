@@ -8,12 +8,13 @@ import javax.media.opengl.GL2;
 import javax.media.opengl.GLException;
 
 import jjj.entropy.classes.Const;
+import jjj.entropy.ui.TableRow;
 
 import com.jogamp.opengl.util.texture.*;
 
 
 
-public class CardTemplate {
+public class CardTemplate implements TableRow {
 
 	public enum CardType{
 		UNDEFINED,
@@ -158,6 +159,12 @@ public class CardTemplate {
 		String texturePath = TextureManager.GetTexturePath(id);
 		CardTemplate ct = new CardTemplate(id,title, race, type, raceCost, anyCost, income, defense, dmgBase, dmgDice, texturePath);
 		allCardTemplates[id] = ct;
+	}
+
+	@Override
+	public String[] GenRow() 
+	{
+		return new String[] { Title, "1"};
 	}
 	
 }

@@ -11,20 +11,20 @@ public class Player {
 	private CardCollection allCards;
 	private Deck activeDeck;
 	private List<Deck> decks = null;
-	private int NextCardID = 0,	//Card id's are linked to each owner
-			    deckCount;
+	private int NextCardID = 0;	//Card id's are linked to each owner
+	
 				
 	
 	
 	
-	public Player(int playerID, String name, int activeDeck, int[] allCards, int[][] decks )	//Used for creating the player on this client
+	public Player(int playerID, String name, int activeDeck, int[] allCards, int[] allCardCounts, int[][] decks, int[][] deckCounts)	//Used for creating the player on this client
 	{
 
 		this.allCards = new CardCollection();
 		try {
-			for (int c : allCards)
+			for (int i = 0; i < allCards.length; i++)
 			{
-				this.allCards.AddCard(Card.LoadCard(c, this));
+				this.allCards.AddCard(CardTemplate.GetTemplate(allCards[i]), allCardCounts[i]);
 			}
 		} catch (IllegalAccessException e) {
 			e.printStackTrace();
@@ -39,7 +39,7 @@ public class Player {
 		{
 			for (int i = 0; i < decks.length; i++)
 			{
-				this.decks.add(Deck.LoadDeck(this, "Deck "+(i+1), decks[i]));	//Temporary deck names
+				this.decks.add(Deck.LoadDeck(this, "Deck "+(i+1), decks[i], deckCounts[i]));	//Temporary deck names
 			}
 			this.activeDeck = this.decks.get(activeDeck);
 		}
@@ -47,14 +47,14 @@ public class Player {
 		
 	}
 	
-	public Player(int playerID, String name, int[] activeDeck)	//Used for creating opponent players that only need an active deck
+	public Player(int playerID, String name, int[] activeDeck, int[] activeDeckCounts)	//Used for creating opponent players that only need an active deck
 	{
 		this.decks = new ArrayList<Deck>();
 		this.id = playerID;
 		this.name = name;
 		
 		if (activeDeck != null)
-			this.activeDeck = Deck.LoadDeck(this, "Default deck",activeDeck);
+			this.activeDeck = Deck.LoadDeck(this, "Default deck",activeDeck, activeDeckCounts);
 
 	}
 
@@ -86,6 +86,10 @@ public class Player {
 	public void SetActiveDeck(Deck activeDeck) 
 	{
 		this.activeDeck = activeDeck;
+	}
+
+	public String GetName() {
+		return name;
 	}
 	
 	

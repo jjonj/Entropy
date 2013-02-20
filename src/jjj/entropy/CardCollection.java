@@ -1,51 +1,40 @@
 package jjj.entropy;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
-
 import javax.media.opengl.GL2;
 
-import jjj.entropy.*;
-import jjj.entropy.classes.EntUtilities;
 
-
-public class CardCollection implements Iterable<Card>
+public class CardCollection implements Iterable<CardTemplate>
 {
 
+	protected HashMap<CardTemplate, Integer> cards;
 	
-	List<Card> cards;
-	
+
 	public CardCollection()
 	{
-		cards = new ArrayList<Card>();
+		cards = new HashMap<CardTemplate, Integer>();
 	}
 	
 	
-	public void AddCard(Card card)
+	public void AddCard(CardTemplate card, int count)
 	{
-		cards.add(card);
+		cards.put(card, count);
 	}
-	public void RemoveCard(int index)
+	public void RemoveCard(Card card)
 	{
-		cards.remove(index);
+		cards.remove(card);
 	}
-	
+
 	public void LoadTextures(GL2 gl)
 	{
-		for (Card card : cards)
+		for (CardTemplate card : cards.keySet())
 		{
-			card.GetTemplate().LoadTexture(gl);
+			card.LoadTexture(gl);
 		}
 	}
 	
-	
-	public Card GetRandomCard()
-	{
-		return cards.get(EntUtilities.GetRandom(0, cards.size()-1, 1));
-	}
-	
+
 	public int GetSize()
 	{
 		return cards.size();
@@ -53,17 +42,11 @@ public class CardCollection implements Iterable<Card>
 
 
 	@Override
-	public Iterator<Card> iterator() 
+	public Iterator<CardTemplate> iterator() 
 	{
-		return cards.iterator();
+		return cards.keySet().iterator();
 	}
 
 	
-	
-	//Returns the internal list for use with table
-	public List<Card> GetList() 
-	{
-		return cards;
-	}
 	
 }

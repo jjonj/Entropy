@@ -9,7 +9,7 @@ import jjj.entropy.classes.Enums.Zone;
 import jjj.entropy.ui.TableRow;
 
 
-public class Card implements TableRow
+public class Card implements Comparable<Card>, TableRow
 {
 
 
@@ -77,13 +77,7 @@ public class Card implements TableRow
 		this.y = y;
 		this.z = z;
 		this.template = template;
-		/*this.faceX = faceX;
-		this.faceY = faceY;
-		this.faceZ = faceZ;*/
-		
-		//this.upX = upX;
-	//	this.upY = upY;
-	//	this.upZ = upZ;
+
 		
 		switch(face)
 		{
@@ -105,6 +99,29 @@ public class Card implements TableRow
 		winY = new double[4];
 	}
 	
+	//Copy constructor
+	public Card(Card source) 
+	{
+		this.originalOwner = source.originalOwner;
+		
+		this.id = originalOwner.GetNextCardID();
+		
+		currentOwner = originalOwner;
+		
+		this.template = source.template;
+		
+		this.x = source.x;
+		this.y = source.y;
+		this.z = source.z;
+		this.status = source.status;
+		this.rotX = source.rotX;
+		this.rotY = source.rotY;
+		this.rotZ = source.rotZ;
+				  
+		winX = new double[4];
+		winY = new double[4];
+	}
+
 	public void Update()
 	{
 		if (moving)
@@ -399,6 +416,19 @@ public class Card implements TableRow
 	@Override
 	public String[] GenRow() {
 		return new String[] {template.Title};
+	}
+
+	@Override
+	public int compareTo(Card other) 	//The compare method doesnt need to make complete sense atm, just needed for consistency with order of deck IDs
+	{
+		if (template.ID > other.template.ID)
+		{
+			return -1;
+		}
+		else if (template.ID < other.template.ID)
+			return 1;
+		else
+			return 0;
 	}
 
 	

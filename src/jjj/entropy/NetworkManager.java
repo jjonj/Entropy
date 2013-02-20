@@ -177,14 +177,14 @@ public class NetworkManager extends Listener
 			System.out.println(pdm);
 			if (pdm.loginAccepted)
 			{
-				Player p = new Player(pdm.playerID, pdm.name, pdm.activeDeck, pdm.allCards, pdm.decks);
+				Player p = new Player(pdm.playerID, pdm.name, pdm.activeDeck, pdm.allCards, pdm.allCardCounts, pdm.decks, pdm.deckCounts);
 				Game.GetInstance().SetPlayer(1, p);
 				
 				//Create a new two dimensional list for the card table
 				List<TableRow> playerCards = new ArrayList<TableRow>();
 				//Add the newly created players cards to it
 				
-				for (Card c : p.GetAllCards().GetList())
+				for (CardTemplate c : p.GetAllCards())
 				{
 					playerCards.add(c);
 				}
@@ -205,7 +205,7 @@ public class NetworkManager extends Listener
 			}
 			else //Recieved data is for opponent
 			{
-				Game.GetInstance().SetPlayer(2, new Player(pdm.playerID, pdm.name, pdm.decks[0]));
+				Game.GetInstance().SetPlayer(2, new Player(pdm.playerID, pdm.name, pdm.decks[0], pdm.deckCounts[0]));
 			}
 		}
 		else if (object instanceof CardDataMessage)

@@ -114,7 +114,7 @@ public class Game implements GLEventListener
         cardsToRender = new HashSet<Card>();
     	
     	
-        neutralPlayer = new Player(0, "Neutral", null);
+        neutralPlayer = new Player(0, "Neutral", null, null);
         
   //  	NetworkManager.Connect("10.0.0.5", 11759);
     	NetworkManager.GetInstance().Connect("127.0.0.1", 54555);	//Temporary location
@@ -605,7 +605,7 @@ public class Game implements GLEventListener
 		List<TableRow> deckCards = new ArrayList<TableRow>();
 		//Add the newly created players cards to it
 		
-		for (Card c : buildingDeck)
+		for (CardTemplate c : buildingDeck)
 		{
 			deckCards.add(c);
 		}

@@ -61,8 +61,9 @@ public class EntMouseListener implements MouseListener, MouseMotionListener, Mou
 					return;
 
 				}
-
-				NetworkManager.GetInstance().SendAction(game.GetPlayer(1).GetActiveDeck().GetDeckIndex(c), Game.mode, Game.modeNumber);
+				
+				//The card has an ID that is individual to the client but is synchronized across clients in each decks unique ID system so the deck id is used here
+				NetworkManager.GetInstance().SendAction(game.GetPlayer(1).GetActiveDeck().GetCardDeckID(c), Game.mode, Game.modeNumber);
 	
 				switch(Game.mode)
 				{
@@ -110,6 +111,8 @@ public class EntMouseListener implements MouseListener, MouseMotionListener, Mou
 					
 				
 			}
+			break;
+		default:
 			break;
 		}
 	}

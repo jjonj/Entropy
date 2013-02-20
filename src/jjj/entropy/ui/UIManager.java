@@ -10,6 +10,7 @@ import java.util.Set;
 import com.esotericsoftware.kryonet.Connection;
 
 import jjj.entropy.Card;
+import jjj.entropy.CardTemplate;
 import jjj.entropy.Deck;
 import jjj.entropy.EntMouseListener;
 import jjj.entropy.Game;
@@ -110,29 +111,29 @@ public class UIManager
 				new UIAction() {public void Activate(){
 					Deck newActiveDeck = playerDeckDropdown.GetSelectedObject();
      				Game.GetInstance().GetPlayer(1).SetActiveDeck(newActiveDeck);
-     				
-     				
+
      				List<TableRow> deckCards = new ArrayList<TableRow>();
      				//Add the newly created players cards to it
-     				for (Card c : newActiveDeck)
+     				for (CardTemplate c : newActiveDeck)
      				{
      					deckCards.add(c);
-     					System.out.println(c);
      				}
      				playerDeckTable.SetDataSource(deckCards);
  				}});
 		
      	DeckScreenUIComponents.add(playerDeckDropdown);
-     	
+
+     	//transfer card left arrow
      	DeckScreenUIComponents.add(new Button(-0.35f, -0.05f, 0, 0, "", ButtonSize.TINY_SQUARE, TextureManager.arrow1ButtonTexture,
      			new UIAction() {public void Activate(){
 	     				
      				}
      			}
      	));
+     	//transfer card right arrow
      	DeckScreenUIComponents.add(new Button(-0.35f, -0.12f, 0, 0, "", ButtonSize.TINY_SQUARE, TextureManager.arrow2ButtonTexture,
      			new UIAction() {public void Activate(){
-	     				
+     				//	Game.GetInstance().GetPlayer(1).GetActiveDeck().AddCard(new Card(playerCardTable.GetSelectedObject()));
      				}
      			}
      	));
