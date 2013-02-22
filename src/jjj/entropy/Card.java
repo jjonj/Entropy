@@ -9,7 +9,7 @@ import jjj.entropy.classes.Enums.Zone;
 import jjj.entropy.ui.TableRow;
 
 
-public class Card implements Comparable<Card>, TableRow
+public class Card implements Comparable<Card>
 {
 
 
@@ -413,10 +413,7 @@ public class Card implements Comparable<Card>, TableRow
 		}
 	}
 
-	@Override
-	public String[] GenRow() {
-		return new String[] {template.Title};
-	}
+
 
 	@Override
 	public int compareTo(Card other) 	//The compare method doesnt need to make complete sense atm, just needed for consistency with order of deck IDs

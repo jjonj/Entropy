@@ -10,11 +10,14 @@ import java.util.Set;
 import com.esotericsoftware.kryonet.Connection;
 
 import jjj.entropy.Card;
+import jjj.entropy.CardCollection;
 import jjj.entropy.CardTemplate;
 import jjj.entropy.Deck;
 import jjj.entropy.EntMouseListener;
 import jjj.entropy.Game;
 import jjj.entropy.NetworkManager;
+import jjj.entropy.Player;
+import jjj.entropy.SimpleCollection;
 import jjj.entropy.TextureManager;
 import jjj.entropy.classes.Const;
 import jjj.entropy.classes.Enums.GameState;
@@ -54,6 +57,8 @@ public class UIManager
     private Textbox usernameTextbox,
     				   passwordTextbox;
     
+    
+    private SimpleCollection<TableRow> activeDataSource;	// The datasource currently being used for updating table data
     
     public void InitUIComponents()
     {
@@ -98,12 +103,13 @@ public class UIManager
      	
      	
      	//Initiate the player card table UI element with an empty list of data. The players cards are added once logged in.
-     	List<TableRow> tempTable = new ArrayList<TableRow>();
-     	playerCardTable = new Table(-0.715f, 0.39f, 20, 21, tempTable, 20, GameState.DECK_SCREEN);
+     	SimpleCollection<TableRow> tempDeck = new CardCollection();
+     	
+     	playerCardTable = new Table(-0.715f, 0.39f, 20, 21, tempDeck, 20, GameState.DECK_SCREEN);
      	DeckScreenUIComponents.add(playerCardTable);
      	
      	//The card table for the current deck
-     	playerDeckTable = new Table(-0.283f, 0.16f, 20, 12, tempTable, 20, GameState.DECK_SCREEN);
+     	playerDeckTable = new Table(-0.283f, 0.16f, 20, 12, tempDeck, 20, GameState.DECK_SCREEN);
      	DeckScreenUIComponents.add(playerDeckTable);
      	
     	//Dropdown initiated with a temporary data source that is updated on login ( game.OnLogin(); )
@@ -111,14 +117,8 @@ public class UIManager
 				new UIAction() {public void Activate(){
 					Deck newActiveDeck = playerDeckDropdown.GetSelectedObject();
      				Game.GetInstance().GetPlayer(1).SetActiveDeck(newActiveDeck);
-
-     				List<TableRow> deckCards = new ArrayList<TableRow>();
-     				//Add the newly created players cards to it
-     				for (CardTemplate c : newActiveDeck)
-     				{
-     					deckCards.add(c);
-     				}
-     				playerDeckTable.SetDataSource(deckCards);
+     				playerDeckTable.SetDataSource(newActiveDeck);
+     				playerCardTable.UpdateData();
  				}});
 		
      	DeckScreenUIComponents.add(playerDeckDropdown);
@@ -126,14 +126,39 @@ public class UIManager
      	//transfer card left arrow
      	DeckScreenUIComponents.add(new Button(-0.35f, -0.05f, 0, 0, "", ButtonSize.TINY_SQUARE, TextureManager.arrow1ButtonTexture,
      			new UIAction() {public void Activate(){
-	     				
+     				
+     				Player player = Game.GetInstance().GetPlayer(1);
+ 					Deck activeDeck = player.GetActiveDeck();
+ 					CardTemplate transferCard = (CardTemplate)playerDeckTable.GetSelectedObject();
+ 					if ( activeDeck.GetCount(transferCard) > 0 )
+ 					{
+
+     					activeDeck.ChangeCount(transferCard, -1);
+     					
+     					playerDeckTable.UpdateData();
+     					playerCardTable.UpdateData();
+ 					}
+ 					
      				}
      			}
      	));
      	//transfer card right arrow
      	DeckScreenUIComponents.add(new Button(-0.35f, -0.12f, 0, 0, "", ButtonSize.TINY_SQUARE, TextureManager.arrow2ButtonTexture,
      			new UIAction() {public void Activate(){
-     				//	Game.GetInstance().GetPlayer(1).GetActiveDeck().AddCard(new Card(playerCardTable.GetSelectedObject()));
+     				
+     					Player player = Game.GetInstance().GetPlayer(1);
+     					Deck activeDeck = player.GetActiveDeck();
+     					CardTemplate transferCard = (CardTemplate)playerCardTable.GetSelectedObject();
+     					if ( (player.GetAllCards().GetCount(transferCard) - activeDeck.GetCount(transferCard)) > 0 )
+     					{
+     						if (activeDeck.Contains(transferCard))
+         						activeDeck.ChangeCount(transferCard, 1);
+         					else
+         						activeDeck.AddCard(transferCard, 1);
+         					
+         					playerDeckTable.UpdateData();
+         					playerCardTable.UpdateData();
+     					}
      				}
      			}
      	));
@@ -294,6 +319,15 @@ public class UIManager
 	public Dropdown<Deck> GetPlayerDeckDropdown() 
 	{
 		return playerDeckDropdown;
+	}
+
+	public SimpleCollection<TableRow> GetActiveDataSource() 
+	{
+		return activeDataSource;
+	}
+
+	public void SetActiveDataSource( SimpleCollection<TableRow> source) {
+		activeDataSource = source;
 	}
 
 	

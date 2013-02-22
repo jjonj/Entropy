@@ -9,6 +9,7 @@ import javax.media.opengl.GLException;
 
 import jjj.entropy.classes.Const;
 import jjj.entropy.ui.TableRow;
+import jjj.entropy.ui.UIManager;
 
 import com.jogamp.opengl.util.texture.*;
 
@@ -164,7 +165,25 @@ public class CardTemplate implements TableRow {
 	@Override
 	public String[] GenRow() 
 	{
-		return new String[] { Title, "1"};
+		// Using a slightly complicated method of extracting the count of this CardTemplate in the dataSource being used for generating rows for a table
+		CardCollection dataSource = (CardCollection)(UIManager.GetInstance().GetActiveDataSource());
+		if (dataSource != null)
+		{
+			if (dataSource == Game.GetInstance().GetPlayer(1).GetAllCards())	//The representation is the number of cards in the players card not already in the active deck
+				return new String[] { Title, ""+(dataSource.GetCount(this)-Game.GetInstance().GetPlayer(1).GetActiveDeck().GetCount(this))+"/"+dataSource.GetCount(this)};
+			else	//It is assumed here that the collection is then the active deck (TODO: NOT PRETTY)
+				return new String[] { Title, ""+dataSource.GetCount(this)+"/"+Game.GetInstance().GetPlayer(1).GetAllCards().GetCount(this)};
+		}
+			
+		return new String[] { Title, "0"};
+	}
+
+	@Override
+	public int compareTo(TableRow other) 	//Compares alphabetically
+	{	
+		if (other instanceof CardTemplate)	//Should only be false if tables are misused
+			return Title.compareTo(((CardTemplate)other).Title);			
+		return 0;
 	}
 	
 }

@@ -1,11 +1,14 @@
 package jjj.entropy;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import javax.media.opengl.GL2;
 
+import jjj.entropy.ui.TableRow;
 
-public class CardCollection implements Iterable<CardTemplate>
+
+public class CardCollection implements SimpleCollection<TableRow>, Iterable<CardTemplate>
 {
 
 	protected HashMap<CardTemplate, Integer> cards;
@@ -47,6 +50,27 @@ public class CardCollection implements Iterable<CardTemplate>
 		return cards.keySet().iterator();
 	}
 
-	
+
+	@Override
+	public int Size() {
+		return cards.size();
+	}
+
+
+	@Override
+	public void AddAllTo(Collection<TableRow> c) 
+	{
+		for (CardTemplate ct : this)
+		{
+			c.add(ct);
+		}
+	}
+
+	public int GetCount(CardTemplate cardTemplate) 
+	{
+		if (cards.containsKey(cardTemplate))
+			return cards.get(cardTemplate);
+		return 0;
+	}
 	
 }

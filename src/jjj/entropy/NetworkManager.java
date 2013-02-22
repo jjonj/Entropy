@@ -180,21 +180,9 @@ public class NetworkManager extends Listener
 				Player p = new Player(pdm.playerID, pdm.name, pdm.activeDeck, pdm.allCards, pdm.allCardCounts, pdm.decks, pdm.deckCounts);
 				Game.GetInstance().SetPlayer(1, p);
 				
-				//Create a new two dimensional list for the card table
-				List<TableRow> playerCards = new ArrayList<TableRow>();
-				//Add the newly created players cards to it
-				
-				for (CardTemplate c : p.GetAllCards())
-				{
-					playerCards.add(c);
-				}
+					
+				UIManager.GetInstance().GetCardTable().SetDataSource(p.GetAllCards());
 
-				
-				UIManager.GetInstance().GetCardTable().SetDataSource(playerCards);
-				
-				
-				
-			
 				//Game.GetInstance().GetDeckDropdown().SetDataSource(decks);
 				
 				

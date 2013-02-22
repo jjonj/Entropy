@@ -599,17 +599,7 @@ public class Game implements GLEventListener
 	
 	public void OnDeckScreen()
 	{
-		buildingDeck = GetPlayer(1).GetActiveDeck();
-		
-		
-		List<TableRow> deckCards = new ArrayList<TableRow>();
-		//Add the newly created players cards to it
-		
-		for (CardTemplate c : buildingDeck)
-		{
-			deckCards.add(c);
-		}
-		UIManager.GetInstance().GetPlayerDeckTable().SetDataSource(deckCards);
+		UIManager.GetInstance().GetPlayerDeckTable().SetDataSource(GetPlayer(1).GetActiveDeck());
 
 		
 	}

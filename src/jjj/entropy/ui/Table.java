@@ -7,14 +7,19 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import javax.media.opengl.GLException;
 
 import jjj.entropy.Card;
+import jjj.entropy.CardCollection;
 import jjj.entropy.EntMouseListener;
 import jjj.entropy.GLHelper;
 import jjj.entropy.Game;
+import jjj.entropy.SimpleCollection;
 import jjj.entropy.classes.Const;
 import jjj.entropy.classes.Enums.GameState;
 
@@ -28,8 +33,9 @@ public class Table extends Clickable implements MouseListener, MouseMotionListen
 	
 	
 	private EntFont  font;
-	private List<TableRow> dataSource;	//Two dimensional array of data
-	private String[][] data;
+	private SimpleCollection<TableRow> dataSource;	//The actual source of the data
+	private List<TableRow> orderedData; 		//An internal sorted list of the data
+	private String[][] data;					//A cache of the string data (no need to recompute that every render call)
 	
 	private Texture texture;
 	private Texture scrollHandleTexture,
@@ -51,11 +57,15 @@ public class Table extends Clickable implements MouseListener, MouseMotionListen
 				lineOffset = 0;	// Used for scrolling
 	private boolean scrolling = false;
 
-	public Table(float x, float y,  int offsetX, int offsetY,  List<TableRow> dataSource, GameState activeGameState)
+	public Table(float x, float y,  int offsetX, int offsetY, GameState activeGameState)	// Table supports a null dataSource
 	{
-		this(x, y, offsetX, offsetY, dataSource, dataSource.size(), activeGameState);
+		this(x, y, offsetX, offsetY, null, 0, activeGameState);
 	}
-	public Table(float x, float y, int offsetX, int offsetY, List<TableRow> dataSource, int maxLines, GameState activeGameState)
+	public Table(float x, float y,  int offsetX, int offsetY,  SimpleCollection<TableRow> dataSource, GameState activeGameState)
+	{
+		this(x, y, offsetX, offsetY, dataSource, dataSource.Size(), activeGameState);
+	}
+	public Table(float x, float y, int offsetX, int offsetY, SimpleCollection<TableRow> dataSource, int maxLines, GameState activeGameState)
 	{
 		//Width should be adjustable, probably like button size "is"
 		super(x, y, Const.TABLE_WIDTH, Const.TABLE_ROW_HEIGHT*maxLines);
@@ -98,28 +108,55 @@ public class Table extends Clickable implements MouseListener, MouseMotionListen
 		
 	    scrollHandleY = screenY;
 	    scrollHandleYOffsetGLFloat = 0;
-		if (dataSource.size() < maxLines)
-			displayLineCount = dataSource.size();
-		else
-			displayLineCount =  maxLines;
-		
-		UpdateData();
-		
+	    if (dataSource != null)
+	    {
+			if (dataSource.Size() < maxLines)
+				displayLineCount = dataSource.Size();
+			else
+				displayLineCount =  maxLines;
+	    }
+	    else
+	    	displayLineCount = 0;
+	    UpdateData();
 		 Game.GetInstance().GetCanvas().addMouseListener(this);
 		 Game.GetInstance().GetCanvas().addMouseMotionListener(this);
 	}
 	
 	//Method to update the internal data structure with the current data source
+	//TODO: Find a more reasonable approach than just reload the entire collection
 	public void UpdateData()
 	{
-		if (data == null || data.length != dataSource.size())
-			data = new String[dataSource.size()][];
-		
-		for (int i = 0; i < dataSource.size(); i++)
+		UIManager.GetInstance().SetActiveDataSource(dataSource);	// Helping UIManager manage the currently updating dataSource for use with rowgeneration of CardTemplates
+		if (dataSource != null)
 		{
-			data[i] = dataSource.get(i).GenRow();
+			if (dataSource.Size() < maxLines)
+				displayLineCount = dataSource.Size();
+			else
+				displayLineCount =  maxLines;
+			
+			if (data == null || data.length != dataSource.Size())
+			{
+				data = new String[dataSource.Size()][];
+				orderedData = new ArrayList<TableRow>(dataSource.Size());
+			}
+			
+			orderedData.clear();
+			dataSource.AddAllTo(orderedData);
+			Collections.sort(orderedData);
+			
+			for (int i = 0; i < orderedData.size(); i++)
+			{
+				try {
+				data[i] = orderedData.get(i).GenRow();
+				}
+				catch (Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
 		}
-		
+		else
+			data = new String[0][0];
 	}
 	
 	public void Render(Game game)
@@ -158,20 +195,16 @@ public class Table extends Clickable implements MouseListener, MouseMotionListen
 	}*/
 	
 	
-	public void SetDataSource(List<TableRow> dataSource) 
+	public void SetDataSource(SimpleCollection<TableRow> dataSource) 
 	{
 		this.dataSource = dataSource;
-		if (dataSource.size() < maxLines)
-			displayLineCount = dataSource.size();
-		else
-			displayLineCount =  maxLines;
 		UpdateData();
 	} 
 	
 	
 	public int GetLineCount() 
 	{
-		return dataSource.size();
+		return dataSource.Size();
 	}
 	
 	public int GetLineCountToRender() 
@@ -190,7 +223,7 @@ public class Table extends Clickable implements MouseListener, MouseMotionListen
 	}
 	public boolean DisplayScrollbar() 
 	{
-		return displayLineCount < dataSource.size();
+		return displayLineCount < dataSource.Size();
 	}
 	
 	@Override
@@ -266,7 +299,7 @@ public class Table extends Clickable implements MouseListener, MouseMotionListen
 			else if (mouseOffSetFromTaTop > adjH)
 				mouseOffSetFromTaTop = adjH;
 			scrollHandleY = screenY - mouseOffSetFromTaTop;
-			lineOffset = (int) ((float)(mouseOffSetFromTaTop)/(adjH)*(dataSource.size()-displayLineCount));
+			lineOffset = (int) ((float)(mouseOffSetFromTaTop)/(adjH)*(dataSource.Size()-displayLineCount));
 			scrollHandleYOffsetGLFloat = (Const.TABLE_ROW_HEIGHT*displayLineCount - Const.SCROLL_HANDLE_HEIGHT) * ((float)(mouseOffSetFromTaTop)/(adjH));
 			
 		}
@@ -284,7 +317,7 @@ public class Table extends Clickable implements MouseListener, MouseMotionListen
 	//Assumes UpdateData has been called before the last change to the dataSource
 	public TableRow GetSelectedObject()
 	{
-		return dataSource.get(selectedIndex);
+		return orderedData.get(selectedIndex);	//Ordered data is in the same order as Data so there is a 1 to 1 correspondence
 	}
 	public Texture GetSelectedTexture() {
 		return selectedFieldTexture;
@@ -292,6 +325,9 @@ public class Table extends Clickable implements MouseListener, MouseMotionListen
 	public int GetLineOffset() 
 	{
 		return lineOffset;
+	}
+	public SimpleCollection<TableRow> GetDatSource() {
+		return dataSource;
 	}
 	
 

@@ -10,7 +10,8 @@ import javax.media.opengl.GL2;
 import jjj.entropy.classes.EntUtilities;
 
 
-public class Deck extends CardCollection {
+public class Deck extends CardCollection
+{
 
 	
 	private Player owner;
@@ -151,6 +152,31 @@ public class Deck extends CardCollection {
 	{
 	    return name;
 	}
+
+
+	public boolean Contains(CardTemplate card) 
+	{
+		return cards.containsKey(card);
+	}
+
+
+	//Adds the specified count to the count of the card. Negative values are valid for substracting counts but wont go below 1. If card isn't in collection, it is added
+	public void ChangeCount(CardTemplate card, int changeAmount) 
+	{
+		int newVal = cards.get(card)+changeAmount;
+		if (cards.containsKey(card))
+		{
+			if (newVal < 1)
+				cards.remove(card);
+			else
+				cards.put(card, newVal);
+		}
+		if (newVal > 0)
+			cards.put(card, newVal);			
+	}
+
+
+	
 	
 	
 }
