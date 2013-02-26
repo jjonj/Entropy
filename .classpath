@@ -13,5 +13,6 @@
 	<classpathentry kind="lib" path="D:/Users/JavaWorkspace/Entropy/lib/mysql-connector-java-5.1.22-bin.jar"/>
 	<classpathentry kind="lib" path="D:/Users/JavaWorkspace/Entropy/lib/kryonet-debug-2.18-all.jar"/>
 	<classpathentry kind="src" path="/EntropyCore"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

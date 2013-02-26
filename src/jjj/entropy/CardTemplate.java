@@ -71,7 +71,7 @@ public class CardTemplate implements TableRow {
 	public final String Title,
 						texturePath;
 	
-	public final short  ID,
+	public final short  ID,			//Global ID, not client based
 						RaceCost,
 						AnyCost,
 						Income,

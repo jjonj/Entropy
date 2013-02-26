@@ -78,6 +78,8 @@ public class Button extends Clickable
 		{
 	 	case TINY_SQUARE:
 	 		return Const.TINY_SQUARE_BUTTON_WIDTH;
+	 	case SMALL:
+			return Const.SMALL_BUTTON_WIDTH;
 		case BIG:
 			return Const.BIG_BUTTON_WIDTH;
 		default:
@@ -90,6 +92,8 @@ public class Button extends Clickable
 		{
 		case TINY_SQUARE:
 	 		return Const.TINY_SQUARE_BUTTON_HEIGHT;
+		case SMALL:
+			return Const.SMALL_BUTTON_HEIGHT;
 		case BIG:
 			return Const.BIG_BUTTON_HEIGHT;
 		default:
@@ -104,25 +108,13 @@ public class Button extends Clickable
 		
 		Game.gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 	    	
-		switch (buttonSize)
+
+		if (texture != null)
 		{
-		case TINY_SQUARE:
-			if (texture != null)
-			{
-				texture.bind(Game.gl);
-				GLHelper.DrawUIButton(Game.gl, this);
-			}
-		case BIG:
-			if (texture != null)
-			{
-				texture.bind(Game.gl);
-				GLHelper.DrawUIButton(Game.gl, this);
-			}
-			font.Render(game, textX + textOffsetX, textY - textOffsetY, text);
-			break;
-		default:
-			break;
+			texture.bind(Game.gl);
+			GLHelper.DrawUIButton(Game.gl, this);
 		}
+		font.Render(game, textX + textOffsetX, textY - textOffsetY, text);
 		
 		
 	}

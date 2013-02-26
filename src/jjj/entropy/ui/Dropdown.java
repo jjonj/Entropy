@@ -126,7 +126,6 @@ public class Dropdown <T> extends Clickable
 	@Override
 	public void Activate(int mouseX, int mouseY)
 	{
-		System.out.println("SSS");
 		if (!selecting)
 		{
 			if (mouseY > screenY - h/data.length)	//Only accept clicks on the visible element when not selecting

@@ -120,9 +120,18 @@ public class UIManager
      				playerDeckTable.SetDataSource(newActiveDeck);
      				playerCardTable.UpdateData();
  				}});
-		
+
      	DeckScreenUIComponents.add(playerDeckDropdown);
 
+     	
+      	DeckScreenUIComponents.add(new Button(-0.06f, 0.21f, 25, -7, "Save deck", new EntFont(FontTypes.MainParagraph, Font.PLAIN, 16, Color.black), ButtonSize.SMALL, TextureManager.smallButtonTexture,
+     			new UIAction() {public void Activate(){
+     					NetworkManager.GetInstance().SendDeckUpdate(Game.GetInstance().GetPlayer(1).GetActiveDeck());
+     				}
+     			}
+     	));
+     	
+     	
      	//transfer card left arrow
      	DeckScreenUIComponents.add(new Button(-0.35f, -0.05f, 0, 0, "", ButtonSize.TINY_SQUARE, TextureManager.arrow1ButtonTexture,
      			new UIAction() {public void Activate(){

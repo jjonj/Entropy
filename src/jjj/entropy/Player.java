@@ -17,7 +17,7 @@ public class Player {
 	
 	
 	
-	public Player(int playerID, String name, int activeDeck, int[] allCards, int[] allCardCounts, int[][] decks, int[][] deckCounts)	//Used for creating the player on this client
+	public Player(int playerID, String name, int activeDeck, int[] allCards, int[] allCardCounts, int[][] decks, int[][] deckCounts, int[] deckDBIDs)	//Used for creating the player on this client
 	{
 
 		this.allCards = new CardCollection();
@@ -39,7 +39,7 @@ public class Player {
 		{
 			for (int i = 0; i < decks.length; i++)
 			{
-				this.decks.add(Deck.LoadDeck(this, "Deck "+(i+1), decks[i], deckCounts[i]));	//Temporary deck names
+				this.decks.add(Deck.LoadDeck(this, "Deck "+(i+1), decks[i], deckCounts[i], deckDBIDs[i]));	//Temporary deck names
 			}
 			this.activeDeck = this.decks.get(activeDeck);
 		}
@@ -54,11 +54,12 @@ public class Player {
 		this.name = name;
 		
 		if (activeDeck != null)
-			this.activeDeck = Deck.LoadDeck(this, "Default deck",activeDeck, activeDeckCounts);
+			this.activeDeck = Deck.LoadDeck(this, "Default deck",activeDeck, activeDeckCounts, -1);
 
 	}
 
-	public int GetID() {
+	public int GetID() 
+	{
 		return id;
 	}
 

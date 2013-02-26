@@ -130,6 +130,23 @@ public class NetworkManager extends Listener
 		}
 	}
 	
+	
+	public void SendDeckUpdate(Deck deck)
+	{
+		PlayerDataMessage pdm = new PlayerDataMessage();
+		pdm.playerID = Game.GetInstance().GetPlayer(1).GetID();
+		
+		pdm.deckDBIDs = new int[]{deck.GetDBID()};	//Include the ID of the deck being updated as the first entry in the array
+		int[][] IDsAndCounts = deck.ToIDCountArray();	//Returns two int arrays. One of the IDs one of the counts
+		
+		pdm.decks = new int[1][];		//Initialize the two dimensional arrays to only have 1 dimension/element
+		pdm.decks[0] = IDsAndCounts[0];
+		pdm.deckCounts = new int[1][];	
+		pdm.deckCounts[0] = IDsAndCounts[1];
+		client.sendTCP(pdm);
+		
+	}
+	
 	public void SendTextMessage(String text)
 	{
 		ChatMessage request = new ChatMessage();
@@ -177,7 +194,7 @@ public class NetworkManager extends Listener
 			System.out.println(pdm);
 			if (pdm.loginAccepted)
 			{
-				Player p = new Player(pdm.playerID, pdm.name, pdm.activeDeck, pdm.allCards, pdm.allCardCounts, pdm.decks, pdm.deckCounts);
+				Player p = new Player(pdm.playerID, pdm.name, pdm.activeDeck, pdm.allCards, pdm.allCardCounts, pdm.decks, pdm.deckCounts, pdm.deckDBIDs);
 				Game.GetInstance().SetPlayer(1, p);
 				
 					

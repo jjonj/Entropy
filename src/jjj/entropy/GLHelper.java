@@ -314,6 +314,18 @@ public class GLHelper {
 		 gl.glEnd();
 		 
 		 gl.glEndList();
+		 
+		 SmallButtonModel = gl.glGenLists(1);
+         gl.glNewList(SmallButtonModel, GL2.GL_COMPILE);
+
+		 gl.glBegin(GL2.GL_QUADS);
+		 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(0, 0, 0f );
+		    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(Const.SMALL_BUTTON_WIDTH, 0, 0f );
+		    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(Const.SMALL_BUTTON_WIDTH, -Const.SMALL_BUTTON_HEIGHT, 0f  );
+		    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(0, -Const.SMALL_BUTTON_HEIGHT, 0f  );
+		 gl.glEnd();
+		 
+		 gl.glEndList();
 	}
 	
 	public static void GenerateTextbox(GL2 gl, Texture texture)
@@ -346,6 +358,9 @@ public class GLHelper {
 		 {
 		 case TINY_SQUARE:
 			 gl.glCallList(TinySquareButtonModel);
+			 break;
+		 case SMALL:
+			 gl.glCallList(SmallButtonModel);
 			 break;
 		 case BIG:
 			 gl.glCallList(BigButtonModel);

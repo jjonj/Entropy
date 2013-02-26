@@ -37,6 +37,20 @@ public class CardCollection implements SimpleCollection<TableRow>, Iterable<Card
 		}
 	}
 	
+	//Returns a 2xSize array as a trick to return two arrays. One for the IDs one for the Counts
+	public int[][] ToIDCountArray()
+	{
+		int[][] arr = new int[2][cards.size()];
+		
+		int i = 0;
+		for (CardTemplate c : this)
+		{
+			arr[0][i] = c.ID;			//Set ID's 
+			arr[1][i] = cards.get(c);	//Set counts
+			i++;
+		}
+		return arr;
+	}
 
 	public int GetSize()
 	{

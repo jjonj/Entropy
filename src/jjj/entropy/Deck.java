@@ -17,13 +17,19 @@ public class Deck extends CardCollection
 	private Player owner;
 	private String name;
 	private List<Card> remainingCards;	//Cards unplayed in the deck in a given game
-	
+	private final int DBID;
 	private HashMap<Card, Integer> CardToDeckIDMap;		//	Maps cards to their deck ids and back
 	private HashMap<Integer, Card> DeckIDToCardMap;		//
 	
+	
 	public Deck(Player owner, String name)
 	{
+		this(owner, name, -1);
+	}
+	public Deck(Player owner, String name, int DBID)
+	{
 		super();
+		this.DBID = DBID;
 		this.name = name;
 		remainingCards = new ArrayList<Card>();
 		CardToDeckIDMap = new HashMap<Card, Integer>();
@@ -123,13 +129,13 @@ public class Deck extends CardCollection
 		return DeckIDToCardMap.get(cardDeckID);
 	}
 	
-	public static Deck LoadDeck(Player owner, String deckName, int[] deck, int[] deckCounts) 
+	public static Deck LoadDeck(Player owner, String deckName, int[] deck, int[] counts, int DBID) 
 	{
-		Deck rDeck = new Deck(owner, deckName);
+		Deck rDeck = new Deck(owner, deckName, DBID);
 		try {
 			for (int i = 0; i < deck.length; i++)
 			{
-				rDeck.AddCard(CardTemplate.GetTemplate(deck[i]), deckCounts[i]);
+				rDeck.AddCard(CardTemplate.GetTemplate(deck[i]), counts[i]);
 			}
 		} catch (IllegalAccessException e) {
 			e.printStackTrace();
@@ -145,6 +151,10 @@ public class Deck extends CardCollection
 		return CardToDeckIDMap.get(card);
 	}
 
+	public int GetDBID()
+	{
+		return DBID;
+	}
 
 	
 	@Override 
