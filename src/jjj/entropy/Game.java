@@ -27,6 +27,7 @@ import jjj.entropy.CardTemplate.CardRace;
 import jjj.entropy.CardTemplate.CardType;
 import jjj.entropy.classes.*;
 import jjj.entropy.classes.Enums.GameState;
+import jjj.entropy.classes.Enums.Zone;
 import jjj.entropy.ui.*;
 import jjj.entropy.ui.Button.ButtonSize;
 import jjj.entropy.ui.EntFont.FontTypes;
@@ -609,6 +610,9 @@ public class Game implements GLEventListener
 		//Add the players deck to the dropdown of decks
 		UIManager.GetInstance().GetPlayerDeckDropdown().SetDataSource(GetPlayer(1).GetAllDecks());
 	}
+
+	
+
 	
 }
 

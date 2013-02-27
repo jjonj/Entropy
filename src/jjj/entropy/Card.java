@@ -33,15 +33,16 @@ public class Card implements Comparable<Card>
 	
 	private CardTemplate template;
 	
-
-	private float oldX, oldY, oldZ,
-				  oldRX, oldRY, oldRZ,
-				  x, y, z,
-				  targetX, targetY, targetZ,
-				  dirVecX, dirVecY, dirVecZ,
-				  rotX, rotY, rotZ,
-				  targetRotX, targetRotY, targetRotZ,
-				  rotDirX, rotDirY, rotDirZ;
+	private Zone zone = null;	//The cards current zone, equals null if the card is not in a zone
+	
+	private float oldX, oldY, oldZ,						//Cached location for when card is zoomed on
+				  oldRX, oldRY, oldRZ,					//Cached rotation for when card is zoomed on
+				  x, y, z,								//The cards current X,Y,Z coordinates
+				  targetX, targetY, targetZ,			//The coordinates of the cards current movement target
+				  dirVecX, dirVecY, dirVecZ,			//The current direction vector (which is added to the actual coordinates each frame)
+				  rotX, rotY, rotZ,						//The current rotation vector of the card
+				  targetRotX, targetRotY, targetRotZ,	//The rotation vector of the cards movement target
+				  rotDirX, rotDirY, rotDirZ;			//The current rotation direction vector (which is added to the actual rotation each frame)
 				  
 
 	
@@ -54,7 +55,7 @@ public class Card implements Comparable<Card>
 	private int id;	//Id is an auto incrementing value, Note that there is an individual incrementer per player so two cards can have id X, one for each player.
 	public int glMIndex = -1;
 	
-	private short zone;
+	
 	
 	private Status status;
 	
@@ -78,6 +79,10 @@ public class Card implements Comparable<Card>
 		this.z = z;
 		this.template = template;
 
+		this.targetX = x;
+		this.targetY = y;
+		this.targetZ = z;
+		
 		
 		switch(face)
 		{
@@ -108,6 +113,7 @@ public class Card implements Comparable<Card>
 		
 		currentOwner = originalOwner;
 		
+		this.zone = source.zone;
 		this.template = source.template;
 		
 		this.x = source.x;
@@ -152,12 +158,12 @@ public class Card implements Comparable<Card>
 	}
 
 	public void PlayToZone(Zone zone) {PlayToZone(zone, false);}
-	public void PlayToZone(Zone zone, boolean enemy)
+	public void PlayToZone(Zone zone, boolean opponent)
 	{
-		if (!enemy)	
-			SetTarget(x, 0, Zone.GetZLoc(zone), 90, 0, 0);
+		if (!opponent)	
+			SetTarget(Zone.GetAvailCardX(zone, opponent), 0, Zone.GetZLoc(zone), 90, 0, 0);
 		else
-			SetTarget(x, 0, Zone.GetZLoc(zone), -90, 180, 0);
+			SetTarget(Zone.GetAvailCardX(zone, opponent), 0, Zone.GetZLoc(zone), -90, 180, 0);
 	}
 	public void PlayToLife(Life life){PlayToLife(life, false);}
 	public void PlayToLife(Life life, boolean enemy)
@@ -228,7 +234,7 @@ public class Card implements Comparable<Card>
 	public void SetTarget(float x, float y, float z, float rotX, float rotY, float rotZ)
 	{
 		
-		double steps = 90;	//1.5 sec animation time
+		double steps = 90;	//1.5 sec animation time TODO: Make a const
 		
 		targetX = x;
 		targetY = y;
@@ -372,7 +378,7 @@ public class Card implements Comparable<Card>
 	public float GetRotZ() {
 		return rotZ;
 	}
-	
+
 	public void SetRot(float x, float y, float z) {
 		rotX = x;
 		rotY = y;
@@ -427,6 +433,18 @@ public class Card implements Comparable<Card>
 		else
 			return 0;
 	}
+
+	public Zone GetZone() 
+	{
+		return zone;
+	}
+
+	public void SetZone(Zone zone) 
+	{
+		this.zone = zone;
+	}
+
+	
 
 	
 

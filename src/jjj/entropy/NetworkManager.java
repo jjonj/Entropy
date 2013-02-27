@@ -247,6 +247,18 @@ public class NetworkManager extends Listener
 				card.MoveToDeck(2);
 				Game.GetInstance().ShowCard(card);
 			}
+			
+			boolean movingOutOfZone = false;
+			Zone cardOldZone = card.GetZone();
+			float oldCardX = 0;
+			if (cardOldZone != null)	//If the card is in a combat zone
+			{
+				oldCardX = card.GetTargetX();
+				movingOutOfZone = true;	//assume the card is moving out of the combat zone (checked below)
+				card.SetZone(null);		//
+			}
+			
+			
 			switch(amsg.mode)
 			{
 			case 1:
@@ -273,16 +285,40 @@ public class NetworkManager extends Listener
 				switch(amsg.modeNumber)	//Note that zone numbers are reversed for the other player so they get reversed here
 				{
 				case 1:
-					card.PlayToZone(Zone.ZONE4, true);
+					if (cardOldZone != Zone.ZONE4)
+					{
+						card.PlayToZone(Zone.ZONE4, true);
+						card.SetZone(Zone.ZONE4);
+					}
+					else
+						movingOutOfZone = false;
 					break;
 				case 2:
-					card.PlayToZone(Zone.ZONE3, true);
+					if (cardOldZone != Zone.ZONE3)
+					{
+						card.PlayToZone(Zone.ZONE3, true);
+						card.SetZone(Zone.ZONE3);
+					}
+					else
+						movingOutOfZone = false;
 					break;
 				case 3:
-					card.PlayToZone(Zone.ZONE2, true);
+					if (cardOldZone != Zone.ZONE2)
+					{
+						card.PlayToZone(Zone.ZONE2, true);
+						card.SetZone(Zone.ZONE2);
+					}
+					else
+						movingOutOfZone = false;
 					break;
 				case 4:
-					card.PlayToZone(Zone.ZONE1, true);
+					if (cardOldZone != Zone.ZONE1)
+					{
+						card.PlayToZone(Zone.ZONE1, true);
+						card.SetZone(Zone.ZONE1);
+					}
+					else
+						movingOutOfZone = false;
 					break;
 				}
 				break;
@@ -290,6 +326,12 @@ public class NetworkManager extends Listener
 				card.PlayToHand(amsg.modeNumber, true);
 				break;
 			}
+			
+			if (movingOutOfZone)
+			{
+				Zone.ReturnAvailCardX(cardOldZone, oldCardX, true);
+			}
+			
 		}
 	}
 

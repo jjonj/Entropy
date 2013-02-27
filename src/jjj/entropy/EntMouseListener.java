@@ -65,9 +65,20 @@ public class EntMouseListener implements MouseListener, MouseMotionListener, Mou
 				//The card has an ID that is individual to the client but is synchronized across clients in each decks unique ID system so the deck id is used here
 				NetworkManager.GetInstance().SendAction(game.GetPlayer(1).GetActiveDeck().GetCardDeckID(c), Game.mode, Game.modeNumber);
 	
+				boolean movingOutOfZone = false;
+				Zone cardOldZone = c.GetZone();
+				float oldCardX = 0;
+				if (cardOldZone != null)	//If the card is in a combat zone
+				{
+					oldCardX = c.GetTargetX();
+					movingOutOfZone = true;	//assume the card is moving out of the combat zone (checked below)
+					c.SetZone(null);		//
+				}
+				
 				switch(Game.mode)
 				{
 				case 1:
+					
 					switch(Game.modeNumber)
 					{
 					case 1:
@@ -91,16 +102,40 @@ public class EntMouseListener implements MouseListener, MouseMotionListener, Mou
 					switch(Game.modeNumber)
 					{
 					case 1:
-						c.PlayToZone(Zone.ZONE1);
+						if (cardOldZone != Zone.ZONE1)
+						{
+							c.PlayToZone(Zone.ZONE1);
+							c.SetZone(Zone.ZONE1);
+						}
+						else
+							movingOutOfZone = false;
 						break;
 					case 2:
-						c.PlayToZone(Zone.ZONE2);
+						if (cardOldZone != Zone.ZONE2)
+						{
+							c.PlayToZone(Zone.ZONE2);
+							c.SetZone(Zone.ZONE2);
+						}
+						else
+							movingOutOfZone = false;
 						break;
 					case 3:
-						c.PlayToZone(Zone.ZONE3);
+						if (cardOldZone != Zone.ZONE3)
+						{
+							c.PlayToZone(Zone.ZONE3);
+							c.SetZone(Zone.ZONE3);
+						}
+						else
+							movingOutOfZone = false;
 						break;
 					case 4:
-						c.PlayToZone(Zone.ZONE4);
+						if (cardOldZone != Zone.ZONE4)
+						{
+							c.PlayToZone(Zone.ZONE4);
+							c.SetZone(Zone.ZONE4);
+						}
+						else
+							movingOutOfZone = false;
 						break;
 					}
 					break;
@@ -109,7 +144,10 @@ public class EntMouseListener implements MouseListener, MouseMotionListener, Mou
 					break;
 				}
 					
-				
+				if (movingOutOfZone)
+				{
+					Zone.ReturnAvailCardX(cardOldZone, oldCardX, false);
+				}
 			}
 			break;
 		default:
