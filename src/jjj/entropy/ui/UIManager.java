@@ -7,8 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import com.esotericsoftware.kryonet.Connection;
-
 import jjj.entropy.Card;
 import jjj.entropy.CardCollection;
 import jjj.entropy.CardTemplate;
@@ -51,7 +49,6 @@ public class UIManager
     		 playerDeckTable;
     Dropdown<Deck> playerDeckDropdown;
     private Label FPSLabel;
-    private Set<Card> cardsToRender;
     private Textbox chatTextbox;
     private Label chatWindow;
     private Textbox usernameTextbox,
@@ -82,14 +79,16 @@ public class UIManager
     	//Main menu UI components
     	
      	MainMenuUIComponents.add(new Button(-0.16f, 0.05f, 48, 15, "Multiplayer", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.orange), TextureManager.bigButtonTexture,
-     			new UIAction() {public void Activate(){
+     			new UIAction() {@Override
+				public void Activate(){
 	     				NetworkManager.GetInstance().JoinGame();
      				}
      			}
      	));
 
      	MainMenuUIComponents.add(new Button(-0.16f, -0.05f, 60, 22, "My decks", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.orange), TextureManager.bigButtonTexture,
-     			new UIAction() {public void Activate(){
+     			new UIAction() {@Override
+				public void Activate(){
      					Game.GetInstance().SetGameState(GameState.DECK_SCREEN);
      				}
      			}
@@ -114,7 +113,8 @@ public class UIManager
      	
     	//Dropdown initiated with a temporary data source that is updated on login ( game.OnLogin(); )
      	playerDeckDropdown = new Dropdown<Deck>(-0.275f, 0.21f, 12, 14, new ArrayList<Deck>(),
-				new UIAction() {public void Activate(){
+				new UIAction() {@Override
+				public void Activate(){
 					Deck newActiveDeck = playerDeckDropdown.GetSelectedObject();
      				Game.GetInstance().GetPlayer(1).SetActiveDeck(newActiveDeck);
      				playerDeckTable.SetDataSource(newActiveDeck);
@@ -125,7 +125,8 @@ public class UIManager
 
      	
       	DeckScreenUIComponents.add(new Button(-0.06f, 0.21f, 25, -7, "Save deck", new EntFont(FontTypes.MainParagraph, Font.PLAIN, 16, Color.black), ButtonSize.SMALL, TextureManager.smallButtonTexture,
-     			new UIAction() {public void Activate(){
+     			new UIAction() {@Override
+				public void Activate(){
      					NetworkManager.GetInstance().SendDeckUpdate(Game.GetInstance().GetPlayer(1).GetActiveDeck());
      				}
      			}
@@ -134,7 +135,8 @@ public class UIManager
      	
      	//transfer card left arrow
      	DeckScreenUIComponents.add(new Button(-0.35f, -0.05f, 0, 0, "", ButtonSize.TINY_SQUARE, TextureManager.arrow1ButtonTexture,
-     			new UIAction() {public void Activate(){
+     			new UIAction() {@Override
+				public void Activate(){
      				
      				Player player = Game.GetInstance().GetPlayer(1);
  					Deck activeDeck = player.GetActiveDeck();
@@ -153,7 +155,8 @@ public class UIManager
      	));
      	//transfer card right arrow
      	DeckScreenUIComponents.add(new Button(-0.35f, -0.12f, 0, 0, "", ButtonSize.TINY_SQUARE, TextureManager.arrow2ButtonTexture,
-     			new UIAction() {public void Activate(){
+     			new UIAction() {@Override
+				public void Activate(){
      				
      					Player player = Game.GetInstance().GetPlayer(1);
      					Deck activeDeck = player.GetActiveDeck();
@@ -183,7 +186,8 @@ public class UIManager
      	LoginScreenUIComponents.add(new Label(555, 320, "Password", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black)));
      	
      	LoginScreenUIComponents.add(new Button(-0.155f, -0.155f, 85, 28, "Login", new EntFont(FontTypes.MainParagraph, Font.BOLD, 22, Color.black), TextureManager.bigButtonTexture,
-     			new UIAction() {public void Activate(){
+     			new UIAction() {@Override
+				public void Activate(){
      				NetworkManager.GetInstance().Login(usernameTextbox.GetText(), passwordTextbox.GetText());
      				//Game.GetInstance().SetGameState(GameState.MAIN_MENU);
  				}

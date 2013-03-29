@@ -5,8 +5,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.media.opengl.GL2;
-
 import jjj.entropy.classes.EntUtilities;
 
 

@@ -2,7 +2,6 @@ package jjj.entropy.ui;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,8 +13,6 @@ import com.jogamp.opengl.util.awt.TextRenderer;
 @SuppressWarnings("serial")
 public class EntFont extends Font {
 
-	private float lengthOfAChar;
-	
 	public enum FontTypes{
 		MainTitle("SansSerif"),
 		MainParagraph("SansSerif");
@@ -58,7 +55,6 @@ public class EntFont extends Font {
 		}
 	}
 
-	private Rectangle2D rec;
 	List<String> cLines = new ArrayList<String>();
 	public void RenderBox(Game game, int x, int y, int maxLines, int lineWidth, String text)
 	{
@@ -66,7 +62,6 @@ public class EntFont extends Font {
 		{
 			cLines.clear();
 		
-			lengthOfAChar = 8f;
 			int heightLineSkip = 0;
 			
 			String[] lines = text.split("\n");

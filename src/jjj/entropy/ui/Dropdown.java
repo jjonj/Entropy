@@ -1,24 +1,15 @@
 package jjj.entropy.ui;
 
 import java.awt.Font;
-import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
-import java.nio.DoubleBuffer;
-import java.nio.IntBuffer;
 import java.util.List;
 
-import javax.media.opengl.GL2;
 import javax.media.opengl.GLException;
 
 import jjj.entropy.GLHelper;
 import jjj.entropy.Game;
-import jjj.entropy.NetworkManager;
-import jjj.entropy.Game.*;
 import jjj.entropy.classes.Const;
-import jjj.entropy.classes.Enums.*;
-
-import com.jogamp.opengl.util.awt.TextRenderer;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureIO;
 
@@ -65,6 +56,7 @@ public class Dropdown <T> extends Clickable
         selectedIndex = 0;
 
 		int[] temp =  GLHelper.ConvertGLFloatToGLScreen(0, 0);
+		@SuppressWarnings("unused")
 		float zeroOnScreenX = temp[0],
 		      zeroOnScreenY = temp[1];
 		
@@ -85,6 +77,7 @@ public class Dropdown <T> extends Clickable
 	
 	
 	
+	@Override
 	public void Render(Game game)
 	{
 		if (texture != null)

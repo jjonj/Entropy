@@ -1,24 +1,17 @@
 package jjj.entropy;
 
 
-import java.awt.Color;
-import java.awt.Font;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
-import java.util.List;
-import java.util.ArrayList;
 import java.util.Set;
 
-import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLEventListener;
-import javax.media.opengl.GLException;
 import javax.media.opengl.awt.GLCanvas;
+import javax.media.opengl.fixedfunc.GLMatrixFunc;
 import javax.media.opengl.glu.GLU;
 
 import jjj.entropy.Card.Facing;
@@ -27,13 +20,8 @@ import jjj.entropy.CardTemplate.CardRace;
 import jjj.entropy.CardTemplate.CardType;
 import jjj.entropy.classes.*;
 import jjj.entropy.classes.Enums.GameState;
-import jjj.entropy.classes.Enums.Zone;
 import jjj.entropy.ui.*;
-import jjj.entropy.ui.Button.ButtonSize;
-import jjj.entropy.ui.EntFont.FontTypes;
-
 import com.jogamp.opengl.util.FPSAnimator;
-import com.jogamp.opengl.util.texture.*;
 
 
 public class Game implements GLEventListener  
@@ -46,11 +34,12 @@ public class Game implements GLEventListener
     private static GameState gamestate;
     
     private static Game instance = null;
-	private String title;
 	private int gameWidth, 
 				gameHeight;
 	private float aspectRatio;
+	@SuppressWarnings("unused")
 	private boolean fullscreen = false;
+	@SuppressWarnings("unused")
 	private boolean showFPS = false;
 	private boolean loggedIn = false;
     private int realGameHeight;	//Used for calculating the real Y values
@@ -81,9 +70,9 @@ public class Game implements GLEventListener
 	private int iteratingCardsToRender = 0;
     
     
-    public static void InitSingleton(String title, int width, int height, GLCanvas canvas)
+    public static void InitSingleton(int width, int height, GLCanvas canvas)
     {
-    	new Game(title, width, height, canvas);
+    	new Game(width, height, canvas);
     }
     
     public static Game GetInstance()
@@ -95,12 +84,11 @@ public class Game implements GLEventListener
     	return null;
     }
     
-    protected Game(String title, int width, int height, GLCanvas canvas)
+    protected Game(int width, int height, GLCanvas canvas)
     {
     	instance = this;
     	
     	this.canvas = canvas;
-    	this.title = title;
     	gameWidth = width;
     	gameHeight = height;
     	aspectRatio = (float)width/height;
@@ -121,7 +109,8 @@ public class Game implements GLEventListener
     	NetworkManager.GetInstance().Connect("127.0.0.1", 54555);	//Temporary location
     } 
 
-    public void init(GLAutoDrawable gLDrawable) 
+    @Override
+	public void init(GLAutoDrawable gLDrawable) 
     {
     	gl = gLDrawable.getGL().getGL2();
     	System.out.println("init() called");
@@ -159,12 +148,13 @@ public class Game implements GLEventListener
         realGameHeight = viewport[3];
     }
  
-    public void display(GLAutoDrawable gLDrawable) 
+    @Override
+	public void display(GLAutoDrawable gLDrawable) 
     {
-		gl.glMatrixMode(GL2.GL_PROJECTION);	//Switch to camera adjustment mode
+		gl.glMatrixMode(GLMatrixFunc.GL_PROJECTION);	//Switch to camera adjustment mode
     	gl.glLoadIdentity();
     	glu.gluPerspective(45, aspectRatio, 1, 100);
-    	gl.glMatrixMode(GL2.GL_MODELVIEW);	//Switch to hand adjustment mode
+    	gl.glMatrixMode(GLMatrixFunc.GL_MODELVIEW);	//Switch to hand adjustment mode
 		
     	switch (gamestate)
     	{
@@ -355,7 +345,8 @@ public class Game implements GLEventListener
     {
     }
  
-    public void reshape(GLAutoDrawable gLDrawable, int x, int y, int width, int height) 
+    @Override
+	public void reshape(GLAutoDrawable gLDrawable, int x, int y, int width, int height) 
     {
         final GL2 gl = gLDrawable.getGL().getGL2();
  
@@ -372,8 +363,8 @@ public class Game implements GLEventListener
 	    double model[] = new double[16];
 	    double proj[] = new double[16];
 		gl.glGetIntegerv(GL2.GL_VIEWPORT, view, 0);
-		gl.glGetDoublev(GL2.GL_MODELVIEW_MATRIX, model, 0);
-		gl.glGetDoublev(GL2.GL_PROJECTION_MATRIX, proj, 0);
+		gl.glGetDoublev(GLMatrixFunc.GL_MODELVIEW_MATRIX, model, 0);
+		gl.glGetDoublev(GLMatrixFunc.GL_PROJECTION_MATRIX, proj, 0);
     
 		
 		UIManager.GetInstance().OnResize(view, model, proj);
@@ -382,6 +373,7 @@ public class Game implements GLEventListener
     }
  
     //openGL specific cleanup code
+	@Override
 	public void dispose(GLAutoDrawable arg0)
 	{
 		animator.stop();
@@ -429,8 +421,8 @@ public class Game implements GLEventListener
 		//NOTE: Depth testing not tested, and only tests for card center
 		Card rCard = null;
 		
-		double  px = (double)EntMouseListener.MouseX, 
-				py = (double)(EntMouseListener.MouseY);
+		double  px = EntMouseListener.MouseX, 
+				py = (EntMouseListener.MouseY);
 		++iteratingCardsToRender;
 		for(Card ca : cardsToRender)
 		{

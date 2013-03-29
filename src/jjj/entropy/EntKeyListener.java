@@ -1,20 +1,8 @@
 package jjj.entropy;
 
-import java.awt.Color;
-import java.awt.Font;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.io.File;
-import java.io.IOException;
-
-import javax.media.opengl.GLException;
-
-import com.jogamp.opengl.util.texture.Texture;
-import com.jogamp.opengl.util.texture.TextureIO;
-
 import jjj.entropy.classes.Enums.GameState;
-import jjj.entropy.ui.EntFont;
-import jjj.entropy.ui.Label;
 import jjj.entropy.ui.Textbox;
 import jjj.entropy.ui.UIComponent;
 import jjj.entropy.ui.UIManager;

@@ -1,12 +1,8 @@
 package jjj.entropy.ui;
 
 import java.awt.Font;
-import java.awt.Color;
-
 import jjj.entropy.Game;
 import jjj.entropy.classes.Const;
-
-import com.jogamp.opengl.util.awt.TextRenderer;
 
 public class Label extends UIComponent{
 	
@@ -40,6 +36,7 @@ public class Label extends UIComponent{
 		this.maxLines = maxLines;
 	}
 	
+	@Override
 	public void Render(Game game)
 	{
 		if (boxed)

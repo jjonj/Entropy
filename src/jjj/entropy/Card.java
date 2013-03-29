@@ -3,10 +3,8 @@ package jjj.entropy;
 import java.lang.Math;
 
 import jjj.entropy.classes.EntUtilities;
-import jjj.entropy.classes.Enums;
 import jjj.entropy.classes.Enums.Life;
 import jjj.entropy.classes.Enums.Zone;
-import jjj.entropy.ui.TableRow;
 
 
 public class Card implements Comparable<Card>

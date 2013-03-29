@@ -1,21 +1,17 @@
 package jjj.entropy.ui;
 
 import java.awt.Font;
-import java.awt.Color;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import javax.media.opengl.GLException;
 
-import jjj.entropy.Card;
-import jjj.entropy.CardCollection;
 import jjj.entropy.EntMouseListener;
 import jjj.entropy.GLHelper;
 import jjj.entropy.Game;
@@ -23,7 +19,6 @@ import jjj.entropy.SimpleCollection;
 import jjj.entropy.classes.Const;
 import jjj.entropy.classes.Enums.GameState;
 
-import com.jogamp.opengl.util.awt.TextRenderer;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureIO;
 
@@ -159,6 +154,7 @@ public class Table extends Clickable implements MouseListener, MouseMotionListen
 			data = new String[0][0];
 	}
 	
+	@Override
 	public void Render(Game game)
 	{
 		int i,
@@ -177,7 +173,7 @@ public class Table extends Clickable implements MouseListener, MouseMotionListen
 			i = 0;
 			for (String cell : data[k])
 			{
-				xOffset = (int)textX + i * Const.TABLE_COLUMN_WIDTH_PX;
+				xOffset = textX + i * Const.TABLE_COLUMN_WIDTH_PX;
 				font.Render(game, xOffset, yOffset, cell);
 				++i;
 			}
@@ -273,7 +269,7 @@ public class Table extends Clickable implements MouseListener, MouseMotionListen
 				}
 				else
 				{
-					selectedIndex = (int) ((screenY - EntMouseListener.MouseY) / (int)lineHeight)+lineOffset;
+					selectedIndex = (screenY - EntMouseListener.MouseY) / (int)lineHeight+lineOffset;
 				}
 			}
 		}

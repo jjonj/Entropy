@@ -136,21 +136,21 @@ public class CardTemplate implements TableRow {
 
 		String[] data = encodedTemplate.split(",");
 		
-		short id = (short) Short.parseShort(data[0]);
+		short id = Short.parseShort(data[0]);
 		
 		if (allCardTemplates[id] != null)	// If the template already is loaded
 			return;
 		
-		CardRace race = CardRace.GetRace((short) Short.parseShort(data[2]));
-		CardType type = CardType.GetType((short) Short.parseShort(data[3]));
+		CardRace race = CardRace.GetRace(Short.parseShort(data[2]));
+		CardType type = CardType.GetType(Short.parseShort(data[3]));
 		
 		
-		short raceCost = (short) Short.parseShort(data[4]),
-			  anyCost = (short) Short.parseShort(data[5]),
-			  income = (short) Short.parseShort(data[6]),
-			  defense = (short) Short.parseShort(data[7]),
-			  dmgBase = (short) Short.parseShort(data[8]),
-			  dmgDice = (short) Short.parseShort(data[9]);
+		short raceCost = Short.parseShort(data[4]),
+			  anyCost = Short.parseShort(data[5]),
+			  income = Short.parseShort(data[6]),
+			  defense = Short.parseShort(data[7]),
+			  dmgBase = Short.parseShort(data[8]),
+			  dmgDice = Short.parseShort(data[9]);
 		
 		
 		String title = data[1];

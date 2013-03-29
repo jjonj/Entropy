@@ -1,13 +1,10 @@
 package jjj.entropy;
 
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
-import javax.media.opengl.GLException;
+import javax.media.opengl.GL2ES1;
+import javax.media.opengl.fixedfunc.GLLightingFunc;
+import javax.media.opengl.fixedfunc.GLMatrixFunc;
 import javax.media.opengl.glu.GLU;
 
 import jjj.entropy.classes.Const;
@@ -17,13 +14,13 @@ import jjj.entropy.ui.Table;
 import jjj.entropy.ui.Textbox;
 
 import com.jogamp.opengl.util.texture.Texture;
-import com.jogamp.opengl.util.texture.TextureIO;
 
 public class GLHelper {
 
 	private GLHelper(){}	//Should not be instantiated.
 	
 	
+	@SuppressWarnings("unused")
 	private static int tableModel,
 				cardModel,
 				deckModel,
@@ -44,10 +41,10 @@ public class GLHelper {
 	
 	public static void InitTexture(GL2 gl, Texture texture)
 	{
-		texture.setTexParameteri(gl, GL2.GL_TEXTURE_WRAP_S, GL2.GL_REPEAT);
-		texture.setTexParameteri(gl, GL2.GL_TEXTURE_WRAP_T, GL2.GL_REPEAT);
-		texture.setTexParameteri(gl, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
-		texture.setTexParameteri(gl, GL2.GL_TEXTURE_MIN_FILTER,
+		texture.setTexParameteri(gl, GL.GL_TEXTURE_WRAP_S, GL.GL_REPEAT);
+		texture.setTexParameteri(gl, GL.GL_TEXTURE_WRAP_T, GL.GL_REPEAT);
+		texture.setTexParameteri(gl, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
+		texture.setTexParameteri(gl, GL.GL_TEXTURE_MIN_FILTER,
 				GL.GL_LINEAR_MIPMAP_LINEAR);
 	}
 	
@@ -57,16 +54,16 @@ public class GLHelper {
 		Game.gl.glEnable(GL.GL_BLEND);
     	Game.gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
         
-        Game.gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_S, GL2.GL_REPEAT);
-        Game.gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_T, GL2.GL_REPEAT);
+        Game.gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_REPEAT);
+        Game.gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_REPEAT);
        
-        Game.gl.glEnable(GL2.GL_TEXTURE_2D);                            
-        Game.gl.glDepthFunc(GL2.GL_LEQUAL);                             		// The Type Of Depth Testing To Do
-        Game.gl.glHint(GL2.GL_PERSPECTIVE_CORRECTION_HINT, GL2.GL_NICEST);  // Really Nice Perspective Calculations
+        Game.gl.glEnable(GL.GL_TEXTURE_2D);                            
+        Game.gl.glDepthFunc(GL.GL_LEQUAL);                             		// The Type Of Depth Testing To Do
+        Game.gl.glHint(GL2ES1.GL_PERSPECTIVE_CORRECTION_HINT, GL.GL_NICEST);  // Really Nice Perspective Calculations
          
          
-        Game.gl.glShadeModel(GL2.GL_SMOOTH);
-        Game.gl.glEnable(GL2.GL_DEPTH_TEST);
+        Game.gl.glShadeModel(GLLightingFunc.GL_SMOOTH);
+        Game.gl.glEnable(GL.GL_DEPTH_TEST);
      	
      	//Calling generate methods that initiate the displaylists in openGL for fast rendering
      	GLHelper.GenerateTable(Game.gl, Const.BOARD_WIDTH, Const.BOARD_LENGTH, Const.BOARD_THICKNESS);
@@ -132,7 +129,7 @@ public class GLHelper {
 		UIModel = gl.glGenLists(1);
 		
 		
-		gl.glDisable(GL2.GL_TEXTURE_2D);
+		gl.glDisable(GL.GL_TEXTURE_2D);
 		
         gl.glNewList(UIModel, GL2.GL_COMPILE);
         bottomPanelTexture.bind(gl);
@@ -149,7 +146,7 @@ public class GLHelper {
 
 		 gl.glEndList();
 		 
-		 gl.glEnable(GL2.GL_TEXTURE_2D);
+		 gl.glEnable(GL.GL_TEXTURE_2D);
 		 
 	}
 	
@@ -181,9 +178,9 @@ public class GLHelper {
 		
 		 
 		//Save the cards window position to be used for click collision detection
-	     gl.glGetIntegerv(GL2.GL_VIEWPORT, viewport, 0);
-	     gl.glGetDoublev(GL2.GL_MODELVIEW_MATRIX, mvmatrix, 0);
-	     gl.glGetDoublev(GL2.GL_PROJECTION_MATRIX, projmatrix, 0);
+	     gl.glGetIntegerv(GL.GL_VIEWPORT, viewport, 0);
+	     gl.glGetDoublev(GLMatrixFunc.GL_MODELVIEW_MATRIX, mvmatrix, 0);
+	     gl.glGetDoublev(GLMatrixFunc.GL_PROJECTION_MATRIX, projmatrix, 0);
 	     
 	     glu.gluProject(0-HALF_CARD_WIDTH, 0-HALF_CARD_HEIGHT, 0, //
 	             mvmatrix, 0,
@@ -388,7 +385,7 @@ public class GLHelper {
 	{
 		
 		 gl.glPushMatrix();
-		 gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_T, GL2.GL_REPEAT);	//Why is it needed to re-set this seting?
+		 gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_REPEAT);	//Why is it needed to re-set this seting?
 		 gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 		 gl.glTranslatef(dropdown.GetX(), dropdown.GetY(), 0);
 
@@ -399,8 +396,8 @@ public class GLHelper {
 			 gl.glBegin(GL2.GL_QUADS);
 			 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( 0, 0, 0);
 			    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(Const.DROPDOWN_WIDTH, 0,  0);
-			    gl.glTexCoord2f(1.0f, (float)dropdown.GetDataSize()); gl.glVertex3f(Const.DROPDOWN_WIDTH, -(float)dropdown.GetDataSize()*Const.TABLE_ROW_HEIGHT, 0 );
-			    gl.glTexCoord2f(0.0f, (float)dropdown.GetDataSize()); gl.glVertex3f(0, -(float)dropdown.GetDataSize()*Const.TABLE_ROW_HEIGHT, 0);
+			    gl.glTexCoord2f(1.0f, dropdown.GetDataSize()); gl.glVertex3f(Const.DROPDOWN_WIDTH, -dropdown.GetDataSize()*Const.TABLE_ROW_HEIGHT, 0 );
+			    gl.glTexCoord2f(0.0f, dropdown.GetDataSize()); gl.glVertex3f(0, -dropdown.GetDataSize()*Const.TABLE_ROW_HEIGHT, 0);
 			 gl.glEnd();
 			 //Showing the selected element
 			 dropdown.GetSelectedTexture().bind(gl);
@@ -437,8 +434,8 @@ public class GLHelper {
 		 gl.glBegin(GL2.GL_QUADS);
 		 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( 0, 0, 0);
 		    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(Const.TABLE_WIDTH, 0,  0);
-		    gl.glTexCoord2f(1.0f, (float)table.GetLineCountToRender()); gl.glVertex3f(Const.TABLE_WIDTH, -(float)table.GetLineCountToRender()*Const.TABLE_ROW_HEIGHT, 0 );
-		    gl.glTexCoord2f(0.0f, (float)table.GetLineCountToRender()); gl.glVertex3f(0, -(float)table.GetLineCountToRender()*Const.TABLE_ROW_HEIGHT,  0);
+		    gl.glTexCoord2f(1.0f, table.GetLineCountToRender()); gl.glVertex3f(Const.TABLE_WIDTH, -(float)table.GetLineCountToRender()*Const.TABLE_ROW_HEIGHT, 0 );
+		    gl.glTexCoord2f(0.0f, table.GetLineCountToRender()); gl.glVertex3f(0, -(float)table.GetLineCountToRender()*Const.TABLE_ROW_HEIGHT,  0);
 		 gl.glEnd();
 		 if (table.GetSelectedIndex() != -1)
 		 {
@@ -542,19 +539,19 @@ public class GLHelper {
 	public static int[] ConvertGLFloatToGLScreen(double x, double y)
 	{
 		 // Resetting the matrices shouldn't be needed as nothing should be modifying them permanently, but code is provided in case
-		 Game.gl.glMatrixMode(GL2.GL_PROJECTION);	
+		 Game.gl.glMatrixMode(GLMatrixFunc.GL_PROJECTION);	
 		 Game.gl.glLoadIdentity();
 		 Game.glu.gluPerspective(45, Game.GetInstance().GetAspectRatio(), 1, 100);
-		 Game.gl.glMatrixMode(GL2.GL_MODELVIEW);	
+		 Game.gl.glMatrixMode(GLMatrixFunc.GL_MODELVIEW);	
 		
 		 Game.gl.glLoadIdentity();   		
-		 Game.gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
+		 Game.gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
 		 Game.gl.glLoadIdentity();
 		 Game.gl.glTranslatef(0,0,-1);
 		
-		 Game.gl.glGetIntegerv(GL2.GL_VIEWPORT, view, 0);
-		 Game.gl.glGetDoublev(GL2.GL_MODELVIEW_MATRIX, model, 0);
-		 Game.gl.glGetDoublev(GL2.GL_PROJECTION_MATRIX, proj, 0);
+		 Game.gl.glGetIntegerv(GL.GL_VIEWPORT, view, 0);
+		 Game.gl.glGetDoublev(GLMatrixFunc.GL_MODELVIEW_MATRIX, model, 0);
+		 Game.gl.glGetDoublev(GLMatrixFunc.GL_PROJECTION_MATRIX, proj, 0);
 
          Game.glu.gluProject(x, y, 0f, //
         		 model, 0,

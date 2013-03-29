@@ -1,7 +1,6 @@
 package jjj.entropy;
 
 import java.io.IOException;
-import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,8 +10,6 @@ import jjj.entropy.classes.Enums.GameState;
 import jjj.entropy.classes.Enums.Life;
 import jjj.entropy.classes.Enums.Zone;
 import jjj.entropy.messages.*;
-import jjj.entropy.ui.Dropdown;
-import jjj.entropy.ui.TableRow;
 import jjj.entropy.ui.UIManager;
 
 import com.esotericsoftware.kryo.Kryo;
@@ -52,7 +49,8 @@ public class NetworkManager extends Listener
 			client = new Client();
 			
 			client.addListener(new Listener() {
-				   public void received (Connection connection, Object object) {
+				   @Override
+				public void received (Connection connection, Object object) {
 				      if (object instanceof ChatMessage) {
 				    	  ChatMessage response = (ChatMessage)object;
 				         System.out.println(response.message);
@@ -215,7 +213,7 @@ public class NetworkManager extends Listener
 		}
 		else if (object instanceof CardDataMessage)
 		{
-			System.out.println(((CardDataMessage) object));
+			System.out.println((object));
 			System.out.println("CardMessage recieved!!! :)");
 			for (String s : ((CardDataMessage) object).cardTemplates) //Load each cardtype/template 
 			{

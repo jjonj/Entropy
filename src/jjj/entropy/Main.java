@@ -1,17 +1,13 @@
 package jjj.entropy;
 
 import java.awt.BorderLayout;
-import java.awt.Choice;
 import java.awt.Container;
-import java.awt.Frame;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLProfile;
 import javax.media.opengl.awt.GLCanvas;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-
 import jjj.entropy.classes.Const;
 
 
@@ -49,7 +45,7 @@ public class Main
    
         
         //Initialize game
-        Game.InitSingleton("Entropy", Const.START_GAME_WIDTH, Const.START_GAME_HEIGHT, canvas);
+        Game.InitSingleton(Const.START_GAME_WIDTH, Const.START_GAME_HEIGHT, canvas);
 
         //Initialize input/output
         EntMouseListener MListener = new EntMouseListener(Game.GetInstance());
@@ -58,7 +54,8 @@ public class Main
         canvas.addMouseMotionListener(MListener);
         canvas.addKeyListener(new EntKeyListener());
         jframe.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
+            @Override
+			public void windowClosing(WindowEvent e) {
 				Game.GetInstance().Cleanup();
                 System.exit(0);
             }

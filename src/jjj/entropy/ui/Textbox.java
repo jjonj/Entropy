@@ -1,17 +1,9 @@
 package jjj.entropy.ui;
 
 import java.awt.Font;
-import java.awt.Color;
-
-import javax.media.opengl.GL2;
-
 import jjj.entropy.GLHelper;
 import jjj.entropy.Game;
-import jjj.entropy.NetworkManager;
 import jjj.entropy.classes.Const;
-import jjj.entropy.classes.Enums.GameState;
-
-import com.jogamp.opengl.util.awt.TextRenderer;
 import com.jogamp.opengl.util.texture.Texture;
 
 public class Textbox extends Clickable{
@@ -53,6 +45,7 @@ public class Textbox extends Clickable{
 	}
 
   
+	@Override
 	public void Render(Game game)
 	{
 		if (texture != null)
