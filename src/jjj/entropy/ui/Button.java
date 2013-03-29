@@ -3,8 +3,8 @@ package jjj.entropy.ui;
 import java.awt.Font;
 import jjj.entropy.GLHelper;
 import jjj.entropy.Game;
+import jjj.entropy.Texture;
 import jjj.entropy.classes.Const;
-import com.jogamp.opengl.util.texture.Texture;
 
 public class Button extends Clickable
 {

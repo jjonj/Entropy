@@ -16,11 +16,11 @@ import jjj.entropy.EntMouseListener;
 import jjj.entropy.GLHelper;
 import jjj.entropy.Game;
 import jjj.entropy.SimpleCollection;
+import jjj.entropy.Texture;
 import jjj.entropy.classes.Const;
 import jjj.entropy.classes.Enums.GameState;
 
-import com.jogamp.opengl.util.texture.Texture;
-import com.jogamp.opengl.util.texture.TextureIO;
+
 
 //MISSING: Add parameter for text offset coordinates or even better automatize it
 public class Table extends Clickable implements MouseListener, MouseMotionListener
@@ -87,9 +87,9 @@ public class Table extends Clickable implements MouseListener, MouseMotionListen
 		fontLineHeight = (int)lineHeight+1;
 		//selectedIndex = -1;
 		try {
-			texture = TextureIO.newTexture(new File("resources/textures/TableEntry.png"), true);
-			scrollHandleTexture = TextureIO.newTexture(new File("resources/textures/ScrollHandle.png"), true);
-			selectedFieldTexture = TextureIO.newTexture(new File("resources/textures/SelectedTableEntry.png"), true);
+			texture = Texture.Load(new File("resources/textures/TableEntry.png"), true);
+			scrollHandleTexture = Texture.Load(new File("resources/textures/ScrollHandle.png"), true);
+			selectedFieldTexture = Texture.Load(new File("resources/textures/SelectedTableEntry.png"), true);
 		} catch (GLException | IOException e) {
 			e.printStackTrace();
 			System.exit(1);

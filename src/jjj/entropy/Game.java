@@ -115,13 +115,13 @@ public class Game implements GLEventListener
     	gl = gLDrawable.getGL().getGL2();
     	System.out.println("init() called");
 
-    	TextureManager.LoadTextureList();	//Simply loads a string array of texturepaths from file.
+    	Texture.LoadTextureList();	//Simply loads a string array of texturepaths from file.
     	
-   		TextureManager.InitTextures();
+    	Texture.InitTextures();
    		
    		
    		//Creating cards require a template, this is just an old template still used below
-		TinidQueen = new CardTemplate((short)1, "Tinid Queen", CardRace.CRAWNID, CardType.CREATURE, (short)0,(short)0,(short)0,(short)0,(short)0,(short)0,TextureManager.cardtestfront);
+		TinidQueen = new CardTemplate((short)1, "Tinid Queen", CardRace.CRAWNID, CardType.CREATURE, (short)0,(short)0,(short)0,(short)0,(short)0,(short)0,Texture.cardtestfront);
 
 		// Easiest way atm to detect clicks on the deck pile, is to just place to cards there that cant move.
 		Card card0 = new Card(-3, 0.51f, 1.0f, 
@@ -169,7 +169,7 @@ public class Game implements GLEventListener
 	 	  //  	gl.glDisable(GL2.GL_DEPTH_TEST);
 	 	    	gl.glEnable(GL2.GL_TEXTURE_2D);
 	 	    	
-	 	    	TextureManager.loginScreenTexture.bind(gl);
+	 	    	Texture.loginScreenTexture.bind(gl);
 				 gl.glBegin(GL2.GL_QUADS);
 				 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-0.74f,-0.415f, 0f);
 				 	gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(0.74f,-0.415f, 0f);
@@ -195,7 +195,7 @@ public class Game implements GLEventListener
 	 	  //  	gl.glDisable(GL2.GL_DEPTH_TEST);
 	 	    	gl.glEnable(GL2.GL_TEXTURE_2D);
 	 	    	
-	 	    	TextureManager.mainMenuTexture.bind(gl);
+	 	    	Texture.mainMenuTexture.bind(gl);
 				 gl.glBegin(GL2.GL_QUADS);
 				 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-0.74f,-0.415f, 0f);
 				 	gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(0.74f,-0.415f, 0f);
@@ -221,7 +221,7 @@ public class Game implements GLEventListener
 		    	gl.glTranslatef(0,0,-1);
 	 	    	gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 	 	    	
-	 	    	TextureManager.deckScreenTexture.bind(gl);
+	 	    	Texture.deckScreenTexture.bind(gl);
 				 gl.glBegin(GL2.GL_QUADS);
 				 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-0.74f,-0.415f, 0f);
 				 	gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(0.74f,-0.415f, 0f);
@@ -280,7 +280,7 @@ public class Game implements GLEventListener
     			 
     			 //     ---------------------------------         DRAW OTHERS       ------------------------------------------
     			 
-    			 TextureManager.board.bind(gl);
+    			 Texture.board.bind(gl);
     	    	 GLHelper.DrawTable(gl, -Const.BOARD_WIDTH/2, Const.BOARD_HEIGHT);
     	    	 GLHelper.DrawDeck(gl, -3.0f, 0.5f, 1.0f);
     	    	 GLHelper.DrawDeck(gl, 3.0f, 0.5f, 10.0f);
@@ -299,7 +299,7 @@ public class Game implements GLEventListener
     			 //     ---------------------------------         DRAW UI       ------------------------------------------
     			 gl.glPushMatrix();
     			 gl.glLoadIdentity();
-    			 TextureManager.uiTexture.bind(gl);
+    			 Texture.uiTexture.bind(gl);
     			 gl.glBegin(GL2.GL_QUADS);
     			 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-0.74f,-0.415f, -1);
     			 	gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(0.74f,-0.415f,-1);

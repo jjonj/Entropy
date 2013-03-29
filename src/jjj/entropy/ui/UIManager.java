@@ -5,9 +5,6 @@ import java.awt.Font;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
-
-import jjj.entropy.Card;
 import jjj.entropy.CardCollection;
 import jjj.entropy.CardTemplate;
 import jjj.entropy.Deck;
@@ -16,7 +13,7 @@ import jjj.entropy.Game;
 import jjj.entropy.NetworkManager;
 import jjj.entropy.Player;
 import jjj.entropy.SimpleCollection;
-import jjj.entropy.TextureManager;
+import jjj.entropy.Texture;
 import jjj.entropy.classes.Const;
 import jjj.entropy.classes.Enums.GameState;
 import jjj.entropy.ui.Button.ButtonSize;
@@ -78,7 +75,7 @@ public class UIManager
     	
     	//Main menu UI components
     	
-     	MainMenuUIComponents.add(new Button(-0.16f, 0.05f, 48, 15, "Multiplayer", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.orange), TextureManager.bigButtonTexture,
+     	MainMenuUIComponents.add(new Button(-0.16f, 0.05f, 48, 15, "Multiplayer", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.orange), Texture.bigButtonTexture,
      			new UIAction() {@Override
 				public void Activate(){
 	     				NetworkManager.GetInstance().JoinGame();
@@ -86,7 +83,7 @@ public class UIManager
      			}
      	));
 
-     	MainMenuUIComponents.add(new Button(-0.16f, -0.05f, 60, 22, "My decks", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.orange), TextureManager.bigButtonTexture,
+     	MainMenuUIComponents.add(new Button(-0.16f, -0.05f, 60, 22, "My decks", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.orange), Texture.bigButtonTexture,
      			new UIAction() {@Override
 				public void Activate(){
      					Game.GetInstance().SetGameState(GameState.DECK_SCREEN);
@@ -124,7 +121,7 @@ public class UIManager
      	DeckScreenUIComponents.add(playerDeckDropdown);
 
      	
-      	DeckScreenUIComponents.add(new Button(-0.06f, 0.21f, 25, -7, "Save deck", new EntFont(FontTypes.MainParagraph, Font.PLAIN, 16, Color.black), ButtonSize.SMALL, TextureManager.smallButtonTexture,
+      	DeckScreenUIComponents.add(new Button(-0.06f, 0.21f, 25, -7, "Save deck", new EntFont(FontTypes.MainParagraph, Font.PLAIN, 16, Color.black), ButtonSize.SMALL, Texture.smallButtonTexture,
      			new UIAction() {@Override
 				public void Activate(){
      					NetworkManager.GetInstance().SendDeckUpdate(Game.GetInstance().GetPlayer(1).GetActiveDeck());
@@ -134,7 +131,7 @@ public class UIManager
      	
      	
      	//transfer card left arrow
-     	DeckScreenUIComponents.add(new Button(-0.35f, -0.05f, 0, 0, "", ButtonSize.TINY_SQUARE, TextureManager.arrow1ButtonTexture,
+     	DeckScreenUIComponents.add(new Button(-0.35f, -0.05f, 0, 0, "", ButtonSize.TINY_SQUARE, Texture.arrow1ButtonTexture,
      			new UIAction() {@Override
 				public void Activate(){
      				
@@ -154,7 +151,7 @@ public class UIManager
      			}
      	));
      	//transfer card right arrow
-     	DeckScreenUIComponents.add(new Button(-0.35f, -0.12f, 0, 0, "", ButtonSize.TINY_SQUARE, TextureManager.arrow2ButtonTexture,
+     	DeckScreenUIComponents.add(new Button(-0.35f, -0.12f, 0, 0, "", ButtonSize.TINY_SQUARE, Texture.arrow2ButtonTexture,
      			new UIAction() {@Override
 				public void Activate(){
      				
@@ -178,14 +175,14 @@ public class UIManager
      	//Login screen UI components
      	
      	
-        usernameTextbox = new Textbox(-0.155f, 0.05f, 15, 8, "", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black), TextureManager.textboxTexture);
-     	passwordTextbox = new Textbox(-0.155f, -0.06f, 15, 8, "", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black), TextureManager.textboxTexture);
+        usernameTextbox = new Textbox(-0.155f, 0.05f, 15, 8, "", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black), Texture.textboxTexture);
+     	passwordTextbox = new Textbox(-0.155f, -0.06f, 15, 8, "", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black), Texture.textboxTexture);
      	LoginScreenUIComponents.add(usernameTextbox);
      	LoginScreenUIComponents.add(passwordTextbox);
      	LoginScreenUIComponents.add(new Label(555, 415, "Username", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black)));
      	LoginScreenUIComponents.add(new Label(555, 320, "Password", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black)));
      	
-     	LoginScreenUIComponents.add(new Button(-0.155f, -0.155f, 85, 28, "Login", new EntFont(FontTypes.MainParagraph, Font.BOLD, 22, Color.black), TextureManager.bigButtonTexture,
+     	LoginScreenUIComponents.add(new Button(-0.155f, -0.155f, 85, 28, "Login", new EntFont(FontTypes.MainParagraph, Font.BOLD, 22, Color.black), Texture.bigButtonTexture,
      			new UIAction() {@Override
 				public void Activate(){
      				NetworkManager.GetInstance().Login(usernameTextbox.GetText(), passwordTextbox.GetText());

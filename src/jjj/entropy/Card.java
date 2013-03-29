@@ -11,7 +11,8 @@ public class Card implements Comparable<Card>
 {
 
 
-	public enum Status{
+	public enum Status
+	{
 		IN_DECK,
 		IN_HAND,
 		IN_LIMBO,
@@ -19,7 +20,8 @@ public class Card implements Comparable<Card>
 		IS_LIFE
 	}
 	
-	public enum Facing{
+	public enum Facing
+	{
 		UP,
 		DOWN,
 		FRONT,

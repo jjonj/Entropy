@@ -107,7 +107,7 @@ public class CardTemplate implements TableRow {
 		if (texture == null)
 		{
 			try {
-				texture = TextureIO.newTexture(new File(texturePath), true);
+				texture = Texture.Load(new File(texturePath), true);
 			} catch (GLException | IOException e) {
 				e.printStackTrace();
 				System.exit(1);	
@@ -157,7 +157,7 @@ public class CardTemplate implements TableRow {
 		
 		//HANDLE SPECIALS
 		
-		String texturePath = TextureManager.GetTexturePath(id);
+		String texturePath = Texture.GetTexturePath(id);
 		CardTemplate ct = new CardTemplate(id,title, race, type, raceCost, anyCost, income, defense, dmgBase, dmgDice, texturePath);
 		allCardTemplates[id] = ct;
 	}

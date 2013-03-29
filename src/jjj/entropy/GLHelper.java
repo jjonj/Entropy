@@ -13,7 +13,6 @@ import jjj.entropy.ui.Dropdown;
 import jjj.entropy.ui.Table;
 import jjj.entropy.ui.Textbox;
 
-import com.jogamp.opengl.util.texture.Texture;
 
 public class GLHelper {
 
@@ -67,11 +66,11 @@ public class GLHelper {
      	
      	//Calling generate methods that initiate the displaylists in openGL for fast rendering
      	GLHelper.GenerateTable(Game.gl, Const.BOARD_WIDTH, Const.BOARD_LENGTH, Const.BOARD_THICKNESS);
-     	GLHelper.GenerateButtons(Game.gl, TextureManager.bigButtonTexture);
-     	GLHelper.GenerateUI(Game.gl, 0, 0, 0, TextureManager.uiTexture);
-     	GLHelper.GenerateDeck(Game.gl, TextureManager.cardBackside, TextureManager.deckSideTexture, Const.CARD_WIDTH, Const.CARD_HEIGHT, 0.5f);
-       	GLHelper.GenerateTextbox(Game.gl, TextureManager.textboxTexture);
-     	GLHelper.GenerateCard(Game.gl, TextureManager.cardBackside, Const.CARD_WIDTH, Const.CARD_HEIGHT, Const.CARD_THICKNESS);
+     	GLHelper.GenerateButtons(Game.gl, Texture.bigButtonTexture);
+     	GLHelper.GenerateUI(Game.gl, 0, 0, 0, Texture.uiTexture);
+     	GLHelper.GenerateDeck(Game.gl, Texture.cardBackside, Texture.deckSideTexture, Const.CARD_WIDTH, Const.CARD_HEIGHT, 0.5f);
+       	GLHelper.GenerateTextbox(Game.gl, Texture.textboxTexture);
+     	GLHelper.GenerateCard(Game.gl, Texture.cardBackside, Const.CARD_WIDTH, Const.CARD_HEIGHT, Const.CARD_THICKNESS);
         
 	}
 	
