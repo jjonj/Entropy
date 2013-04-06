@@ -1,8 +1,9 @@
 package jjj.entropy.ui;
 
 import java.awt.Font;
-import jjj.entropy.GLHelper;
+import jjj.entropy.OpenGL;
 import jjj.entropy.Game;
+import jjj.entropy.OpenGL;
 import jjj.entropy.Texture;
 import jjj.entropy.classes.Const;
 
@@ -96,13 +97,13 @@ public class Button extends Clickable
 	public void Render(Game game)
 	{
 		
-		Game.gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+		OpenGL.gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 	    	
 
 		if (texture != null)
 		{
-			texture.bind(Game.gl);
-			GLHelper.DrawUIButton(Game.gl, this);
+			texture.bind(OpenGL.gl);
+			OpenGL.DrawUIButton(OpenGL.gl, this);
 		}
 		font.Render(game, textX + textOffsetX, textY - textOffsetY, text);
 		
@@ -116,7 +117,7 @@ public class Button extends Clickable
 	{
 		super.UpdateScreenCoords();
 	    double winPos[] = new double[4];// wx, wy, wz;// returned xyz coords
-        Game.glu.gluProject((double) x, (double) y, 0f, //
+        OpenGL.glu.gluProject((double) x, (double) y, 0f, //
         		 model, 0,
         		 proj, 0, 
         		 view, 0, 
@@ -135,7 +136,7 @@ public class Button extends Clickable
  			break;
  		}
          
-         Game.glu.gluProject(right, bottom, 0f, //
+         OpenGL.glu.gluProject(right, bottom, 0f, //
         		 model, 0,
         		 proj, 0, 
         		 view, 0, 

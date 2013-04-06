@@ -44,9 +44,7 @@ public class Game implements GLEventListener
 	private boolean loggedIn = false;
     private int realGameHeight;	//Used for calculating the real Y values
 	
-	public static GL2 gl;				//These are made 'public static' as they can be accessed that way regardless.
-    public static GLU glu = new GLU();	//OpenGL utilities object
-    private FPSAnimator animator;
+	    private FPSAnimator animator;
     private ByteArrayOutputStream FPSCounter;
 	
 	private Player neutralPlayer,
@@ -112,16 +110,18 @@ public class Game implements GLEventListener
     @Override
 	public void init(GLAutoDrawable gLDrawable) 
     {
-    	gl = gLDrawable.getGL().getGL2();
+    //	gl = gLDrawable.getGL().getGL2();
     	System.out.println("init() called");
 
+    	OpenGL.gl = gLDrawable.getGL().getGL2();
+    	
     	Texture.LoadTextureList();	//Simply loads a string array of texturepaths from file.
     	
     	Texture.InitTextures();
    		
    		
    		//Creating cards require a template, this is just an old template still used below
-		TinidQueen = new CardTemplate((short)1, "Tinid Queen", CardRace.CRAWNID, CardType.CREATURE, (short)0,(short)0,(short)0,(short)0,(short)0,(short)0,Texture.cardtestfront);
+		TinidQueen = new CardTemplate((short)1, "Tinid Queen", CardRace.CRAWNID, CardType.CREATURE, (short)0,(short)0,(short)0,(short)0,(short)0,Texture.cardtestfront);
 
 		// Easiest way atm to detect clicks on the deck pile, is to just place to cards there that cant move.
 		Card card0 = new Card(-3, 0.51f, 1.0f, 
@@ -133,7 +133,7 @@ public class Game implements GLEventListener
 		ShowCard(card0);
 		ShowCard(card1);
        
-        GLHelper.InitOpenGL();
+        OpenGL.InitOpenGL();
      	
         
         UIManager.GetInstance().InitUIComponents();
@@ -144,38 +144,38 @@ public class Game implements GLEventListener
      	
      	//Setting the real window height as GL scaling changes it
      	int viewport[] = new int[4];
-        gl.glGetIntegerv(GL2.GL_VIEWPORT, viewport, 0);
+        OpenGL.gl.glGetIntegerv(GL2.GL_VIEWPORT, viewport, 0);
         realGameHeight = viewport[3];
     }
  
     @Override
 	public void display(GLAutoDrawable gLDrawable) 
     {
-		gl.glMatrixMode(GLMatrixFunc.GL_PROJECTION);	//Switch to camera adjustment mode
-    	gl.glLoadIdentity();
-    	glu.gluPerspective(45, aspectRatio, 1, 100);
-    	gl.glMatrixMode(GLMatrixFunc.GL_MODELVIEW);	//Switch to hand adjustment mode
+		OpenGL.gl.glMatrixMode(GLMatrixFunc.GL_PROJECTION);	//Switch to camera adjustment mode
+    	OpenGL.gl.glLoadIdentity();
+    	OpenGL.glu.gluPerspective(45, aspectRatio, 1, 100);
+    	OpenGL.gl.glMatrixMode(GLMatrixFunc.GL_MODELVIEW);	//Switch to hand adjustment mode
 		
     	switch (gamestate)
     	{
     		case LOGIN:
     			
-	    		gl.glLoadIdentity();   		
-	    		gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
-		    	gl.glLoadIdentity();
-		    	gl.glTranslatef(0,0,-1);
-	 	    	gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+	    		OpenGL.gl.glLoadIdentity();   		
+	    		OpenGL.gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
+		    	OpenGL.gl.glLoadIdentity();
+		    	OpenGL.gl.glTranslatef(0,0,-1);
+	 	    	OpenGL.gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 	 	    	
-	 	  //  	gl.glDisable(GL2.GL_DEPTH_TEST);
-	 	    	gl.glEnable(GL2.GL_TEXTURE_2D);
+	 	  //  	OpenGL.gl.glDisable(GL2.GL_DEPTH_TEST);
+	 	    	OpenGL.gl.glEnable(GL2.GL_TEXTURE_2D);
 	 	    	
-	 	    	Texture.loginScreenTexture.bind(gl);
-				 gl.glBegin(GL2.GL_QUADS);
-				 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-0.74f,-0.415f, 0f);
-				 	gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(0.74f,-0.415f, 0f);
-				 	gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(0.74f,0.415f, 0f);
-				 	gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-0.74f,0.415f, 0f);
-				 gl.glEnd();
+	 	    	Texture.loginScreenTexture.bind(OpenGL.gl);
+				 OpenGL.gl.glBegin(GL2.GL_QUADS);
+				 	OpenGL.gl.glTexCoord2f(0.0f, 0.0f); OpenGL.gl.glVertex3f(-0.74f,-0.415f, 0f);
+				 	OpenGL.gl.glTexCoord2f(1.0f, 0.0f); OpenGL.gl.glVertex3f(0.74f,-0.415f, 0f);
+				 	OpenGL.gl.glTexCoord2f(1.0f, 1.0f); OpenGL.gl.glVertex3f(0.74f,0.415f, 0f);
+				 	OpenGL.gl.glTexCoord2f(0.0f, 1.0f); OpenGL.gl.glVertex3f(-0.74f,0.415f, 0f);
+				 OpenGL.gl.glEnd();
 				 
 		         break;
     		case MAIN_MENU:
@@ -186,22 +186,22 @@ public class Game implements GLEventListener
     				OnLogin();
     			}
     			
-	    		gl.glLoadIdentity();   		
-	    		gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
-		    	gl.glLoadIdentity();
-		    	gl.glTranslatef(0,0,-1);
-	 	    	gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+	    		OpenGL.gl.glLoadIdentity();   		
+	    		OpenGL.gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
+		    	OpenGL.gl.glLoadIdentity();
+		    	OpenGL.gl.glTranslatef(0,0,-1);
+	 	    	OpenGL.gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 	 	    	
-	 	  //  	gl.glDisable(GL2.GL_DEPTH_TEST);
-	 	    	gl.glEnable(GL2.GL_TEXTURE_2D);
+	 	  //  	OpenGL.gl.glDisable(GL2.GL_DEPTH_TEST);
+	 	    	OpenGL.gl.glEnable(GL2.GL_TEXTURE_2D);
 	 	    	
-	 	    	Texture.mainMenuTexture.bind(gl);
-				 gl.glBegin(GL2.GL_QUADS);
-				 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-0.74f,-0.415f, 0f);
-				 	gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(0.74f,-0.415f, 0f);
-				 	gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(0.74f,0.415f, 0f);
-				 	gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-0.74f,0.415f, 0f);
-				 gl.glEnd();
+	 	    	Texture.mainMenuTexture.bind(OpenGL.gl);
+				 OpenGL.gl.glBegin(GL2.GL_QUADS);
+				 	OpenGL.gl.glTexCoord2f(0.0f, 0.0f); OpenGL.gl.glVertex3f(-0.74f,-0.415f, 0f);
+				 	OpenGL.gl.glTexCoord2f(1.0f, 0.0f); OpenGL.gl.glVertex3f(0.74f,-0.415f, 0f);
+				 	OpenGL.gl.glTexCoord2f(1.0f, 1.0f); OpenGL.gl.glVertex3f(0.74f,0.415f, 0f);
+				 	OpenGL.gl.glTexCoord2f(0.0f, 1.0f); OpenGL.gl.glVertex3f(-0.74f,0.415f, 0f);
+				 OpenGL.gl.glEnd();
 
     			break;
     		case DECK_SCREEN:
@@ -212,22 +212,22 @@ public class Game implements GLEventListener
 
     			if (Const.INIT_GAMESTATE == GameState.LOGIN)	//Check that makes ingame debugging easier
     			{
-	    			player1.GetAllCards().LoadTextures(gl);
+	    			player1.GetAllCards().LoadTextures();
     			}
     			
-    			gl.glLoadIdentity();   		
-	    		gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
-		    	gl.glLoadIdentity();
-		    	gl.glTranslatef(0,0,-1);
-	 	    	gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+    			OpenGL.gl.glLoadIdentity();   		
+	    		OpenGL.gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
+		    	OpenGL.gl.glLoadIdentity();
+		    	OpenGL.gl.glTranslatef(0,0,-1);
+	 	    	OpenGL.gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 	 	    	
-	 	    	Texture.deckScreenTexture.bind(gl);
-				 gl.glBegin(GL2.GL_QUADS);
-				 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-0.74f,-0.415f, 0f);
-				 	gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(0.74f,-0.415f, 0f);
-				 	gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(0.74f,0.415f, 0f);
-				 	gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-0.74f,0.415f, 0f);
-				 gl.glEnd();
+	 	    	Texture.deckScreenTexture.bind(OpenGL.gl);
+				 OpenGL.gl.glBegin(GL2.GL_QUADS);
+				 	OpenGL.gl.glTexCoord2f(0.0f, 0.0f); OpenGL.gl.glVertex3f(-0.74f,-0.415f, 0f);
+				 	OpenGL.gl.glTexCoord2f(1.0f, 0.0f); OpenGL.gl.glVertex3f(0.74f,-0.415f, 0f);
+				 	OpenGL.gl.glTexCoord2f(1.0f, 1.0f); OpenGL.gl.glVertex3f(0.74f,0.415f, 0f);
+				 	OpenGL.gl.glTexCoord2f(0.0f, 1.0f); OpenGL.gl.glVertex3f(-0.74f,0.415f, 0f);
+				 OpenGL.gl.glEnd();
 		 	    	
 			    
 	 	    	break;
@@ -238,75 +238,75 @@ public class Game implements GLEventListener
     			
     			if (Const.INIT_GAMESTATE == GameState.LOGIN)	//Check that makes ingame debugging easier
     			{
-	    			player1.GetActiveDeck().LoadTextures(gl);
-	    			player2.GetActiveDeck().LoadTextures(gl);
+	    			player1.GetActiveDeck().LoadTextures();
+	    			player2.GetActiveDeck().LoadTextures();
     			}
     			
     			 //     ---------------------------------         INIT FRAME       ------------------------------------------
 
-    	    	gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
-    	    	gl.glLoadIdentity();
-    	    	glu.gluLookAt(	1, 5, -4,
+    	    	OpenGL.gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
+    	    	OpenGL.gl.glLoadIdentity();
+    	    	OpenGL.glu.gluLookAt(	1, 5, -4,
     	     				0, 0f, 4,
     	     				0.0f, 1.0f,  0.0f);
-    	    	gl.glTranslatef(0,0,5);
-    	    	//gl.glRotatef(rotator, 0, 1, 0);
+    	    	OpenGL.gl.glTranslatef(0,0,5);
+    	    	//OpenGL.gl.glRotatef(rotator, 0, 1, 0);
     	    	
-    	    	gl.glPushMatrix();
+    	    	OpenGL.gl.glPushMatrix();
     	    	 
     	    	 //     ---------------------------------         DRAW 3D LINES       ------------------------------------------
     	    	
-    	    	 gl.glDisable(GL2.GL_TEXTURE_2D);     
+    	    	 OpenGL.gl.glDisable(GL2.GL_TEXTURE_2D);     
     	    	
     	    	
     	 	    
-    	    	 gl.glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
+    	    	 OpenGL.gl.glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
     			 
-    			 gl.glBegin(GL2.GL_LINES);
+    			 OpenGL.gl.glBegin(GL2.GL_LINES);
     			 
-    			 gl.glVertex3f(-10.0f,0.0f,0.0f);
-    			 gl.glVertex3f(10.0f,0.0f,0.0f);
+    			 OpenGL.gl.glVertex3f(-10.0f,0.0f,0.0f);
+    			 OpenGL.gl.glVertex3f(10.0f,0.0f,0.0f);
     			 
-    			 gl.glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
-    			 gl.glVertex3f(0.0f,10.0f,0.0f);
-    			 gl.glVertex3f(0.0f,-10.0f,0.0f);
+    			 OpenGL.gl.glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+    			 OpenGL.gl.glVertex3f(0.0f,10.0f,0.0f);
+    			 OpenGL.gl.glVertex3f(0.0f,-10.0f,0.0f);
     			 
-    			 gl.glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
-    			 	gl.glVertex3f(0.0f,0.0f,-10.0f);
-    			 	gl.glVertex3f(0.0f,0.0f,10.0f);
-    			 gl.glEnd();
-    			   gl.glColor4f(1.0f, 1.0f, 1.0f, 1f);
-    			 gl.glEnable(GL2.GL_TEXTURE_2D);     
+    			 OpenGL.gl.glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
+    			 	OpenGL.gl.glVertex3f(0.0f,0.0f,-10.0f);
+    			 	OpenGL.gl.glVertex3f(0.0f,0.0f,10.0f);
+    			 OpenGL.gl.glEnd();
+    			   OpenGL.gl.glColor4f(1.0f, 1.0f, 1.0f, 1f);
+    			 OpenGL.gl.glEnable(GL2.GL_TEXTURE_2D);     
     			 
     			 //     ---------------------------------         DRAW OTHERS       ------------------------------------------
     			 
-    			 Texture.board.bind(gl);
-    	    	 GLHelper.DrawTable(gl, -Const.BOARD_WIDTH/2, Const.BOARD_HEIGHT);
-    	    	 GLHelper.DrawDeck(gl, -3.0f, 0.5f, 1.0f);
-    	    	 GLHelper.DrawDeck(gl, 3.0f, 0.5f, 10.0f);
+    			 Texture.board.bind(OpenGL.gl);
+    	    	 OpenGL.DrawTable(OpenGL.gl, -Const.BOARD_WIDTH/2, Const.BOARD_HEIGHT);
+    	    	 OpenGL.DrawDeck(OpenGL.gl, -3.0f, 0.5f, 1.0f);
+    	    	 OpenGL.DrawDeck(OpenGL.gl, 3.0f, 0.5f, 10.0f);
     	    	 
-    			 gl.glPopMatrix();
+    			 OpenGL.gl.glPopMatrix();
     			 
     			 //     ---------------------------------        DRAW/UPDATE CARDS      ------------------------------------------
     			 ++iteratingCardsToRender;
     			 for(Card ca : cardsToRender)
     			 {
-    				GLHelper.DrawCard(gl, glu, ca);
+    				OpenGL.DrawCard(OpenGL.gl, OpenGL.glu, ca);
     				ca.Update();
     			 }
     			 --iteratingCardsToRender;
     			 
     			 //     ---------------------------------         DRAW UI       ------------------------------------------
-    			 gl.glPushMatrix();
-    			 gl.glLoadIdentity();
-    			 Texture.uiTexture.bind(gl);
-    			 gl.glBegin(GL2.GL_QUADS);
-    			 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-0.74f,-0.415f, -1);
-    			 	gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(0.74f,-0.415f,-1);
-    			 	gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(0.74f,-0.25f, -1);
-    			 	gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-0.74f,-0.25f, -1);
-    			 gl.glEnd();
-    			 gl.glPopMatrix();
+    			 OpenGL.gl.glPushMatrix();
+    			 OpenGL.gl.glLoadIdentity();
+    			 Texture.uiTexture.bind(OpenGL.gl);
+    			 OpenGL.gl.glBegin(GL2.GL_QUADS);
+    			 	OpenGL.gl.glTexCoord2f(0.0f, 0.0f); OpenGL.gl.glVertex3f(-0.74f,-0.415f, -1);
+    			 	OpenGL.gl.glTexCoord2f(1.0f, 0.0f); OpenGL.gl.glVertex3f(0.74f,-0.415f,-1);
+    			 	OpenGL.gl.glTexCoord2f(1.0f, 1.0f); OpenGL.gl.glVertex3f(0.74f,-0.25f, -1);
+    			 	OpenGL.gl.glTexCoord2f(0.0f, 1.0f); OpenGL.gl.glVertex3f(-0.74f,-0.25f, -1);
+    			 OpenGL.gl.glEnd();
+    			 OpenGL.gl.glPopMatrix();
     	 		 
     			 
     	    	 c++;
@@ -329,7 +329,7 @@ public class Game implements GLEventListener
     	        if (rotator >= 360f)
     	         	rotator = 0f;
     	        
-    	        gl.glEnable(GL2.GL_TEXTURE_2D);     
+    	        OpenGL.gl.glEnable(GL2.GL_TEXTURE_2D);     
     			break;
     	}
     	
@@ -338,7 +338,7 @@ public class Game implements GLEventListener
     	UIManager.GetInstance().RenderUI(this);
     	
     	
-    	gl.glFlush();		
+    	OpenGL.gl.glFlush();		
 	}
     
     public void displayChanged(GLAutoDrawable gLDrawable, boolean modeChanged, boolean deviceChanged) 

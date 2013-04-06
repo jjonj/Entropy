@@ -81,20 +81,20 @@ public class Texture
    			System.exit(1);
    		}
 		
-		GLHelper.InitTexture(Game.gl, cardBackside);
-     	GLHelper.InitTexture(Game.gl, cardtestfront);
-     	GLHelper.InitTexture(Game.gl, crawnidworkertexture);
-     	GLHelper.InitTexture(Game.gl, deckSideTexture);
-     	GLHelper.InitTexture(Game.gl, board);
-     	GLHelper.InitTexture(Game.gl, uiTexture);
-     	GLHelper.InitTexture(Game.gl, mainMenuTexture);
-     	GLHelper.InitTexture(Game.gl, deckScreenTexture);
-     	GLHelper.InitTexture(Game.gl, loginScreenTexture);
-     	GLHelper.InitTexture(Game.gl, bigButtonTexture);
-      	GLHelper.InitTexture(Game.gl, smallButtonTexture);
-     	GLHelper.InitTexture(Game.gl, arrow1ButtonTexture);
-     	GLHelper.InitTexture(Game.gl, arrow2ButtonTexture);
-     	GLHelper.InitTexture(Game.gl, textboxTexture);
+		OpenGL.InitTexture(cardBackside);
+     	OpenGL.InitTexture(cardtestfront);
+     	OpenGL.InitTexture(crawnidworkertexture);
+     	OpenGL.InitTexture(deckSideTexture);
+     	OpenGL.InitTexture(board);
+     	OpenGL.InitTexture(uiTexture);
+     	OpenGL.InitTexture(mainMenuTexture);
+     	OpenGL.InitTexture(deckScreenTexture);
+     	OpenGL.InitTexture(loginScreenTexture);
+     	OpenGL.InitTexture(bigButtonTexture);
+      	OpenGL.InitTexture(smallButtonTexture);
+     	OpenGL.InitTexture(arrow1ButtonTexture);
+     	OpenGL.InitTexture(arrow2ButtonTexture);
+     	OpenGL.InitTexture(textboxTexture);
 	}
 	
 	

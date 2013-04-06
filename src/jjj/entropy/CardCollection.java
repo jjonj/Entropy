@@ -29,11 +29,11 @@ public class CardCollection implements SimpleCollection<TableRow>, Iterable<Card
 		cards.remove(card);
 	}
 
-	public void LoadTextures(GL2 gl)
+	public void LoadTextures()
 	{
 		for (CardTemplate card : cards.keySet())
 		{
-			card.LoadTexture(gl);
+			card.LoadTexture();
 		}
 	}
 	

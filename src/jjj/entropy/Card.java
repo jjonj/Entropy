@@ -197,13 +197,8 @@ public class Card implements Comparable<Card>
 	
 	public int Attack(Card target)
 	{
-		int randToUse = -1;
-		if (currentOwner == Game.GetInstance().GetPlayer(1))
-			randToUse = 1;
-		else if (currentOwner == Game.GetInstance().GetPlayer(2))
-			randToUse = 2;
-		int dmg = template.DmgBase + EntUtilities.GetRandom(0, template.DmgDice, randToUse);
-		target.Damage(dmg);
+		int dmg = template.Strength;
+		target.Damage(template.Strength);
 		return dmg;
 	}
 	public void Damage(int amount)

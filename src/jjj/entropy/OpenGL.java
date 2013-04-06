@@ -14,9 +14,14 @@ import jjj.entropy.ui.Table;
 import jjj.entropy.ui.Textbox;
 
 
-public class GLHelper {
+public class OpenGL
+{
 
-	private GLHelper(){}	//Should not be instantiated.
+	
+	public static GL2 gl;				
+    public static GLU glu = new GLU();
+    
+	private OpenGL(){}	//Should not be instantiated.
 	
 	
 	@SuppressWarnings("unused")
@@ -38,39 +43,39 @@ public class GLHelper {
 	private static double projmatrix[] = new double[16];
 	private static double wincoord[] = new double[4];
 	
-	public static void InitTexture(GL2 gl, Texture texture)
+	public static void InitTexture(Texture texture)
 	{
-		texture.setTexParameteri(gl, GL.GL_TEXTURE_WRAP_S, GL.GL_REPEAT);
-		texture.setTexParameteri(gl, GL.GL_TEXTURE_WRAP_T, GL.GL_REPEAT);
-		texture.setTexParameteri(gl, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
-		texture.setTexParameteri(gl, GL.GL_TEXTURE_MIN_FILTER,
+		texture.setTexParameteri(OpenGL.gl, GL.GL_TEXTURE_WRAP_S, GL.GL_REPEAT);
+		texture.setTexParameteri(OpenGL.gl, GL.GL_TEXTURE_WRAP_T, GL.GL_REPEAT);
+		texture.setTexParameteri(OpenGL.gl, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
+		texture.setTexParameteri(OpenGL.gl, GL.GL_TEXTURE_MIN_FILTER,
 				GL.GL_LINEAR_MIPMAP_LINEAR);
 	}
 	
 	public static void InitOpenGL() {
-		Game.gl.glClearColor(0.9f, 0.78f, 0.6f, 1.0f);
+		OpenGL.gl.glClearColor(0.9f, 0.78f, 0.6f, 1.0f);
         
-		Game.gl.glEnable(GL.GL_BLEND);
-    	Game.gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+		OpenGL.gl.glEnable(GL.GL_BLEND);
+    	OpenGL.gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
         
-        Game.gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_REPEAT);
-        Game.gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_REPEAT);
+        OpenGL.gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_REPEAT);
+        OpenGL.gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_REPEAT);
        
-        Game.gl.glEnable(GL.GL_TEXTURE_2D);                            
-        Game.gl.glDepthFunc(GL.GL_LEQUAL);                             		// The Type Of Depth Testing To Do
-        Game.gl.glHint(GL2ES1.GL_PERSPECTIVE_CORRECTION_HINT, GL.GL_NICEST);  // Really Nice Perspective Calculations
+        OpenGL.gl.glEnable(GL.GL_TEXTURE_2D);                            
+        OpenGL.gl.glDepthFunc(GL.GL_LEQUAL);                             		// The Type Of Depth Testing To Do
+        OpenGL.gl.glHint(GL2ES1.GL_PERSPECTIVE_CORRECTION_HINT, GL.GL_NICEST);  // Really Nice Perspective Calculations
          
          
-        Game.gl.glShadeModel(GLLightingFunc.GL_SMOOTH);
-        Game.gl.glEnable(GL.GL_DEPTH_TEST);
+        OpenGL.gl.glShadeModel(GLLightingFunc.GL_SMOOTH);
+        OpenGL.gl.glEnable(GL.GL_DEPTH_TEST);
      	
      	//Calling generate methods that initiate the displaylists in openGL for fast rendering
-     	GLHelper.GenerateTable(Game.gl, Const.BOARD_WIDTH, Const.BOARD_LENGTH, Const.BOARD_THICKNESS);
-     	GLHelper.GenerateButtons(Game.gl, Texture.bigButtonTexture);
-     	GLHelper.GenerateUI(Game.gl, 0, 0, 0, Texture.uiTexture);
-     	GLHelper.GenerateDeck(Game.gl, Texture.cardBackside, Texture.deckSideTexture, Const.CARD_WIDTH, Const.CARD_HEIGHT, 0.5f);
-       	GLHelper.GenerateTextbox(Game.gl, Texture.textboxTexture);
-     	GLHelper.GenerateCard(Game.gl, Texture.cardBackside, Const.CARD_WIDTH, Const.CARD_HEIGHT, Const.CARD_THICKNESS);
+     	OpenGL.GenerateTable(OpenGL.gl, Const.BOARD_WIDTH, Const.BOARD_LENGTH, Const.BOARD_THICKNESS);
+     	OpenGL.GenerateButtons(OpenGL.gl, Texture.bigButtonTexture);
+     	OpenGL.GenerateUI(OpenGL.gl, 0, 0, 0, Texture.uiTexture);
+     	OpenGL.GenerateDeck(OpenGL.gl, Texture.cardBackside, Texture.deckSideTexture, Const.CARD_WIDTH, Const.CARD_HEIGHT, 0.5f);
+       	OpenGL.GenerateTextbox(OpenGL.gl, Texture.textboxTexture);
+     	OpenGL.GenerateCard(OpenGL.gl, Texture.cardBackside, Const.CARD_WIDTH, Const.CARD_HEIGHT, Const.CARD_THICKNESS);
         
 	}
 	
@@ -390,7 +395,7 @@ public class GLHelper {
 
 		 if (dropdown.IsSelecting())
 		 {
-			 dropdown.GetTexture().bind(Game.gl);
+			 dropdown.GetTexture().bind(OpenGL.gl);
 			
 			 gl.glBegin(GL2.GL_QUADS);
 			 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( 0, 0, 0);
@@ -410,7 +415,7 @@ public class GLHelper {
 		 }
 		 else
 		 {
-		//	 dropdown.GetTexture().bind(Game.gl);
+		//	 dropdown.GetTexture().bind(OpenGL.gl);
 			 gl.glBegin(GL2.GL_QUADS);
 			 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( 0, 0, 0);
 			    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(Const.DROPDOWN_WIDTH, 0,  0);
@@ -538,21 +543,21 @@ public class GLHelper {
 	public static int[] ConvertGLFloatToGLScreen(double x, double y)
 	{
 		 // Resetting the matrices shouldn't be needed as nothing should be modifying them permanently, but code is provided in case
-		 Game.gl.glMatrixMode(GLMatrixFunc.GL_PROJECTION);	
-		 Game.gl.glLoadIdentity();
-		 Game.glu.gluPerspective(45, Game.GetInstance().GetAspectRatio(), 1, 100);
-		 Game.gl.glMatrixMode(GLMatrixFunc.GL_MODELVIEW);	
+		 OpenGL.gl.glMatrixMode(GLMatrixFunc.GL_PROJECTION);	
+		 OpenGL.gl.glLoadIdentity();
+		 OpenGL.glu.gluPerspective(45, Game.GetInstance().GetAspectRatio(), 1, 100);
+		 OpenGL.gl.glMatrixMode(GLMatrixFunc.GL_MODELVIEW);	
 		
-		 Game.gl.glLoadIdentity();   		
-		 Game.gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
-		 Game.gl.glLoadIdentity();
-		 Game.gl.glTranslatef(0,0,-1);
+		 OpenGL.gl.glLoadIdentity();   		
+		 OpenGL.gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
+		 OpenGL.gl.glLoadIdentity();
+		 OpenGL.gl.glTranslatef(0,0,-1);
 		
-		 Game.gl.glGetIntegerv(GL.GL_VIEWPORT, view, 0);
-		 Game.gl.glGetDoublev(GLMatrixFunc.GL_MODELVIEW_MATRIX, model, 0);
-		 Game.gl.glGetDoublev(GLMatrixFunc.GL_PROJECTION_MATRIX, proj, 0);
+		 OpenGL.gl.glGetIntegerv(GL.GL_VIEWPORT, view, 0);
+		 OpenGL.gl.glGetDoublev(GLMatrixFunc.GL_MODELVIEW_MATRIX, model, 0);
+		 OpenGL.gl.glGetDoublev(GLMatrixFunc.GL_PROJECTION_MATRIX, proj, 0);
 
-         Game.glu.gluProject(x, y, 0f, //
+         OpenGL.glu.gluProject(x, y, 0f, //
         		 model, 0,
         		 proj, 0, 
         		 view, 0, 

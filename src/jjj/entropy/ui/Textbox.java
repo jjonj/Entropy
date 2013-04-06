@@ -1,8 +1,9 @@
 package jjj.entropy.ui;
 
 import java.awt.Font;
-import jjj.entropy.GLHelper;
+import jjj.entropy.OpenGL;
 import jjj.entropy.Game;
+import jjj.entropy.OpenGL;
 import jjj.entropy.Texture;
 import jjj.entropy.classes.Const;
 
@@ -50,10 +51,10 @@ public class Textbox extends Clickable{
 	{
 		if (texture != null)
 		{
-			Game.gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+			OpenGL.gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 			if (texture != null)
-				texture.bind(Game.gl);
-			 GLHelper.DrawUITextbox(Game.gl, this);
+				texture.bind(OpenGL.gl);
+			 OpenGL.DrawUITextbox(OpenGL.gl, this);
 		}
 		font.RenderBox(game, textX + textOffsetX, textY - textOffsetY, 1, Const.TEXTBOX_LINE_WIDTH, text);
 	}

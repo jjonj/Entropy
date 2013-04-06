@@ -74,20 +74,20 @@ public class CardTemplate implements TableRow {
 	public final short  ID,			//Global ID, not client based
 						RaceCost,
 						AnyCost,
-						Income,
-						Defense,
-						DmgBase,
-						DmgDice;
+						Strength,
+						Intelligence,
+						Vitality;
+
+
 	
 	// ArrayList<Specials>
-	
-	public CardTemplate(short id, String title, CardRace race, CardType type, short raceCost, short anyCost, short income, short defense, short dmgBase, short dmgDice, Texture texture)
+	public CardTemplate(short id, String title, CardRace race, CardType type, short raceCost, short anyCost, short strength, short intelligence, short vitality, Texture texture)
 	{
-		this(id, title, race, type, raceCost, anyCost, income, defense, dmgBase, dmgDice, "");
+		this(id, title, race, type, raceCost, anyCost, strength, intelligence, vitality, "");
 		this.texture = texture;
 	}
 	
-	public CardTemplate(short id, String title, CardRace race, CardType type, short raceCost, short anyCost, short income, short defense, short dmgBase, short dmgDice, String texturePath)
+	public CardTemplate(short id, String title, CardRace race, CardType type, short raceCost, short anyCost, short strength, short intelligence, short vitality, String texturePath)
 	{
 		this.ID = id;
 		this.texturePath = texturePath;
@@ -96,13 +96,12 @@ public class CardTemplate implements TableRow {
 		Type = type;
 		RaceCost = raceCost;
 		AnyCost = anyCost;
-		Income = income;
-		Defense = defense;
-		DmgBase = dmgBase;
-		DmgDice = dmgDice;
+		Strength = strength;
+		Intelligence = intelligence;
+		Vitality = vitality;
 	}
 	
-	public void LoadTexture(GL2 gl)
+	public void LoadTexture()
 	{
 		if (texture == null)
 		{
@@ -112,7 +111,7 @@ public class CardTemplate implements TableRow {
 				e.printStackTrace();
 				System.exit(1);	
 			}
-			GLHelper.InitTexture(gl, texture);
+			OpenGL.InitTexture(texture);
 		}
 	}
 	
@@ -132,8 +131,11 @@ public class CardTemplate implements TableRow {
 	
 	
 	//Takes an encoded card template and loads it
-	public static void LoadCardTemplate(String encodedTemplate) {
+	public static void LoadCardTemplate(String encodedTemplate) 
+	{
 
+		// Encoding: 	ID,TITLE,RACE,TYPE,COSTR,COSTA,STR,INT,VIT
+		
 		String[] data = encodedTemplate.split(",");
 		
 		short id = Short.parseShort(data[0]);
@@ -147,10 +149,9 @@ public class CardTemplate implements TableRow {
 		
 		short raceCost = Short.parseShort(data[4]),
 			  anyCost = Short.parseShort(data[5]),
-			  income = Short.parseShort(data[6]),
-			  defense = Short.parseShort(data[7]),
-			  dmgBase = Short.parseShort(data[8]),
-			  dmgDice = Short.parseShort(data[9]);
+			  strenght = Short.parseShort(data[6]),
+			  intelligence = Short.parseShort(data[7]),
+			  vitality = Short.parseShort(data[8]);
 		
 		
 		String title = data[1];
@@ -158,7 +159,7 @@ public class CardTemplate implements TableRow {
 		//HANDLE SPECIALS
 		
 		String texturePath = Texture.GetTexturePath(id);
-		CardTemplate ct = new CardTemplate(id,title, race, type, raceCost, anyCost, income, defense, dmgBase, dmgDice, texturePath);
+		CardTemplate ct = new CardTemplate(id,title, race, type, raceCost, anyCost, strenght, intelligence, vitality, texturePath);
 		allCardTemplates[id] = ct;
 	}
 
