@@ -60,11 +60,36 @@ public class CardTemplate implements TableRow {
 		}
 	}
 	
+	public enum CardRarity{
+		UNDEFINED,
+		COMMON,
+		UNCOMMON,
+		RARE,
+		LEGENDARY;
+
+		public static CardRarity GetRarity(short index) {
+			switch (index)
+			{
+			case 1:
+				return COMMON;
+			case 2:
+				return UNCOMMON;
+			case 3:
+				return RARE;
+			case 4:
+				return LEGENDARY;
+			}
+			return UNDEFINED;
+		}
+	}
+	
 	private static CardTemplate[] allCardTemplates = new CardTemplate[Const.MAX_CARD_COUNT];
 	
 	
 	public final CardType Type;		//Fields are public since they can be final, no need for clutter Getters
 	public final CardRace Race;
+	public final CardRarity Rarity;
+	
 	
 	public Texture texture = null; //Loaded when needed from texturePath
 	
@@ -81,19 +106,20 @@ public class CardTemplate implements TableRow {
 
 	
 	// ArrayList<Specials>
-	public CardTemplate(short id, String title, CardRace race, CardType type, short raceCost, short anyCost, short strength, short intelligence, short vitality, Texture texture)
+	public CardTemplate(short id, String title, CardRace race, CardType type, CardRarity rarity, short raceCost, short anyCost, short strength, short intelligence, short vitality, Texture texture)
 	{
-		this(id, title, race, type, raceCost, anyCost, strength, intelligence, vitality, "");
+		this(id, title, race, type, rarity, raceCost, anyCost, strength, intelligence, vitality, "");
 		this.texture = texture;
 	}
 	
-	public CardTemplate(short id, String title, CardRace race, CardType type, short raceCost, short anyCost, short strength, short intelligence, short vitality, String texturePath)
+	public CardTemplate(short id, String title, CardRace race, CardType type, CardRarity rarity,  short raceCost, short anyCost, short strength, short intelligence, short vitality, String texturePath)
 	{
 		this.ID = id;
 		this.texturePath = texturePath;
 		Title = title;
 		Race = race;
 		Type = type;
+		Rarity = rarity;
 		RaceCost = raceCost;
 		AnyCost = anyCost;
 		Strength = strength;
@@ -134,7 +160,7 @@ public class CardTemplate implements TableRow {
 	public static void LoadCardTemplate(String encodedTemplate) 
 	{
 
-		// Encoding: 	ID,TITLE,RACE,TYPE,COSTR,COSTA,STR,INT,VIT
+		// Encoding: 	ID,TITLE,RACE,TYPE,RARITY,COSTR,COSTA,STR,INT,VIT
 		
 		String[] data = encodedTemplate.split(",");
 		
@@ -145,13 +171,14 @@ public class CardTemplate implements TableRow {
 		
 		CardRace race = CardRace.GetRace(Short.parseShort(data[2]));
 		CardType type = CardType.GetType(Short.parseShort(data[3]));
+		CardRarity rarity = CardRarity.GetRarity(Short.parseShort(data[4]));
 		
 		
-		short raceCost = Short.parseShort(data[4]),
-			  anyCost = Short.parseShort(data[5]),
-			  strenght = Short.parseShort(data[6]),
-			  intelligence = Short.parseShort(data[7]),
-			  vitality = Short.parseShort(data[8]);
+		short raceCost = Short.parseShort(data[5]),
+			  anyCost = Short.parseShort(data[6]),
+			  strenght = Short.parseShort(data[7]),
+			  intelligence = Short.parseShort(data[8]),
+			  vitality = Short.parseShort(data[9]);
 		
 		
 		String title = data[1];
@@ -159,7 +186,7 @@ public class CardTemplate implements TableRow {
 		//HANDLE SPECIALS
 		
 		String texturePath = Texture.GetTexturePath(id);
-		CardTemplate ct = new CardTemplate(id,title, race, type, raceCost, anyCost, strenght, intelligence, vitality, texturePath);
+		CardTemplate ct = new CardTemplate(id,title, race, type, rarity, raceCost, anyCost, strenght, intelligence, vitality, texturePath);
 		allCardTemplates[id] = ct;
 	}
 

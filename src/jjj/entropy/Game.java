@@ -17,6 +17,7 @@ import javax.media.opengl.glu.GLU;
 import jjj.entropy.Card.Facing;
 import jjj.entropy.Card.Status;
 import jjj.entropy.CardTemplate.CardRace;
+import jjj.entropy.CardTemplate.CardRarity;
 import jjj.entropy.CardTemplate.CardType;
 import jjj.entropy.classes.*;
 import jjj.entropy.classes.Enums.GameState;
@@ -121,7 +122,7 @@ public class Game implements GLEventListener
    		
    		
    		//Creating cards require a template, this is just an old template still used below
-		TinidQueen = new CardTemplate((short)1, "Tinid Queen", CardRace.CRAWNID, CardType.CREATURE, (short)0,(short)0,(short)0,(short)0,(short)0,Texture.cardtestfront);
+		TinidQueen = new CardTemplate((short)1, "Tinid Queen", CardRace.CRAWNID, CardType.CREATURE, CardRarity.COMMON, (short)0,(short)0,(short)0,(short)0,(short)0,Texture.cardtestfront);
 
 		// Easiest way atm to detect clicks on the deck pile, is to just place to cards there that cant move.
 		Card card0 = new Card(-3, 0.51f, 1.0f, 
