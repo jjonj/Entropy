@@ -113,7 +113,7 @@ public class UIManager
 				new UIAction() {@Override
 				public void Activate(){
 					Deck newActiveDeck = playerDeckDropdown.GetSelectedObject();
-     				Game.GetInstance().GetPlayer(1).SetActiveDeck(newActiveDeck);
+     				Game.GetInstance().GetPlayer().SetActiveDeck(newActiveDeck);
      				playerDeckTable.SetDataSource(newActiveDeck);
      				playerCardTable.UpdateData();
  				}});
@@ -124,7 +124,7 @@ public class UIManager
       	DeckScreenUIComponents.add(new Button(-0.06f, 0.21f, 25, -7, "Save deck", new EntFont(FontTypes.MainParagraph, Font.PLAIN, 16, Color.black), ButtonSize.SMALL, Texture.smallButtonTexture,
      			new UIAction() {@Override
 				public void Activate(){
-     					NetworkManager.GetInstance().SendDeckUpdate(Game.GetInstance().GetPlayer(1).GetActiveDeck());
+     					NetworkManager.GetInstance().SendDeckUpdate(Game.GetInstance().GetPlayer().GetActiveDeck());
      				}
      			}
      	));
@@ -135,7 +135,7 @@ public class UIManager
      			new UIAction() {@Override
 				public void Activate(){
      				
-     				Player player = Game.GetInstance().GetPlayer(1);
+     				Player player = Game.GetInstance().GetPlayer();
  					Deck activeDeck = player.GetActiveDeck();
  					CardTemplate transferCard = (CardTemplate)playerDeckTable.GetSelectedObject();
  					if ( activeDeck.GetCount(transferCard) > 0 )
@@ -155,7 +155,7 @@ public class UIManager
      			new UIAction() {@Override
 				public void Activate(){
      				
-     					Player player = Game.GetInstance().GetPlayer(1);
+     					Player player = Game.GetInstance().GetPlayer();
      					Deck activeDeck = player.GetActiveDeck();
      					CardTemplate transferCard = (CardTemplate)playerCardTable.GetSelectedObject();
      					if ( (player.GetAllCards().GetCount(transferCard) - activeDeck.GetCount(transferCard)) > 0 )

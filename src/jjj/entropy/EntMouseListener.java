@@ -44,7 +44,7 @@ public class EntMouseListener implements MouseListener, MouseMotionListener, Mou
 				{
 				//	c = new Card(-3, 0.51f, 1.0f, 
 				//			Facing.DOWN, game.TinidQueen, Status.IN_ZONE, Game.GetInstance().GetPlayer(1));
-					c = game.GetPlayer(1).GetActiveDeck().GameGetTopCard();
+					c = game.GetPlayer().GetActiveDeck().GameGetTopCard();
 					
 					if (c == null)	//If deck is empty
 						return;
@@ -62,7 +62,7 @@ public class EntMouseListener implements MouseListener, MouseMotionListener, Mou
 				}
 				
 				//The card has an ID that is individual to the client but is synchronized across clients in each decks unique ID system so the deck id is used here
-				NetworkManager.GetInstance().SendAction(game.GetPlayer(1).GetActiveDeck().GetCardDeckID(c), Game.mode, Game.modeNumber);
+				NetworkManager.GetInstance().SendAction(game.GetPlayer().GetActiveDeck().GetCardDeckID(c), Game.mode, Game.modeNumber);
 	
 				boolean movingOutOfZone = false;
 				Zone cardOldZone = c.GetZone();

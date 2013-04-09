@@ -28,6 +28,8 @@ public class NetworkManager extends Listener
 	
 	private boolean searchingGame = false;
 	
+	private Player cachedPlayer;
+	
 	public static NetworkManager GetInstance()
 	{
 		return instance;
@@ -111,7 +113,7 @@ public class NetworkManager extends Listener
 		{
 			searchingGame = true;
 			GameMessage joinRequest = new GameMessage();
-			joinRequest.playerID = Game.GetInstance().GetPlayer(1).GetID();
+			joinRequest.playerID = Game.GetInstance().GetPlayer().GetID();
 			client.sendTCP(joinRequest);
 		}
 	}
@@ -123,7 +125,7 @@ public class NetworkManager extends Listener
 			amsg.cardID = cardID;
 			amsg.mode = mode;
 			amsg.modeNumber = modeNumber;
-			amsg.playerID = Game.GetInstance().GetPlayer(1).GetID();
+			amsg.playerID = Game.GetInstance().GetPlayer().GetID();
 			client.sendTCP(amsg);
 		}
 	}
@@ -132,7 +134,7 @@ public class NetworkManager extends Listener
 	public void SendDeckUpdate(Deck deck)
 	{
 		PlayerDataMessage pdm = new PlayerDataMessage();
-		pdm.playerID = Game.GetInstance().GetPlayer(1).GetID();
+		pdm.playerID = Game.GetInstance().GetPlayer().GetID();
 		
 		pdm.deckDBIDs = new int[]{deck.GetDBID()};	//Include the ID of the deck being updated as the first entry in the array
 		int[][] IDsAndCounts = deck.ToIDCountArray();	//Returns two int arrays. One of the IDs one of the counts
@@ -193,7 +195,7 @@ public class NetworkManager extends Listener
 			if (pdm.loginAccepted)
 			{
 				Player p = new Player(pdm.playerID, pdm.name, pdm.activeDeck, pdm.allCards, pdm.allCardCounts, pdm.decks, pdm.deckCounts, pdm.deckDBIDs);
-				Game.GetInstance().SetPlayer(1, p);
+				Game.GetInstance().SetPlayer(p);
 				
 					
 				UIManager.GetInstance().GetCardTable().SetDataSource(p.GetAllCards());
@@ -207,8 +209,8 @@ public class NetworkManager extends Listener
 		     	
 			}
 			else //Recieved data is for opponent
-			{
-				Game.GetInstance().SetPlayer(2, new Player(pdm.playerID, pdm.name, pdm.decks[0], pdm.deckCounts[0]));
+			{				
+				cachedPlayer = new Player(pdm.playerID, pdm.name, pdm.decks[0], pdm.deckCounts[0]);
 			}
 		}
 		else if (object instanceof CardDataMessage)
@@ -226,17 +228,25 @@ public class NetworkManager extends Listener
 			System.out.println(gmsg);
 			if (gmsg.accepted)
 			{
-				Game.GetInstance().SetGameID(gmsg.gameID);
-				EntUtilities.SetSeed(gmsg.seed1, gmsg.seed2);
-				Game.GetInstance().StartGame();
-				networkState = NetworkState.IN_GAME;
+				if (cachedPlayer != null)	//If data has been recieved for the opponent
+				{
+					EntUtilities.SetSeed(gmsg.seed1, gmsg.seed2);
+					Game.GetInstance().StartGame(gmsg.gameID, cachedPlayer);
+					cachedPlayer = null;
+					networkState = NetworkState.IN_GAME;
+				}
+				else
+				{
+					//TODO: Handle error, send to server a rejection
+					Game.GetInstance().Quit();
+				}
 			}
 		}
 		else if(object instanceof ActionMessage)	//Recived action from opponent
 		{
 			ActionMessage amsg = (ActionMessage)object;
 			System.out.println(amsg);
-			Player opponent = Game.GetInstance().GetPlayer(2);
+			Player opponent = Game.GetInstance().GetActiveMatch().GetOpponent();
 			Card card = opponent.GetActiveDeck().GameGetCard(amsg.cardID);
 		
 

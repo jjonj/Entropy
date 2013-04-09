@@ -19,6 +19,7 @@ public class Deck extends CardCollection
 	private HashMap<Card, Integer> CardToDeckIDMap;		//	Maps cards to their deck ids and back
 	private HashMap<Integer, Card> DeckIDToCardMap;		//
 	
+	//Match activeMatch;
 	
 	public Deck(Player owner, String name)
 	{
@@ -45,9 +46,9 @@ public class Deck extends CardCollection
 	public void GameReturnCard(Card card)
 	{
 		int randToUse = -1;
-		if (owner == Game.GetInstance().GetPlayer(1))
+		if (owner == Game.GetInstance().GetPlayer())
 			randToUse = 1;
-		else if (owner == Game.GetInstance().GetPlayer(2))
+		else
 			randToUse = 2;
 		GameReturnCard(card, EntUtilities.GetRandom(0, remainingCards.size()-1, randToUse));
 	}
@@ -62,9 +63,9 @@ public class Deck extends CardCollection
 	public void GameShuffleDeck()
 	{
 		int randToUse = -1;
-		if (owner == Game.GetInstance().GetPlayer(1))
+		if (owner == Game.GetInstance().GetPlayer())
 			randToUse = 1;
-		else if (owner == Game.GetInstance().GetPlayer(2))
+		else
 			randToUse = 2;
 		Collections.shuffle(remainingCards, EntUtilities.GetRndObject(randToUse));	// How trustworthy is this shuffle procedure?
 	}
@@ -72,9 +73,9 @@ public class Deck extends CardCollection
 	public Card GameGetRandomCard()
 	{
 		int randToUse = -1;
-		if (owner == Game.GetInstance().GetPlayer(1))
+		if (owner == Game.GetInstance().GetPlayer())
 			randToUse = 1;
-		else if (owner == Game.GetInstance().GetPlayer(2))
+		else
 			randToUse = 2;
 		if (remainingCards.size() > 0)
 			return remainingCards.remove(EntUtilities.GetRandom(0, remainingCards.size()-1, randToUse));
@@ -96,7 +97,7 @@ public class Deck extends CardCollection
 		{
 			for (int i = 0; i < cards.get(c); i++)	//Add card 'count' (which is the value in the hashmap) times
 			{
-				remainingCards.add(new Card(0,0,0, c, Game.GetInstance().GetPlayer(1)));
+				remainingCards.add(new Card(0,0,0, c, Game.GetInstance().GetPlayer()));
 			}
 			
 			Collections.sort(remainingCards);	//Sort list for consistent ordering across clients before Deck ids are added

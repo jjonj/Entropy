@@ -4,7 +4,9 @@ package jjj.entropy;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.media.opengl.GL2;
@@ -48,24 +50,26 @@ public class Game implements GLEventListener
 	    private FPSAnimator animator;
     private ByteArrayOutputStream FPSCounter;
 	
+    Match activeMatch;
+    
+    
 	private Player neutralPlayer,
-				   player1,
-			       player2;
+				   player;
+			   //    player2;
 
     private GLCanvas canvas;
 
     private Set<Card> cardsToRender;
    
     
-    Deck buildingDeck;
+    private Deck buildingDeck;
     
     private int c = 0;
     private float rotator = 0.0f;
     
-    
+    private List<GLAction> glActionQueue;
 
     public CardTemplate TinidQueen;	//Temporary
-	private int gameID = -1;
 	private int iteratingCardsToRender = 0;
     
     
@@ -101,6 +105,7 @@ public class Game implements GLEventListener
 
         cardsToRender = new HashSet<Card>();
     	
+        glActionQueue = new ArrayList<GLAction>(4);
     	
         neutralPlayer = new Player(0, "Neutral", null, null);
         
@@ -210,11 +215,13 @@ public class Game implements GLEventListener
     			
     			//   -------------------------------------- LOAD ANY MISSING TEXTURES   ----------------------------------
     			
-
+/*
     			if (Const.INIT_GAMESTATE == GameState.LOGIN)	//Check that makes ingame debugging easier
     			{
-	    			player1.GetAllCards().LoadTextures();
+	    			player.GetAllCards().LoadTextures();
     			}
+    			*/
+    			
     			
     			OpenGL.gl.glLoadIdentity();   		
 	    		OpenGL.gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
@@ -236,12 +243,13 @@ public class Game implements GLEventListener
     			
     			//   -------------------------------------- LOAD ANY MISSING TEXTURES   ----------------------------------
     			
-    			
+    			/*
     			if (Const.INIT_GAMESTATE == GameState.LOGIN)	//Check that makes ingame debugging easier
     			{
-	    			player1.GetActiveDeck().LoadTextures();
-	    			player2.GetActiveDeck().LoadTextures();
+	    			activeMatch.LoadTextures();
     			}
+    			*/
+    			
     			
     			 //     ---------------------------------         INIT FRAME       ------------------------------------------
 
@@ -338,6 +346,13 @@ public class Game implements GLEventListener
     	
     	UIManager.GetInstance().RenderUI(this);
     	
+
+    	for (GLAction a : glActionQueue)	//Execute any tasks that need to be executed on the GL containing thread
+    	{
+    		a.Execute();
+    	}
+    	glActionQueue.clear();
+    	
     	
     	OpenGL.gl.glFlush();		
 	}
@@ -410,11 +425,18 @@ public class Game implements GLEventListener
 		}*/
 	}
     
-	public void StartGame()
+	public void StartGame(int matchID, Player opponent)
 	{
-		player1.GetActiveDeck().GameResetDeck();
-		player2.GetActiveDeck().GameResetDeck();
+		activeMatch = new Match(matchID, player, opponent);
 		SetGameState(GameState.IN_GAME);
+		
+		glActionQueue.add(new GLAction(){@Override
+				public void Execute(){
+					activeMatch.Start();			//starting the match requires loading of player textures, which require a GL context
+		}});
+		
+	
+		
 	}
 	
 	public Card CheckCardCollision()
@@ -504,11 +526,13 @@ public class Game implements GLEventListener
 	
 	
 
-	public GameState GetGameState() {
+	public GameState GetGameState() 
+	{
 		return gamestate;
 	}
 	
-	public void SetGameState(GameState state) {
+	public void SetGameState(GameState state) 
+	{
 			
 		gamestate = state;
 		
@@ -529,10 +553,17 @@ public class Game implements GLEventListener
 
 	}
 
-	public int GetRealGameHeight() {
+	public int GetRealGameHeight() 
+	{
 		return realGameHeight;
 	}
 
+	public Player GetPlayer()
+	{
+		return player;
+	}
+	
+	/*
 	public Player GetPlayer(int i) 
 	{
 		switch (i)
@@ -545,19 +576,26 @@ public class Game implements GLEventListener
 			return player2;
 		}
 		return null;
+	}*/
+	
+	
+	public void SetPlayer(Player player)
+	{
+		this.player = player;
 	}
 	
-
+	
+/*
 	public void SetPlayer(int i, Player player) 
 	{
 		switch (i)
 		{
 		case 1:
-			player1 = player;
+			player = player;
 		case 2:
 			player2 = player;
 		}
-	}
+	}*/
 	
     public int GetWidth()
     {
@@ -577,13 +615,15 @@ public class Game implements GLEventListener
 	
 
 	
-	public int GetGameID()
+	public int GetActiveMatchID()
 	{
-		return gameID;
+		return activeMatch.GetID();
 	}
-	public void SetGameID(int gameID) {
+	/*
+	public void SetGameID(int gameID) 
+	{
 		this.gameID = gameID;
-	}
+	}*/
 
 	public GLCanvas GetCanvas()
 	{
@@ -593,7 +633,7 @@ public class Game implements GLEventListener
 	
 	public void OnDeckScreen()
 	{
-		UIManager.GetInstance().GetPlayerDeckTable().SetDataSource(GetPlayer(1).GetActiveDeck());
+		UIManager.GetInstance().GetPlayerDeckTable().SetDataSource(GetPlayer().GetActiveDeck());
 
 		
 	}
@@ -601,7 +641,17 @@ public class Game implements GLEventListener
 	public void OnLogin()
 	{
 		//Add the players deck to the dropdown of decks
-		UIManager.GetInstance().GetPlayerDeckDropdown().SetDataSource(GetPlayer(1).GetAllDecks());
+		UIManager.GetInstance().GetPlayerDeckDropdown().SetDataSource(GetPlayer().GetAllDecks());
+	}
+
+	public void Quit() 
+	{
+		System.exit(0);
+	}
+
+	public Match GetActiveMatch() 
+	{
+		return activeMatch;
 	}
 
 	

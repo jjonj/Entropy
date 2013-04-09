@@ -92,6 +92,12 @@ public class Player {
 	public String GetName() {
 		return name;
 	}
+
+	public void InitGame() 
+	{
+		activeDeck.GameResetDeck();
+		activeDeck.LoadTextures();
+	}
 	
 	
 }
