@@ -118,13 +118,14 @@ public class NetworkManager extends Listener
 		}
 	}
 	
-	public void SendAction(int cardID, int mode, int modeNumber) {
+	public void SendAction(int cardID, int mode, int modeNumber, boolean swapTurn) {
 		if (networkState == NetworkState.IN_GAME)
 		{
 			ActionMessage amsg = new ActionMessage();
 			amsg.cardID = cardID;
 			amsg.mode = mode;
 			amsg.modeNumber = modeNumber;
+			amsg.swapTurn = swapTurn;
 			amsg.playerID = Game.GetInstance().GetPlayer().GetID();
 			client.sendTCP(amsg);
 		}
@@ -231,7 +232,7 @@ public class NetworkManager extends Listener
 				if (cachedPlayer != null)	//If data has been recieved for the opponent
 				{
 					EntUtilities.SetSeed(gmsg.seed1, gmsg.seed2);
-					Game.GetInstance().StartGame(gmsg.gameID, cachedPlayer);
+					Game.GetInstance().StartGame(gmsg.gameID, cachedPlayer, gmsg.firstTurn);
 					cachedPlayer = null;
 					networkState = NetworkState.IN_GAME;
 				}
@@ -339,6 +340,9 @@ public class NetworkManager extends Listener
 			{
 				Zone.ReturnAvailCardX(cardOldZone, oldCardX, true);
 			}
+			
+			if (amsg.swapTurn)
+				Game.GetInstance().GetActiveMatch().SwapTurn();
 			
 		}
 	}

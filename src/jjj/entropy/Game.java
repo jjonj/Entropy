@@ -425,17 +425,15 @@ public class Game implements GLEventListener
 		}*/
 	}
     
-	public void StartGame(int matchID, Player opponent)
+	public void StartGame(int matchID, Player opponent, boolean player1Starts)
 	{
-		activeMatch = new Match(matchID, player, opponent);
+		activeMatch = new Match(matchID, player, opponent, player1Starts);
 		SetGameState(GameState.IN_GAME);
 		
 		glActionQueue.add(new GLAction(){@Override
 				public void Execute(){
 					activeMatch.Start();			//starting the match requires loading of player textures, which require a GL context
 		}});
-		
-	
 		
 	}
 	

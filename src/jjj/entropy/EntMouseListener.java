@@ -61,9 +61,11 @@ public class EntMouseListener implements MouseListener, MouseMotionListener, Mou
 
 				}
 				
-				//The card has an ID that is individual to the client but is synchronized across clients in each decks unique ID system so the deck id is used here
-				NetworkManager.GetInstance().SendAction(game.GetPlayer().GetActiveDeck().GetCardDeckID(c), Game.mode, Game.modeNumber);
-	
+				
+				boolean swapTurn = false;
+				boolean actionPerformed = true;
+				
+				
 				boolean movingOutOfZone = false;
 				Zone cardOldZone = c.GetZone();
 				float oldCardX = 0;
@@ -98,55 +100,73 @@ public class EntMouseListener implements MouseListener, MouseMotionListener, Mou
 					c.PlayToLimbo();
 					break;
 				case 3:
-					switch(Game.modeNumber)
+					if (game.activeMatch.GetActiveTurnPlayer() == game.GetPlayer())
 					{
-					case 1:
-						if (cardOldZone != Zone.ZONE1)
+						swapTurn = true;							//TODO: Always swaps action, fix
+						Game.GetInstance().activeMatch.SwapTurn();
+						switch(Game.modeNumber)
 						{
-							c.PlayToZone(Zone.ZONE1);
-							c.SetZone(Zone.ZONE1);
+						case 1:
+							if (cardOldZone != Zone.ZONE1)
+							{
+								c.PlayToZone(Zone.ZONE1);
+								c.SetZone(Zone.ZONE1);
+							}
+							else
+								movingOutOfZone = false;
+							break;
+						case 2:
+							if (cardOldZone != Zone.ZONE2)
+							{
+								c.PlayToZone(Zone.ZONE2);
+								c.SetZone(Zone.ZONE2);
+							}
+							else
+								movingOutOfZone = false;
+							break;
+						case 3:
+							if (cardOldZone != Zone.ZONE3)
+							{
+								c.PlayToZone(Zone.ZONE3);
+								c.SetZone(Zone.ZONE3);
+							}
+							else
+								movingOutOfZone = false;
+							break;
+						case 4:
+							if (cardOldZone != Zone.ZONE4)
+							{
+								c.PlayToZone(Zone.ZONE4);
+								c.SetZone(Zone.ZONE4);
+							}
+							else
+								movingOutOfZone = false;
+							break;
 						}
-						else
-							movingOutOfZone = false;
-						break;
-					case 2:
-						if (cardOldZone != Zone.ZONE2)
-						{
-							c.PlayToZone(Zone.ZONE2);
-							c.SetZone(Zone.ZONE2);
-						}
-						else
-							movingOutOfZone = false;
-						break;
-					case 3:
-						if (cardOldZone != Zone.ZONE3)
-						{
-							c.PlayToZone(Zone.ZONE3);
-							c.SetZone(Zone.ZONE3);
-						}
-						else
-							movingOutOfZone = false;
-						break;
-					case 4:
-						if (cardOldZone != Zone.ZONE4)
-						{
-							c.PlayToZone(Zone.ZONE4);
-							c.SetZone(Zone.ZONE4);
-						}
-						else
-							movingOutOfZone = false;
 						break;
 					}
-					break;
+					else
+						actionPerformed = false;
 				case 4:
 					c.PlayToHand(Game.modeNumber);
 					break;
 				}
-					
+						
 				if (movingOutOfZone)
 				{
 					Zone.ReturnAvailCardX(cardOldZone, oldCardX, false);
 				}
+					
+				
+				
+				if (actionPerformed)
+				{
+					//The card has an ID that is individual to the client but is synchronized across clients in each decks unique ID system so the deck id is used here
+					NetworkManager.GetInstance().SendAction(game.GetPlayer().GetActiveDeck().GetCardDeckID(c), Game.mode, Game.modeNumber, swapTurn);	
+				}
+				
+
+				
 			}
 			break;
 		default:
