@@ -33,9 +33,8 @@ public class EntMouseListener implements MouseListener, MouseMotionListener, Mou
 		
 		Game game = Game.GetInstance();
 		
-		switch (game.GetGameState())
+		if (game.IsInGame())
 		{
-		case IN_GAME:
 			Card c = game.CheckCardCollision();
 			
 			if (c != null)
@@ -168,9 +167,6 @@ public class EntMouseListener implements MouseListener, MouseMotionListener, Mou
 
 				
 			}
-			break;
-		default:
-			break;
 		}
 	}
 
@@ -187,22 +183,13 @@ public class EntMouseListener implements MouseListener, MouseMotionListener, Mou
 	}
 
 	@Override
-	public void mousePressed(MouseEvent e) {
-		switch (Game.GetInstance().GetGameState())
+	public void mousePressed(MouseEvent e) 
+	{
+		UIComponent uicmm = UIManager.GetInstance().CheckUICollision();
+		if (uicmm != null && uicmm instanceof Clickable)
 		{
-		case DECK_SCREEN:
-		case LOGIN:
-			//Case will fall through to MAIN_MENU as intended
-		case MAIN_MENU:
-			UIComponent uicmm = UIManager.GetInstance().CheckUICollision();
-			if (uicmm != null && uicmm instanceof Clickable)
-			{
-				UIManager.GetInstance().SetFocusedUIComponent(uicmm);
-				((Clickable)uicmm).Activate(MouseX, MouseY);
-			}
-			break;
-		default:
-			break;
+			UIManager.GetInstance().SetFocusedUIComponent(uicmm);
+			((Clickable)uicmm).Activate(MouseX, MouseY);
 		}
 	}
 

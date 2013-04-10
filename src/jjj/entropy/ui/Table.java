@@ -13,13 +13,12 @@ import java.util.List;
 import javax.media.opengl.GLException;
 
 import jjj.entropy.EntMouseListener;
+import jjj.entropy.GameState;
 import jjj.entropy.OGLManager;
 import jjj.entropy.Game;
-import jjj.entropy.OGLManager;
 import jjj.entropy.SimpleCollection;
 import jjj.entropy.Texture;
 import jjj.entropy.classes.Const;
-import jjj.entropy.classes.Enums.GameState;
 
 
 
@@ -38,7 +37,11 @@ public class Table extends Clickable implements MouseListener, MouseMotionListen
 					selectedFieldTexture;
 	private float lineHeight,	//The height of the font used
 				  scrollHandleYOffsetGLFloat;	//The offset of the scroll handle in GL float coordinates
-	private GameState activeGameState;
+	
+	
+	//private GameState activeGameState;
+	
+	
 	private int fontLineHeight,
 				textX,
 				textY,
@@ -52,6 +55,7 @@ public class Table extends Clickable implements MouseListener, MouseMotionListen
 				mouseOffSetFromTaTop,
 				lineOffset = 0;	// Used for scrolling
 	private boolean scrolling = false;
+	private GameState activeGameState;
 
 	public Table(float x, float y,  int offsetX, int offsetY, GameState activeGameState)	// Table supports a null dataSource
 	{
@@ -114,8 +118,8 @@ public class Table extends Clickable implements MouseListener, MouseMotionListen
 	    else
 	    	displayLineCount = 0;
 	    UpdateData();
-		 Game.GetInstance().GetCanvas().addMouseListener(this);
-		 Game.GetInstance().GetCanvas().addMouseMotionListener(this);
+		Game.GetInstance().AddMouseListener(this);
+		Game.GetInstance().AddMouseMotionListener(this);
 	}
 	
 	//Method to update the internal data structure with the current data source

@@ -10,12 +10,12 @@ import jjj.entropy.CardTemplate;
 import jjj.entropy.Deck;
 import jjj.entropy.EntMouseListener;
 import jjj.entropy.Game;
+import jjj.entropy.GameState;
 import jjj.entropy.NetworkManager;
 import jjj.entropy.Player;
 import jjj.entropy.SimpleCollection;
 import jjj.entropy.Texture;
 import jjj.entropy.classes.Const;
-import jjj.entropy.classes.Enums.GameState;
 import jjj.entropy.ui.Button.ButtonSize;
 import jjj.entropy.ui.EntFont.FontTypes;
 
@@ -33,7 +33,10 @@ public class UIManager
 	
 	
 	//Maximum number of gamestates set to 10 here (MONITOR)
-	public HashMap<GameState, List<UIComponent>> GameStateUIComponenstMap = new HashMap<GameState, List<UIComponent>>(10);	
+	public HashMap<jjj.entropy.GameState, List<UIComponent>> GameStateUIComponenstMap = new HashMap<jjj.entropy.GameState, List<UIComponent>>(10);	
+	
+	private HashMap<jjj.entropy.GameState, UIComponent> defaultFocusedUIElementMap = new HashMap<jjj.entropy.GameState, UIComponent>(10);	
+	
 	
 	
 	
@@ -54,21 +57,22 @@ public class UIManager
     
     private SimpleCollection<TableRow> activeDataSource;	// The datasource currently being used for updating table data
     
-    public void InitUIComponents()
+    public void InitUIComponents(jjj.entropy.GameState loginScreen, jjj.entropy.GameState mainMenu, jjj.entropy.GameState inGameState, jjj.entropy.GameState deckScreen)
     {
     	
-    	GameStateUIComponenstMap.put(GameState.LOGIN, LoginScreenUIComponents);
-    	GameStateUIComponenstMap.put(GameState.MAIN_MENU, MainMenuUIComponents);
-    	GameStateUIComponenstMap.put(GameState.IN_GAME, IngameUIComponents);
-    	GameStateUIComponenstMap.put(GameState.DECK_SCREEN, DeckScreenUIComponents);
+    	GameStateUIComponenstMap.put(loginScreen, LoginScreenUIComponents);
+    	GameStateUIComponenstMap.put(mainMenu, MainMenuUIComponents);
+    	GameStateUIComponenstMap.put(inGameState, IngameUIComponents);
+    	GameStateUIComponenstMap.put(deckScreen, DeckScreenUIComponents);
     	
     	//Ingame UI components
      	
     	chatWindow = new Label(129, 116,  Const.CHAT_LINES, "", new EntFont(EntFont.FontTypes.MainParagraph, Font.BOLD, 12, Color.BLUE));
     	chatTextbox = new Textbox(-0.59f, -0.389f, 5,  10, "", new EntFont(EntFont.FontTypes.MainParagraph, Font.BOLD, 12, Color.BLUE), null);
+    	
     	IngameUIComponents.add(chatWindow);
     	IngameUIComponents.add(chatTextbox);
-    	
+    	defaultFocusedUIElementMap.put(inGameState, chatTextbox);
     	FPSLabel = new Label(50, 150, "0", new EntFont(EntFont.FontTypes.MainParagraph, Font.BOLD, 14));
     	IngameUIComponents.add(FPSLabel);
     	
@@ -82,11 +86,11 @@ public class UIManager
      				}
      			}
      	));
-
+     	defaultFocusedUIElementMap.put(mainMenu, MainMenuUIComponents.get(MainMenuUIComponents.size()-1));	//Set the default uicomponent to the last added one (just above)
      	MainMenuUIComponents.add(new Button(-0.16f, -0.05f, 60, 22, "My decks", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.orange), Texture.bigButtonTexture,
      			new UIAction() {@Override
 				public void Activate(){
-     					Game.GetInstance().SetGameState(GameState.DECK_SCREEN);
+     					Game.GetInstance().SetGameState(Game.GetInstance().GetDeckScreen());
      				}
      			}
      	));
@@ -101,11 +105,11 @@ public class UIManager
      	//Initiate the player card table UI element with an empty list of data. The players cards are added once logged in.
      	SimpleCollection<TableRow> tempDeck = new CardCollection();
      	
-     	playerCardTable = new Table(-0.715f, 0.39f, 20, 21, tempDeck, 20, GameState.DECK_SCREEN);
+     	playerCardTable = new Table(-0.715f, 0.39f, 20, 21, tempDeck, 20, deckScreen);
      	DeckScreenUIComponents.add(playerCardTable);
-     	
+     	defaultFocusedUIElementMap.put(deckScreen, playerCardTable);
      	//The card table for the current deck
-     	playerDeckTable = new Table(-0.283f, 0.16f, 20, 12, tempDeck, 20, GameState.DECK_SCREEN);
+     	playerDeckTable = new Table(-0.283f, 0.16f, 20, 12, tempDeck, 20, deckScreen);
      	DeckScreenUIComponents.add(playerDeckTable);
      	
     	//Dropdown initiated with a temporary data source that is updated on login ( game.OnLogin(); )
@@ -178,6 +182,7 @@ public class UIManager
         usernameTextbox = new Textbox(-0.155f, 0.05f, 15, 8, "", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black), Texture.textboxTexture);
      	passwordTextbox = new Textbox(-0.155f, -0.06f, 15, 8, "", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black), Texture.textboxTexture);
      	LoginScreenUIComponents.add(usernameTextbox);
+     	defaultFocusedUIElementMap.put(loginScreen, usernameTextbox);
      	LoginScreenUIComponents.add(passwordTextbox);
      	LoginScreenUIComponents.add(new Label(555, 415, "Username", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black)));
      	LoginScreenUIComponents.add(new Label(555, 320, "Password", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black)));
@@ -234,54 +239,52 @@ public class UIManager
 	public void SetFocusOnGameState(Game game) 
 	{
 
-		SetFocusedUIComponent(GameStateUIComponenstMap.get(game.GetGameState()).get(0));
+		SetFocusedUIComponent(game.GetGameState().GetDefaultFocusedUIElement());
+		
 
 	}
 	
 	
 	public UIComponent CheckUICollision() 	//MOVE COLLISION DETECTION LOGIC TO EntUIComponent
 	{
-		if (Game.GetInstance().GetGameState() != GameState.IN_GAME)
+		List<UIComponent> toIterate = null;
+		
+		
+		toIterate = GameStateUIComponenstMap.get(Game.GetInstance().GetGameState());
+		
+		
+		//First test for collision with the focused UI component, this helps as caching and also fixes a problem with clicking dropdown overlapping other clickable
+		Clickable ecl = (Clickable)focusedUIComponent;
+		int mx = EntMouseListener.MouseX;
+		int my = EntMouseListener.MouseY; //720 - EntMouseListener.MouseY -1;
+		if ( mx > ecl.GetScreenX() )
 		{
-			List<UIComponent> toIterate = null;
-			
-			
-			toIterate = GameStateUIComponenstMap.get(Game.GetInstance().GetGameState());
-			
-			
-			//First test for collision with the focused UI component, this helps as caching and also fixes a problem with clicking dropdown overlapping other clickable
-			Clickable ecl = (Clickable)focusedUIComponent;
-			int mx = EntMouseListener.MouseX;
-			int my = EntMouseListener.MouseY; //720 - EntMouseListener.MouseY -1;
-			if ( mx > ecl.GetScreenX() )
+			if ( mx < ecl.GetScreenWidth()+ecl.GetScreenX() )
 			{
-				if ( mx < ecl.GetScreenWidth()+ecl.GetScreenX() )
+				if (my < ecl.GetScreenY())
 				{
-					if (my < ecl.GetScreenY())
+					if (my > ecl.GetScreenY() - ecl.GetScreenHeight())
 					{
-						if (my > ecl.GetScreenY() - ecl.GetScreenHeight())
-						{
-							return focusedUIComponent;
-						}
+						return focusedUIComponent;
 					}
 				}
 			}
-			//After check for collision with all components in the current context (toIterate)
-			for (UIComponent uic : toIterate)
+		}
+		//After check for collision with all components in the current context (toIterate)
+		for (UIComponent uic : toIterate)
+		{
+			if (uic instanceof Clickable) 
 			{
-				if (uic instanceof Clickable) 
+				ecl = (Clickable)uic;
+				if ( mx > ecl.GetScreenX() )
 				{
-					ecl = (Clickable)uic;
-					if ( mx > ecl.GetScreenX() )
+					if ( mx < ecl.GetScreenWidth()+ecl.GetScreenX() )
 					{
-						if ( mx < ecl.GetScreenWidth()+ecl.GetScreenX() )
+						if (my < ecl.GetScreenY())
 						{
-							if (my < ecl.GetScreenY())
+							if (my > ecl.GetScreenY() - ecl.GetScreenHeight())
 							{
-								if (my > ecl.GetScreenY() - ecl.GetScreenHeight())
-								{
-									return uic;
-								}
+								return uic;
 							}
 						}
 					}
@@ -292,11 +295,13 @@ public class UIManager
 	}
 	
 	
-	public Textbox GetChatTextbox() {
+	public Textbox GetChatTextbox() 
+	{
 		return chatTextbox;
 	}
 	
-	public Label GetChatWindowlabel() {
+	public Label GetChatWindowlabel() 
+	{
 		return chatWindow;
 	}
 	
@@ -338,6 +343,11 @@ public class UIManager
 
 	public void SetActiveDataSource( SimpleCollection<TableRow> source) {
 		activeDataSource = source;
+	}
+
+	public UIComponent GetDefaultFocusedUIElement(GameState gameState) 
+	{
+		return defaultFocusedUIElementMap.get(gameState);
 	}
 
 	

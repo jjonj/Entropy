@@ -13,6 +13,9 @@ public class Player {
 	private List<Deck> decks = null;
 	private int NextCardID = 0;	//Card id's are linked to each owner
 	
+	
+	private int battleTokens,	//Free currency
+				goldTokens;		//Purchased currency
 				
 	
 	

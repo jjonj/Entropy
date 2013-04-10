@@ -1,6 +1,5 @@
 package jjj.entropy;
 
-import jjj.entropy.classes.Enums.GameState;
 
 public class Match 
 {

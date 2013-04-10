@@ -1,30 +1,24 @@
 package jjj.entropy;
 
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.awt.GLCanvas;
 import javax.media.opengl.fixedfunc.GLMatrixFunc;
-import javax.media.opengl.glu.GLU;
 
 import jjj.entropy.Card.Facing;
 import jjj.entropy.Card.Status;
 import jjj.entropy.CardTemplate.CardRace;
 import jjj.entropy.CardTemplate.CardRarity;
 import jjj.entropy.CardTemplate.CardType;
-import jjj.entropy.classes.*;
-import jjj.entropy.classes.Enums.GameState;
+import jjj.entropy.shop.Shop;
 import jjj.entropy.ui.*;
-import com.jogamp.opengl.util.FPSAnimator;
 
 
 public class Game implements GLEventListener  
@@ -34,8 +28,7 @@ public class Game implements GLEventListener
 	public static int mode;
     public static int modeNumber;
     
-    private static GameState gamestate;
-    
+
     private static Game instance = null;
 	private int gameWidth, 
 				gameHeight;
@@ -44,35 +37,38 @@ public class Game implements GLEventListener
 	private boolean fullscreen = false;
 	@SuppressWarnings("unused")
 	private boolean showFPS = false;
-	private boolean loggedIn = false;
     private int realGameHeight;	//Used for calculating the real Y values
 	
-	    private FPSAnimator animator;
-    private ByteArrayOutputStream FPSCounter;
-	
-    Match activeMatch;
+    
+    private GameState currentGameState,
+    				  outerGameState;		//Used for exiting current gamestate
+    
+    private InGameState inGameState;
+    private DeckScreen deckScreen;
+    private LoginScreen loginScreen;
+    private MainMenu mainMenu;
+    private Shop shop;
+    
+
+    Match activeMatch = null;
+    
+    private GLCanvas canvas;
     
     
 	private Player neutralPlayer,
 				   player;
 			   //    player2;
 
-    private GLCanvas canvas;
 
-    private Set<Card> cardsToRender;
-   
-    
     private Deck buildingDeck;
     
-    private int c = 0;
-    private float rotator = 0.0f;
+   
     
     private List<OGLAction> glActionQueue;
 
     public CardTemplate TinidQueen;	//Temporary
-	private int iteratingCardsToRender = 0;
-    
-    
+
+  
     public static void InitSingleton(int width, int height, GLCanvas canvas)
     {
     	new Game(width, height, canvas);
@@ -89,21 +85,23 @@ public class Game implements GLEventListener
     
     protected Game(int width, int height, GLCanvas canvas)
     {
+    	this.canvas = canvas;
+    	
     	instance = this;
     	
-    	this.canvas = canvas;
     	gameWidth = width;
     	gameHeight = height;
     	aspectRatio = (float)width/height;
     	
-    	FPSCounter = new ByteArrayOutputStream();
-        PrintStream ps = new PrintStream(FPSCounter);
-        animator = new FPSAnimator(canvas, 60);
-        animator.setUpdateFPSFrames(60, ps);
-        animator.add(canvas);
-        animator.start();
-
-        cardsToRender = new HashSet<Card>();
+    	inGameState = new InGameState(canvas);
+    	deckScreen = new DeckScreen();
+    	loginScreen = new LoginScreen();
+    	mainMenu = new MainMenu();
+    	shop = new Shop();
+    	
+    	currentGameState = loginScreen;
+    	
+        
     	
         glActionQueue = new ArrayList<OGLAction>(4);
     	
@@ -142,10 +140,10 @@ public class Game implements GLEventListener
         OGLManager.InitOpenGL();
      	
         
-        UIManager.GetInstance().InitUIComponents();
+        UIManager.GetInstance().InitUIComponents(loginScreen, mainMenu, inGameState, deckScreen);
 
 
-     	SetGameState(Const.INIT_GAMESTATE);
+     	SetGameState(loginScreen);
      	
      	
      	//Setting the real window height as GL scaling changes it
@@ -161,186 +159,11 @@ public class Game implements GLEventListener
     	OGLManager.gl.glLoadIdentity();
     	OGLManager.glu.gluPerspective(45, aspectRatio, 1, 100);
     	OGLManager.gl.glMatrixMode(GLMatrixFunc.GL_MODELVIEW);	//Switch to hand adjustment mode
-		
-    	switch (gamestate)
-    	{
-    		case LOGIN:
-    			
-	    		OGLManager.gl.glLoadIdentity();   		
-	    		OGLManager.gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
-		    	OGLManager.gl.glLoadIdentity();
-		    	OGLManager.gl.glTranslatef(0,0,-1);
-	 	    	OGLManager.gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-	 	    	
-	 	  //  	OpenGL.gl.glDisable(GL2.GL_DEPTH_TEST);
-	 	    	OGLManager.gl.glEnable(GL2.GL_TEXTURE_2D);
-	 	    	
-	 	    	Texture.loginScreenTexture.bind(OGLManager.gl);
-				 OGLManager.gl.glBegin(GL2.GL_QUADS);
-				 	OGLManager.gl.glTexCoord2f(0.0f, 0.0f); OGLManager.gl.glVertex3f(-0.74f,-0.415f, 0f);
-				 	OGLManager.gl.glTexCoord2f(1.0f, 0.0f); OGLManager.gl.glVertex3f(0.74f,-0.415f, 0f);
-				 	OGLManager.gl.glTexCoord2f(1.0f, 1.0f); OGLManager.gl.glVertex3f(0.74f,0.415f, 0f);
-				 	OGLManager.gl.glTexCoord2f(0.0f, 1.0f); OGLManager.gl.glVertex3f(-0.74f,0.415f, 0f);
-				 OGLManager.gl.glEnd();
-				 
-		         break;
-    		case MAIN_MENU:
+    	OGLManager.gl.glLoadIdentity();
+    	OGLManager.gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
+    	
 
-    			if (!loggedIn)	//If a player has just logged in
-    			{
-    				loggedIn = true;
-    				OnLogin();
-    			}
-    			
-	    		OGLManager.gl.glLoadIdentity();   		
-	    		OGLManager.gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
-		    	OGLManager.gl.glLoadIdentity();
-		    	OGLManager.gl.glTranslatef(0,0,-1);
-	 	    	OGLManager.gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-	 	    	
-	 	  //  	OpenGL.gl.glDisable(GL2.GL_DEPTH_TEST);
-	 	    	OGLManager.gl.glEnable(GL2.GL_TEXTURE_2D);
-	 	    	
-	 	    	Texture.mainMenuTexture.bind(OGLManager.gl);
-				 OGLManager.gl.glBegin(GL2.GL_QUADS);
-				 	OGLManager.gl.glTexCoord2f(0.0f, 0.0f); OGLManager.gl.glVertex3f(-0.74f,-0.415f, 0f);
-				 	OGLManager.gl.glTexCoord2f(1.0f, 0.0f); OGLManager.gl.glVertex3f(0.74f,-0.415f, 0f);
-				 	OGLManager.gl.glTexCoord2f(1.0f, 1.0f); OGLManager.gl.glVertex3f(0.74f,0.415f, 0f);
-				 	OGLManager.gl.glTexCoord2f(0.0f, 1.0f); OGLManager.gl.glVertex3f(-0.74f,0.415f, 0f);
-				 OGLManager.gl.glEnd();
-
-    			break;
-    		case DECK_SCREEN:
-    			
-    			
-    			//   -------------------------------------- LOAD ANY MISSING TEXTURES   ----------------------------------
-    			
-/*
-    			if (Const.INIT_GAMESTATE == GameState.LOGIN)	//Check that makes ingame debugging easier
-    			{
-	    			player.GetAllCards().LoadTextures();
-    			}
-    			*/
-    			
-    			
-    			OGLManager.gl.glLoadIdentity();   		
-	    		OGLManager.gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
-		    	OGLManager.gl.glLoadIdentity();
-		    	OGLManager.gl.glTranslatef(0,0,-1);
-	 	    	OGLManager.gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-	 	    	
-	 	    	Texture.deckScreenTexture.bind(OGLManager.gl);
-				 OGLManager.gl.glBegin(GL2.GL_QUADS);
-				 	OGLManager.gl.glTexCoord2f(0.0f, 0.0f); OGLManager.gl.glVertex3f(-0.74f,-0.415f, 0f);
-				 	OGLManager.gl.glTexCoord2f(1.0f, 0.0f); OGLManager.gl.glVertex3f(0.74f,-0.415f, 0f);
-				 	OGLManager.gl.glTexCoord2f(1.0f, 1.0f); OGLManager.gl.glVertex3f(0.74f,0.415f, 0f);
-				 	OGLManager.gl.glTexCoord2f(0.0f, 1.0f); OGLManager.gl.glVertex3f(-0.74f,0.415f, 0f);
-				 OGLManager.gl.glEnd();
-		 	    	
-			    
-	 	    	break;
-    		case IN_GAME:
-    			
-    			//   -------------------------------------- LOAD ANY MISSING TEXTURES   ----------------------------------
-    			
-    			/*
-    			if (Const.INIT_GAMESTATE == GameState.LOGIN)	//Check that makes ingame debugging easier
-    			{
-	    			activeMatch.LoadTextures();
-    			}
-    			*/
-    			
-    			
-    			 //     ---------------------------------         INIT FRAME       ------------------------------------------
-
-    	    	OGLManager.gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
-    	    	OGLManager.gl.glLoadIdentity();
-    	    	OGLManager.glu.gluLookAt(	1, 5, -4,
-    	     				0, 0f, 4,
-    	     				0.0f, 1.0f,  0.0f);
-    	    	OGLManager.gl.glTranslatef(0,0,5);
-    	    	//OpenGL.gl.glRotatef(rotator, 0, 1, 0);
-    	    	
-    	    	OGLManager.gl.glPushMatrix();
-    	    	 
-    	    	 //     ---------------------------------         DRAW 3D LINES       ------------------------------------------
-    	    	
-    	    	 OGLManager.gl.glDisable(GL2.GL_TEXTURE_2D);     
-    	    	
-    	    	
-    	 	    
-    	    	 OGLManager.gl.glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
-    			 
-    			 OGLManager.gl.glBegin(GL2.GL_LINES);
-    			 
-    			 OGLManager.gl.glVertex3f(-10.0f,0.0f,0.0f);
-    			 OGLManager.gl.glVertex3f(10.0f,0.0f,0.0f);
-    			 
-    			 OGLManager.gl.glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
-    			 OGLManager.gl.glVertex3f(0.0f,10.0f,0.0f);
-    			 OGLManager.gl.glVertex3f(0.0f,-10.0f,0.0f);
-    			 
-    			 OGLManager.gl.glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
-    			 	OGLManager.gl.glVertex3f(0.0f,0.0f,-10.0f);
-    			 	OGLManager.gl.glVertex3f(0.0f,0.0f,10.0f);
-    			 OGLManager.gl.glEnd();
-    			   OGLManager.gl.glColor4f(1.0f, 1.0f, 1.0f, 1f);
-    			 OGLManager.gl.glEnable(GL2.GL_TEXTURE_2D);     
-    			 
-    			 //     ---------------------------------         DRAW OTHERS       ------------------------------------------
-    			 
-    			 Texture.board.bind(OGLManager.gl);
-    	    	 OGLManager.DrawTable(OGLManager.gl, -Const.BOARD_WIDTH/2, Const.BOARD_HEIGHT);
-    	    	 OGLManager.DrawDeck(OGLManager.gl, -3.0f, 0.5f, 1.0f);
-    	    	 OGLManager.DrawDeck(OGLManager.gl, 3.0f, 0.5f, 10.0f);
-    	    	 
-    			 OGLManager.gl.glPopMatrix();
-    			 
-    			 //     ---------------------------------        DRAW/UPDATE CARDS      ------------------------------------------
-    			 ++iteratingCardsToRender;
-    			 for(Card ca : cardsToRender)
-    			 {
-    				OGLManager.DrawCard(OGLManager.gl, OGLManager.glu, ca);
-    				ca.Update();
-    			 }
-    			 --iteratingCardsToRender;
-    			 
-    			 //     ---------------------------------         DRAW UI       ------------------------------------------
-    			 OGLManager.gl.glPushMatrix();
-    			 OGLManager.gl.glLoadIdentity();
-    			 Texture.uiTexture.bind(OGLManager.gl);
-    			 OGLManager.gl.glBegin(GL2.GL_QUADS);
-    			 	OGLManager.gl.glTexCoord2f(0.0f, 0.0f); OGLManager.gl.glVertex3f(-0.74f,-0.415f, -1);
-    			 	OGLManager.gl.glTexCoord2f(1.0f, 0.0f); OGLManager.gl.glVertex3f(0.74f,-0.415f,-1);
-    			 	OGLManager.gl.glTexCoord2f(1.0f, 1.0f); OGLManager.gl.glVertex3f(0.74f,-0.25f, -1);
-    			 	OGLManager.gl.glTexCoord2f(0.0f, 1.0f); OGLManager.gl.glVertex3f(-0.74f,-0.25f, -1);
-    			 OGLManager.gl.glEnd();
-    			 OGLManager.gl.glPopMatrix();
-    	 		 
-    			 
-    	    	 c++;
-   
-    	         if (c == 120)
-    	 		 {
-    	 			try {
-    	 	    		UIManager.GetInstance().GetFPSLabel().SetText(FPSCounter.toString("UTF8"));
-    	 			} catch (UnsupportedEncodingException e) {
-    	 				// TODO Auto-generated catch block
-    	 				e.printStackTrace();
-    	 			}
-    	 			FPSCounter.reset();
-    	 			c = 0;
-    	 		}
-    	         
-    	         
-    	        //     ---------------------------------         EXTRA STUFF       ------------------------------------------
-    	        rotator += 0.01;
-    	        if (rotator >= 360f)
-    	         	rotator = 0f;
-    	        
-    	        OGLManager.gl.glEnable(GL2.GL_TEXTURE_2D);     
-    			break;
-    	}
+    	currentGameState.Draw();
     	
     	 //     ------------------------------------------          RENDER UI      ------------------------------------------------
     	
@@ -385,50 +208,34 @@ public class Game implements GLEventListener
 		
 		UIManager.GetInstance().OnResize(view, model, proj);
 		
-
     }
  
     //openGL specific cleanup code
 	@Override
 	public void dispose(GLAutoDrawable arg0)
 	{
-		animator.stop();
 	}
 
 	//All non-openGL cleanup code
-	public void Cleanup() {
+	public void Cleanup() 
+	{
 		NetworkManager.GetInstance().Disconnect();
 	}
 
     public void ShowCard(Card card)
 	{
-    	while (iteratingCardsToRender > 0)	//Busywait until the cards have been iterated so we don't get an exception from modifying while iterating
-		{
-		}
-		cardsToRender.add(card);
-		card.SetGLMIndex(cardsToRender.size()-1);
+    	inGameState.ShowCard(card);	//TODO: Proxy method bad?
 	}
 	
 	public void RemoveCard(Card card)
 	{
-		while (iteratingCardsToRender > 0)	//Busywait until the cards have been iterated so we don't get an exception from modifying while iterating
-		{
-		}
-		cardsToRender.remove(card);
-		
-		/*cardsToRender.remove(card.GetGLMIndex());		LIST IMPLEMENTATION
-		int decrementFrom = card.GetGLMIndex();
-		card.SetGLMIndex(0);
-		for (int i = decrementFrom; i < cardsToRender.size(); i++)
-		{
-			cardsToRender.get(i).SetGLMIndex(i);
-		}*/
+		inGameState.RemoveCard(card);
 	}
     
 	public void StartGame(int matchID, Player opponent, boolean player1Starts)
 	{
 		activeMatch = new Match(matchID, player, opponent, player1Starts);
-		SetGameState(GameState.IN_GAME);
+		SetGameState(inGameState);
 		
 		glActionQueue.add(new OGLAction(){@Override
 				public void Execute(){
@@ -439,115 +246,28 @@ public class Game implements GLEventListener
 	
 	public Card CheckCardCollision()
 	{
-		//NOTE: Depth testing not tested, and only tests for card center
-		Card rCard = null;
-		
-		double  px = EntMouseListener.MouseX, 
-				py = (EntMouseListener.MouseY);
-		++iteratingCardsToRender;
-		for(Card ca : cardsToRender)
-		{
-			// This code was copied and modified with permission, i can't remember all the details (Work out later)
-			// Each cards rectangle are divided into two rectangles that are checked for intersection with the mouse position
-			double  x1 = ca.GetWinX(0),	// triangle vertice coordinates
-					y1 = ca.GetWinY(0),
-					x2 = ca.GetWinX(1),
-					y2 = ca.GetWinY(1),
-					x3 = ca.GetWinX(2),
-					y3 = ca.GetWinY(2);
-			for (int i = 0; i < 2; i++)	//Do for the two triangles
-			{
-				double dABx = x2-x1, 
-					   dABy = y2-y1,
-					   dBCx = x3-x2,
-					   dBCy = y3-y2;
-		        	
-			   if ((dABx*dBCy - dABy*dBCx) < 0)	//Clockwise
-			   {
-			      if (dABx*(py-y1) >= dABy*(px-x1)) 
-			      {
-			    	  x2 = ca.GetWinX(3);
-					  y2 = ca.GetWinY(3);
-					  continue;
-			      }
-			      if (dBCx*(py-y2) >= dBCy*(px-x2)) 
-			      {
-			    	  x2 = ca.GetWinX(3);
-					  y2 = ca.GetWinY(3);
-					  continue;
-			      }
-			      if ((x1-x3)*(py-y3) >= (y1-y3)*(px-x3)) 
-			      {
-			    	  x2 = ca.GetWinX(3);
-					  y2 = ca.GetWinY(3);
-					  continue;
-			      }
-			   }
-			   else								// Counter clockwise
-			   {
-			      if (dABx*(py-y1) < dABy*(px-x1)) 
-			      {
-			    	  x2 = ca.GetWinX(3);
-					  y2 = ca.GetWinY(3);
-					  continue;
-			      }
-			      if (dBCx*(py-y2) < dBCy*(px-x2)) 
-			      {
-			    	  x2 = ca.GetWinX(3);
-					  y2 = ca.GetWinY(3);
-					  continue;
-			      }
-			      if ((x1-x3)*(py-y3) < (y1-y3)*(px-x3))
-			      {
-			    	  x2 = ca.GetWinX(3);
-					  y2 = ca.GetWinY(3);
-					  continue;
-			      }
-			   }
-			   
-			   if (rCard == null)
-			   {
-				   rCard = ca;
-			   }
-			   else
-			   {
-				   if (ca.GetZ() < rCard.GetZ())
-					   rCard = ca;
-			   }
-			   break;
-			}
-		}
-		--iteratingCardsToRender;
-
-		return rCard;	// Returns null if no card was hit
+		return inGameState.CheckCardCollision();
 	}
-	
 	
 
 	public GameState GetGameState() 
 	{
-		return gamestate;
+		return currentGameState;
 	}
 	
-	public void SetGameState(GameState state) 
+	public void SetGameState(final GameState state) 
 	{
 			
-		gamestate = state;
+		currentGameState = state;
 		
 		UIManager.GetInstance().SetFocusOnGameState(this);
 
-		switch (gamestate)
-		{
-		case LOGIN:
-			break;
-		case MAIN_MENU:
-			break;
-		case IN_GAME:
-			break;
-		case DECK_SCREEN:
-			OnDeckScreen();	//Call the method for 
-			break;
-		}
+		final Game game = this;
+		
+		glActionQueue.add(new OGLAction(){@Override
+			public void Execute(){
+				state.Activate(game);
+		}});
 
 	}
 
@@ -623,24 +343,8 @@ public class Game implements GLEventListener
 		this.gameID = gameID;
 	}*/
 
-	public GLCanvas GetCanvas()
-	{
-		return canvas;
-	}
 
 	
-	public void OnDeckScreen()
-	{
-		UIManager.GetInstance().GetPlayerDeckTable().SetDataSource(GetPlayer().GetActiveDeck());
-
-		
-	}
-
-	public void OnLogin()
-	{
-		//Add the players deck to the dropdown of decks
-		UIManager.GetInstance().GetPlayerDeckDropdown().SetDataSource(GetPlayer().GetAllDecks());
-	}
 
 	public void Quit() 
 	{
@@ -651,6 +355,46 @@ public class Game implements GLEventListener
 	{
 		return activeMatch;
 	}
+
+	public void ExitGameState() 
+	{
+		if (outerGameState == null)
+			Quit();
+		else
+			currentGameState = outerGameState;
+	}
+
+	public boolean IsInGame() 
+	{
+		if (activeMatch == null)
+			return false;
+		return true;
+	}
+
+	
+	public GameState GetInGameState()
+	{
+		return inGameState;
+	}
+	public GameState GetMainMenu() 
+	{
+		return mainMenu;
+	}
+	public GameState GetDeckScreen() 
+	{
+		return deckScreen;
+	}
+
+	public void AddMouseMotionListener(MouseMotionListener listener) 
+	{
+		canvas.addMouseMotionListener(listener);
+	}
+
+	public void AddMouseListener(MouseListener listener) 
+	{
+		canvas.addMouseListener(listener);
+	}
+
 
 	
 

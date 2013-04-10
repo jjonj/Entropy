@@ -3,8 +3,6 @@ package jjj.entropy;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import javax.media.opengl.GL2;
-
 import jjj.entropy.ui.TableRow;
 
 

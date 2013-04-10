@@ -6,7 +6,6 @@ import java.util.List;
 
 
 import jjj.entropy.classes.EntUtilities;
-import jjj.entropy.classes.Enums.GameState;
 import jjj.entropy.classes.Enums.Life;
 import jjj.entropy.classes.Enums.Zone;
 import jjj.entropy.messages.*;
@@ -205,7 +204,7 @@ public class NetworkManager extends Listener
 				
 				
 				networkState = NetworkState.LOGGED_IN;
-				Game.GetInstance().SetGameState(GameState.MAIN_MENU);
+				Game.GetInstance().SetGameState(Game.GetInstance().GetMainMenu());
 			 	
 		     	
 			}

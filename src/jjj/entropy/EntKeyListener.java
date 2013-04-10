@@ -2,7 +2,6 @@ package jjj.entropy;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import jjj.entropy.classes.Enums.GameState;
 import jjj.entropy.ui.Textbox;
 import jjj.entropy.ui.UIComponent;
 import jjj.entropy.ui.UIManager;
@@ -51,21 +50,8 @@ public class EntKeyListener implements KeyListener {
 					((Textbox) ui).RemoveFromEnd();
 	        	break;
 	        case KeyEvent.VK_ESCAPE:
-	        	switch (Game.GetInstance().GetGameState())
-	        	{
-	        	case LOGIN:
-	        		System.exit(0);
-	        		break;
-	        	case MAIN_MENU:
-	        		Game.GetInstance().SetGameState(GameState.LOGIN);
-	        		break;
-	        	case IN_GAME:
-	        		Game.GetInstance().SetGameState(GameState.MAIN_MENU);
-	        		break;
-	        	case DECK_SCREEN:
-	        		Game.GetInstance().SetGameState(GameState.MAIN_MENU);
-	        		break;
-	        	}
+	        	Game.GetInstance().ExitGameState();
+	        
 	        	
 	        	
 	        	break;

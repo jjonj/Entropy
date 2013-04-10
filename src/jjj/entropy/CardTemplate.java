@@ -4,14 +4,11 @@ package jjj.entropy;
 import java.io.File;
 import java.io.IOException;
 
-import javax.media.opengl.GL2;
 import javax.media.opengl.GLException;
 
 import jjj.entropy.classes.Const;
 import jjj.entropy.ui.TableRow;
 import jjj.entropy.ui.UIManager;
-
-import com.jogamp.opengl.util.texture.*;
 
 
 

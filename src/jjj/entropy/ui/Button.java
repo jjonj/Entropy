@@ -3,7 +3,6 @@ package jjj.entropy.ui;
 import java.awt.Font;
 import jjj.entropy.OGLManager;
 import jjj.entropy.Game;
-import jjj.entropy.OGLManager;
 import jjj.entropy.Texture;
 import jjj.entropy.classes.Const;
 

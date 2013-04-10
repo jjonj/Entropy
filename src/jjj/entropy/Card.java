@@ -2,7 +2,6 @@ package jjj.entropy;
 
 import java.lang.Math;
 
-import jjj.entropy.classes.EntUtilities;
 import jjj.entropy.classes.Enums.Life;
 import jjj.entropy.classes.Enums.Zone;
 
@@ -29,6 +28,7 @@ public class Card implements Comparable<Card>
 	}
 	
 	private Player originalOwner;
+	@SuppressWarnings("unused")
 	private Player currentOwner;
 	
 	private CardTemplate template;
