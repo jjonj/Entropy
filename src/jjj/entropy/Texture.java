@@ -81,20 +81,20 @@ public class Texture
    			System.exit(1);
    		}
 		
-		OpenGL.InitTexture(cardBackside);
-     	OpenGL.InitTexture(cardtestfront);
-     	OpenGL.InitTexture(crawnidworkertexture);
-     	OpenGL.InitTexture(deckSideTexture);
-     	OpenGL.InitTexture(board);
-     	OpenGL.InitTexture(uiTexture);
-     	OpenGL.InitTexture(mainMenuTexture);
-     	OpenGL.InitTexture(deckScreenTexture);
-     	OpenGL.InitTexture(loginScreenTexture);
-     	OpenGL.InitTexture(bigButtonTexture);
-      	OpenGL.InitTexture(smallButtonTexture);
-     	OpenGL.InitTexture(arrow1ButtonTexture);
-     	OpenGL.InitTexture(arrow2ButtonTexture);
-     	OpenGL.InitTexture(textboxTexture);
+		OGLManager.InitTexture(cardBackside);
+     	OGLManager.InitTexture(cardtestfront);
+     	OGLManager.InitTexture(crawnidworkertexture);
+     	OGLManager.InitTexture(deckSideTexture);
+     	OGLManager.InitTexture(board);
+     	OGLManager.InitTexture(uiTexture);
+     	OGLManager.InitTexture(mainMenuTexture);
+     	OGLManager.InitTexture(deckScreenTexture);
+     	OGLManager.InitTexture(loginScreenTexture);
+     	OGLManager.InitTexture(bigButtonTexture);
+      	OGLManager.InitTexture(smallButtonTexture);
+     	OGLManager.InitTexture(arrow1ButtonTexture);
+     	OGLManager.InitTexture(arrow2ButtonTexture);
+     	OGLManager.InitTexture(textboxTexture);
 	}
 	
 	

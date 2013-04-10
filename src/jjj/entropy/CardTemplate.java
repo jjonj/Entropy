@@ -137,7 +137,7 @@ public class CardTemplate implements TableRow {
 				e.printStackTrace();
 				System.exit(1);	
 			}
-			OpenGL.InitTexture(texture);
+			OGLManager.InitTexture(texture);
 		}
 	}
 	

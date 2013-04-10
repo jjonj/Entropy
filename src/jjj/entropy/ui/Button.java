@@ -1,9 +1,9 @@
 package jjj.entropy.ui;
 
 import java.awt.Font;
-import jjj.entropy.OpenGL;
+import jjj.entropy.OGLManager;
 import jjj.entropy.Game;
-import jjj.entropy.OpenGL;
+import jjj.entropy.OGLManager;
 import jjj.entropy.Texture;
 import jjj.entropy.classes.Const;
 
@@ -97,13 +97,13 @@ public class Button extends Clickable
 	public void Render(Game game)
 	{
 		
-		OpenGL.gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+		OGLManager.gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 	    	
 
 		if (texture != null)
 		{
-			texture.bind(OpenGL.gl);
-			OpenGL.DrawUIButton(OpenGL.gl, this);
+			texture.bind(OGLManager.gl);
+			OGLManager.DrawUIButton(OGLManager.gl, this);
 		}
 		font.Render(game, textX + textOffsetX, textY - textOffsetY, text);
 		

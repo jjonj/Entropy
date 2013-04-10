@@ -1,6 +1,6 @@
 package jjj.entropy.ui;
 
-import jjj.entropy.OpenGL;
+import jjj.entropy.OGLManager;
 
 /**
  * @author      Jacob Jensen <jjonj@hotmail.com>
@@ -33,12 +33,12 @@ public abstract class Clickable extends UIComponent
 		glW = width;
 		glH = height;
 		
-	    int[] temp = OpenGL.ConvertGLFloatToGLScreen(x, y);
+	    int[] temp = OGLManager.ConvertGLFloatToGLScreen(x, y);
 	    this.screenX = temp[0];
         this.screenY = temp[1];
         
         
-    	temp = OpenGL.ConvertGLFloatToGLScreen(x+glW, y+glH);
+    	temp = OGLManager.ConvertGLFloatToGLScreen(x+glW, y+glH);
 
     	
         int screenRight = temp[0],
@@ -56,11 +56,11 @@ public abstract class Clickable extends UIComponent
 	protected void UpdateScreenCoords()
 	{
 		
-		int[] temp = OpenGL.ConvertGLFloatToGLScreen(x, y);
+		int[] temp = OGLManager.ConvertGLFloatToGLScreen(x, y);
 	    this.screenX = temp[0];
         this.screenY = temp[1];
         
-        temp = OpenGL.ConvertGLFloatToGLScreen(x+glW, y+glH);
+        temp = OGLManager.ConvertGLFloatToGLScreen(x+glW, y+glH);
 
     	
         int screenRight = temp[0],
@@ -109,7 +109,7 @@ public abstract class Clickable extends UIComponent
 	{
 
 		glW = w;
-		int[] temp = OpenGL.ConvertGLFloatToGLScreen(x+glW, y+glH);
+		int[] temp = OGLManager.ConvertGLFloatToGLScreen(x+glW, y+glH);
 
 
         int screenRight = temp[0];
@@ -122,7 +122,7 @@ public abstract class Clickable extends UIComponent
 		
 		
 		glH = h;
-		int[] temp = OpenGL.ConvertGLFloatToGLScreen(x+glW, y+glH);
+		int[] temp = OGLManager.ConvertGLFloatToGLScreen(x+glW, y+glH);
 
 
 	    int screenTop = temp[1];	// Note: OpenGL screen coordinates are from bottom to top so screenY = bottom

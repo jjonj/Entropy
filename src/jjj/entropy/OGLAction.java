@@ -1,6 +1,6 @@
 package jjj.entropy;
 
-public interface GLAction 
+public interface OGLAction 
 {
 	public void Execute();	
 }

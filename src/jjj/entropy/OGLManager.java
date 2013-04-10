@@ -14,14 +14,14 @@ import jjj.entropy.ui.Table;
 import jjj.entropy.ui.Textbox;
 
 
-public class OpenGL
+public class OGLManager
 {
 
 	
 	public static GL2 gl;				
     public static GLU glu = new GLU();
     
-	private OpenGL(){}	//Should not be instantiated.
+	private OGLManager(){}	//Should not be instantiated.
 	
 	
 	@SuppressWarnings("unused")
@@ -45,37 +45,37 @@ public class OpenGL
 	
 	public static void InitTexture(Texture texture)
 	{
-		texture.setTexParameteri(OpenGL.gl, GL.GL_TEXTURE_WRAP_S, GL.GL_REPEAT);
-		texture.setTexParameteri(OpenGL.gl, GL.GL_TEXTURE_WRAP_T, GL.GL_REPEAT);
-		texture.setTexParameteri(OpenGL.gl, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
-		texture.setTexParameteri(OpenGL.gl, GL.GL_TEXTURE_MIN_FILTER,
+		texture.setTexParameteri(OGLManager.gl, GL.GL_TEXTURE_WRAP_S, GL.GL_REPEAT);
+		texture.setTexParameteri(OGLManager.gl, GL.GL_TEXTURE_WRAP_T, GL.GL_REPEAT);
+		texture.setTexParameteri(OGLManager.gl, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
+		texture.setTexParameteri(OGLManager.gl, GL.GL_TEXTURE_MIN_FILTER,
 				GL.GL_LINEAR_MIPMAP_LINEAR);
 	}
 	
 	public static void InitOpenGL() {
-		OpenGL.gl.glClearColor(0.9f, 0.78f, 0.6f, 1.0f);
+		OGLManager.gl.glClearColor(0.9f, 0.78f, 0.6f, 1.0f);
         
-		OpenGL.gl.glEnable(GL.GL_BLEND);
-    	OpenGL.gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+		OGLManager.gl.glEnable(GL.GL_BLEND);
+    	OGLManager.gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
         
-        OpenGL.gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_REPEAT);
-        OpenGL.gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_REPEAT);
+        OGLManager.gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_REPEAT);
+        OGLManager.gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_REPEAT);
        
-        OpenGL.gl.glEnable(GL.GL_TEXTURE_2D);                            
-        OpenGL.gl.glDepthFunc(GL.GL_LEQUAL);                             		// The Type Of Depth Testing To Do
-        OpenGL.gl.glHint(GL2ES1.GL_PERSPECTIVE_CORRECTION_HINT, GL.GL_NICEST);  // Really Nice Perspective Calculations
+        OGLManager.gl.glEnable(GL.GL_TEXTURE_2D);                            
+        OGLManager.gl.glDepthFunc(GL.GL_LEQUAL);                             		// The Type Of Depth Testing To Do
+        OGLManager.gl.glHint(GL2ES1.GL_PERSPECTIVE_CORRECTION_HINT, GL.GL_NICEST);  // Really Nice Perspective Calculations
          
          
-        OpenGL.gl.glShadeModel(GLLightingFunc.GL_SMOOTH);
-        OpenGL.gl.glEnable(GL.GL_DEPTH_TEST);
+        OGLManager.gl.glShadeModel(GLLightingFunc.GL_SMOOTH);
+        OGLManager.gl.glEnable(GL.GL_DEPTH_TEST);
      	
      	//Calling generate methods that initiate the displaylists in openGL for fast rendering
-     	OpenGL.GenerateTable(OpenGL.gl, Const.BOARD_WIDTH, Const.BOARD_LENGTH, Const.BOARD_THICKNESS);
-     	OpenGL.GenerateButtons(OpenGL.gl, Texture.bigButtonTexture);
-     	OpenGL.GenerateUI(OpenGL.gl, 0, 0, 0, Texture.uiTexture);
-     	OpenGL.GenerateDeck(OpenGL.gl, Texture.cardBackside, Texture.deckSideTexture, Const.CARD_WIDTH, Const.CARD_HEIGHT, 0.5f);
-       	OpenGL.GenerateTextbox(OpenGL.gl, Texture.textboxTexture);
-     	OpenGL.GenerateCard(OpenGL.gl, Texture.cardBackside, Const.CARD_WIDTH, Const.CARD_HEIGHT, Const.CARD_THICKNESS);
+     	OGLManager.GenerateTable(OGLManager.gl, Const.BOARD_WIDTH, Const.BOARD_LENGTH, Const.BOARD_THICKNESS);
+     	OGLManager.GenerateButtons(OGLManager.gl, Texture.bigButtonTexture);
+     	OGLManager.GenerateUI(OGLManager.gl, 0, 0, 0, Texture.uiTexture);
+     	OGLManager.GenerateDeck(OGLManager.gl, Texture.cardBackside, Texture.deckSideTexture, Const.CARD_WIDTH, Const.CARD_HEIGHT, 0.5f);
+       	OGLManager.GenerateTextbox(OGLManager.gl, Texture.textboxTexture);
+     	OGLManager.GenerateCard(OGLManager.gl, Texture.cardBackside, Const.CARD_WIDTH, Const.CARD_HEIGHT, Const.CARD_THICKNESS);
         
 	}
 	
@@ -244,30 +244,6 @@ public class OpenGL
 	    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f( -CARD_WIDTH/2, -CARD_HEIGHT/2, CARD_THICKNESS);
 	    gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-CARD_WIDTH/2,  CARD_HEIGHT/2, CARD_THICKNESS);
 	    gl.glEnd();   
-	    /*tpTexture2.destroy(gl);
-		gl.glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
-		 	gl.glBegin(GL2.GL_QUADS);
-	   // Top Face
-	    gl.glVertex3f(0.02f,  CARD_HEIGHT-0.04f, 0.0f);
-	    gl.glVertex3f(0.02f,  CARD_HEIGHT-0.04f,  CARD_THICKNESS);
-	    gl.glVertex3f( CARD_WIDTH-0.04f,  CARD_HEIGHT-0.04f,  CARD_THICKNESS);
-	    gl.glVertex3f( CARD_WIDTH-0.04f,  CARD_HEIGHT-0.04f, 0.0f);
-	    // Bottom Face
-	    gl.glVertex3f(0.02f, 0.02f, 0.0f);
-	    gl.glVertex3f(CARD_WIDTH-0.04f, 0.02f, 0.0f);
-	    gl.glVertex3f(CARD_WIDTH-0.04f, 0.02f,  CARD_THICKNESS);
-	    gl.glVertex3f(0.02f, 0.02f,  CARD_THICKNESS);
-	    // Right face
-	    gl.glVertex3f(CARD_WIDTH-0.04f, 0.02f, 0.0f);
-	    gl.glVertex3f(CARD_WIDTH-0.04f,  CARD_HEIGHT-0.04f, 0.0f);
-	    gl.glVertex3f(CARD_WIDTH-0.04f,  CARD_HEIGHT-0.04f,  CARD_THICKNESS);
-	    gl.glVertex3f(CARD_WIDTH-0.04f, 0.02f,  CARD_THICKNESS);
-	    // Left Face
-        gl.glVertex3f(0.02f,0.02f, 0.0f);
-        gl.glVertex3f(0.02f, 0.02f,  CARD_THICKNESS);
-        gl.glVertex3f(0.02f,  CARD_HEIGHT-0.04f,  CARD_THICKNESS);
-        gl.glVertex3f(0.02f,  CARD_HEIGHT-0.04f, 0.0f);
-	  gl.glEnd();*/
     
 	    gl.glEnd();
         
@@ -395,7 +371,7 @@ public class OpenGL
 
 		 if (dropdown.IsSelecting())
 		 {
-			 dropdown.GetTexture().bind(OpenGL.gl);
+			 dropdown.GetTexture().bind(OGLManager.gl);
 			
 			 gl.glBegin(GL2.GL_QUADS);
 			 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( 0, 0, 0);
@@ -543,21 +519,21 @@ public class OpenGL
 	public static int[] ConvertGLFloatToGLScreen(double x, double y)
 	{
 		 // Resetting the matrices shouldn't be needed as nothing should be modifying them permanently, but code is provided in case
-		 OpenGL.gl.glMatrixMode(GLMatrixFunc.GL_PROJECTION);	
-		 OpenGL.gl.glLoadIdentity();
-		 OpenGL.glu.gluPerspective(45, Game.GetInstance().GetAspectRatio(), 1, 100);
-		 OpenGL.gl.glMatrixMode(GLMatrixFunc.GL_MODELVIEW);	
+		 OGLManager.gl.glMatrixMode(GLMatrixFunc.GL_PROJECTION);	
+		 OGLManager.gl.glLoadIdentity();
+		 OGLManager.glu.gluPerspective(45, Game.GetInstance().GetAspectRatio(), 1, 100);
+		 OGLManager.gl.glMatrixMode(GLMatrixFunc.GL_MODELVIEW);	
 		
-		 OpenGL.gl.glLoadIdentity();   		
-		 OpenGL.gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
-		 OpenGL.gl.glLoadIdentity();
-		 OpenGL.gl.glTranslatef(0,0,-1);
+		 OGLManager.gl.glLoadIdentity();   		
+		 OGLManager.gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
+		 OGLManager.gl.glLoadIdentity();
+		 OGLManager.gl.glTranslatef(0,0,-1);
 		
-		 OpenGL.gl.glGetIntegerv(GL.GL_VIEWPORT, view, 0);
-		 OpenGL.gl.glGetDoublev(GLMatrixFunc.GL_MODELVIEW_MATRIX, model, 0);
-		 OpenGL.gl.glGetDoublev(GLMatrixFunc.GL_PROJECTION_MATRIX, proj, 0);
+		 OGLManager.gl.glGetIntegerv(GL.GL_VIEWPORT, view, 0);
+		 OGLManager.gl.glGetDoublev(GLMatrixFunc.GL_MODELVIEW_MATRIX, model, 0);
+		 OGLManager.gl.glGetDoublev(GLMatrixFunc.GL_PROJECTION_MATRIX, proj, 0);
 
-         OpenGL.glu.gluProject(x, y, 0f, //
+         OGLManager.glu.gluProject(x, y, 0f, //
         		 model, 0,
         		 proj, 0, 
         		 view, 0, 

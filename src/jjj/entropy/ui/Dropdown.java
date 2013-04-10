@@ -7,9 +7,9 @@ import java.util.List;
 
 import javax.media.opengl.GLException;
 
-import jjj.entropy.OpenGL;
+import jjj.entropy.OGLManager;
 import jjj.entropy.Game;
-import jjj.entropy.OpenGL;
+import jjj.entropy.OGLManager;
 import jjj.entropy.classes.Const;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureIO;
@@ -56,12 +56,12 @@ public class Dropdown <T> extends Clickable
         selecting = false;
         selectedIndex = 0;
 
-		int[] temp =  OpenGL.ConvertGLFloatToGLScreen(0, 0);
+		int[] temp =  OGLManager.ConvertGLFloatToGLScreen(0, 0);
 		@SuppressWarnings("unused")
 		float zeroOnScreenX = temp[0],
 		      zeroOnScreenY = temp[1];
 		
-		temp =  OpenGL.ConvertGLFloatToGLScreen(0, Const.DROPDOWN_ROW_HEIGHT);
+		temp =  OGLManager.ConvertGLFloatToGLScreen(0, Const.DROPDOWN_ROW_HEIGHT);
 		lineHeight = temp[1] - zeroOnScreenY;
 		fontLineHeight = (int)lineHeight+1;
         
@@ -83,8 +83,8 @@ public class Dropdown <T> extends Clickable
 	{
 		if (texture != null)
 		{
-			texture.bind(OpenGL.gl);
-			OpenGL.DrawUIDropdown(OpenGL.gl, this);
+			texture.bind(OGLManager.gl);
+			OGLManager.DrawUIDropdown(OGLManager.gl, this);
 		}
 		
 	

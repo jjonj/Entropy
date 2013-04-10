@@ -13,9 +13,9 @@ import java.util.List;
 import javax.media.opengl.GLException;
 
 import jjj.entropy.EntMouseListener;
-import jjj.entropy.OpenGL;
+import jjj.entropy.OGLManager;
 import jjj.entropy.Game;
-import jjj.entropy.OpenGL;
+import jjj.entropy.OGLManager;
 import jjj.entropy.SimpleCollection;
 import jjj.entropy.Texture;
 import jjj.entropy.classes.Const;
@@ -71,17 +71,17 @@ public class Table extends Clickable implements MouseListener, MouseMotionListen
 		this.dataSource = dataSource;
 		this.activeGameState = activeGameState;
 		
-		int[] temp =  OpenGL.ConvertGLFloatToGLScreen(0, 0);
+		int[] temp =  OGLManager.ConvertGLFloatToGLScreen(0, 0);
 		float zeroOnScreenX = temp[0],
 		      zeroOnScreenY = temp[1];
 		
-		temp =  OpenGL.ConvertGLFloatToGLScreen(0, Const.TABLE_ROW_HEIGHT);
+		temp =  OGLManager.ConvertGLFloatToGLScreen(0, Const.TABLE_ROW_HEIGHT);
 		lineHeight = temp[1] - zeroOnScreenY;
 		
-		temp = OpenGL.ConvertGLFloatToGLScreen(Const.SCROLL_HANDLE_WIDHT, 0);
+		temp = OGLManager.ConvertGLFloatToGLScreen(Const.SCROLL_HANDLE_WIDHT, 0);
 		scrollHandleWidth = (int) (temp[0] - zeroOnScreenX);
 		
-		temp = OpenGL.ConvertGLFloatToGLScreen(0, Const.SCROLL_HANDLE_HEIGHT);
+		temp = OGLManager.ConvertGLFloatToGLScreen(0, Const.SCROLL_HANDLE_HEIGHT);
 		scrollHandleHeight = (int) (temp[1] - zeroOnScreenY);
 		
 		
@@ -95,10 +95,10 @@ public class Table extends Clickable implements MouseListener, MouseMotionListen
 			e.printStackTrace();
 			System.exit(1);
 		}
-		OpenGL.InitTexture(texture);
-		OpenGL.InitTexture(scrollHandleTexture);
-		OpenGL.InitTexture(selectedFieldTexture);
-		temp = OpenGL.ConvertGLFloatToGLScreen(x, y);
+		OGLManager.InitTexture(texture);
+		OGLManager.InitTexture(scrollHandleTexture);
+		OGLManager.InitTexture(selectedFieldTexture);
+		temp = OGLManager.ConvertGLFloatToGLScreen(x, y);
 		this.textX = temp[0] + offsetX;
 	    this.textY = temp[1] + offsetY;
 		
@@ -165,8 +165,8 @@ public class Table extends Clickable implements MouseListener, MouseMotionListen
 		
 		if (texture != null)
 		{
-			texture.bind(OpenGL.gl);
-			OpenGL.DrawUITable(OpenGL.gl, this);
+			texture.bind(OGLManager.gl);
+			OGLManager.DrawUITable(OGLManager.gl, this);
 		}
 
 		for (int k = lineOffset; k < displayLineCount+lineOffset; k++)
@@ -229,17 +229,17 @@ public class Table extends Clickable implements MouseListener, MouseMotionListen
 		System.out.println("RESIZE!!!");
 		UpdateScreenCoords();
 		scrollHandleY = screenY - mouseOffSetFromTaTop;
-		int[] temp =  OpenGL.ConvertGLFloatToGLScreen(0, 0);
+		int[] temp =  OGLManager.ConvertGLFloatToGLScreen(0, 0);
 		float zeroOnScreenX = temp[0],
 		      zeroOnScreenY = temp[1];
 		
-		temp =  OpenGL.ConvertGLFloatToGLScreen(0, Const.TABLE_ROW_HEIGHT);
+		temp =  OGLManager.ConvertGLFloatToGLScreen(0, Const.TABLE_ROW_HEIGHT);
 		lineHeight = temp[1] - zeroOnScreenY;
 		
-		temp = OpenGL.ConvertGLFloatToGLScreen(Const.SCROLL_HANDLE_WIDHT, 0);
+		temp = OGLManager.ConvertGLFloatToGLScreen(Const.SCROLL_HANDLE_WIDHT, 0);
 		scrollHandleWidth = (int) (temp[0] - zeroOnScreenX);
 		
-		temp = OpenGL.ConvertGLFloatToGLScreen(0, Const.SCROLL_HANDLE_HEIGHT);
+		temp = OGLManager.ConvertGLFloatToGLScreen(0, Const.SCROLL_HANDLE_HEIGHT);
 		scrollHandleHeight = (int) (temp[1] - zeroOnScreenY);
 		
 		//Resetting the scrollbar position on resize simplifies problems with pixel calculations done in one window size transfering to another. It could be done with converting to GL coordinates before resize then recalculating the new pixel values using GLHelperConvert
