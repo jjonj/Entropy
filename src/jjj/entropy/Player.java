@@ -20,7 +20,7 @@ public class Player {
 	
 	
 	
-	public Player(int playerID, String name, int activeDeck, int[] allCards, int[] allCardCounts, int[][] decks, int[][] deckCounts, int[] deckDBIDs)	//Used for creating the player on this client
+	public Player(int playerID, String name, int battleTokens, int goldTokens, int activeDeck, int[] allCards, int[] allCardCounts, int[][] decks, int[][] deckCounts, int[] deckDBIDs)	//Used for creating the player on this client
 	{
 
 		this.allCards = new CardCollection();
@@ -33,6 +33,9 @@ public class Player {
 			e.printStackTrace();
 			System.exit(1);
 		}
+		
+		this.battleTokens = battleTokens;
+		this.goldTokens = goldTokens;
 		
 		this.decks = new ArrayList<Deck>();
 		this.id = playerID;

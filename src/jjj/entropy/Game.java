@@ -93,11 +93,11 @@ public class Game implements GLEventListener
     	gameHeight = height;
     	aspectRatio = (float)width/height;
     	
-    	inGameState = new InGameState(canvas);
-    	deckScreen = new DeckScreen();
-    	loginScreen = new LoginScreen();
-    	mainMenu = new MainMenu();
-    	shop = new Shop();
+    	loginScreen = new LoginScreen(null);
+    	mainMenu = new MainMenu(null);
+    	inGameState = new InGameState(canvas, mainMenu);
+    	deckScreen = new DeckScreen(mainMenu);
+    	shop = new Shop(mainMenu);
     	
     	currentGameState = loginScreen;
     	
@@ -140,7 +140,7 @@ public class Game implements GLEventListener
         OGLManager.InitOpenGL();
      	
         
-        UIManager.GetInstance().InitUIComponents(loginScreen, mainMenu, inGameState, deckScreen);
+        UIManager.GetInstance().InitUIComponents(loginScreen, mainMenu, inGameState, deckScreen, shop);
 
 
      	SetGameState(loginScreen);
@@ -257,7 +257,7 @@ public class Game implements GLEventListener
 	
 	public void SetGameState(final GameState state) 
 	{
-			
+		outerGameState = state.GetExitState();
 		currentGameState = state;
 		
 		UIManager.GetInstance().SetFocusOnGameState(this);
@@ -393,6 +393,11 @@ public class Game implements GLEventListener
 	public void AddMouseListener(MouseListener listener) 
 	{
 		canvas.addMouseListener(listener);
+	}
+
+	public GameState GetShop() 
+	{
+		return shop;
 	}
 
 

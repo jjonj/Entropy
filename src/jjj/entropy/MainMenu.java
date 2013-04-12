@@ -9,8 +9,13 @@ public class MainMenu implements GameState
 {
 
 	private boolean loggedIn = false;
-	
+	private GameState exitState;
 
+	public MainMenu(GameState exitState)
+	{
+		this.exitState = exitState;
+	}
+	
 	@Override
 	public void Activate(Game game) 
 	{
@@ -50,4 +55,10 @@ public class MainMenu implements GameState
 		return UIManager.GetInstance().GetDefaultFocusedUIElement(this);
 	}
 
+	@Override
+	public GameState GetExitState() 
+	{
+		return exitState;
+	}
+	
 }

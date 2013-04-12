@@ -45,11 +45,13 @@ public class Texture
 				    mainMenuTexture,
 				    deckScreenTexture,
 				    loginScreenTexture,
+				    shopTexture,
 				    smallButtonTexture,
 				    bigButtonTexture,
 				    arrow1ButtonTexture,
 				    arrow2ButtonTexture,
 				    textboxTexture;
+
 
 
 	
@@ -65,6 +67,7 @@ public class Texture
    			deckSideTexture = new Texture(TextureIO.newTexture(new File("resources/textures/deckside.png"), true));
    			uiTexture = new Texture(TextureIO.newTexture(new File("resources/textures/bottomPanel.png"), true));
    			mainMenuTexture = new Texture(TextureIO.newTexture(new File("resources/textures/MainMenu.png"), true));
+   			shopTexture = new Texture(TextureIO.newTexture(new File("resources/textures/Shop.png"), true));
    			deckScreenTexture =  new Texture(TextureIO.newTexture(new File("resources/textures/DeckScreen.png"), true));
    			loginScreenTexture = new Texture(TextureIO.newTexture(new File("resources/textures/LoginScreen.png"), true));
    			smallButtonTexture = new Texture(TextureIO.newTexture(new File("resources/textures/SmallButton.png"), true));
@@ -89,6 +92,7 @@ public class Texture
      	OGLManager.InitTexture(mainMenuTexture);
      	OGLManager.InitTexture(deckScreenTexture);
      	OGLManager.InitTexture(loginScreenTexture);
+     	OGLManager.InitTexture(shopTexture);
      	OGLManager.InitTexture(bigButtonTexture);
       	OGLManager.InitTexture(smallButtonTexture);
      	OGLManager.InitTexture(arrow1ButtonTexture);

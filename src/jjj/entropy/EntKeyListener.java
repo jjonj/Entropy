@@ -72,7 +72,6 @@ public class EntKeyListener implements KeyListener {
 
 	@Override
 	public void keyTyped(KeyEvent e) {
-		// TODO Auto-generated method stub
 
 		//System.out.print(Character.toString(e.getKeyChar()).replace('\n', 'å'));
 		if (e.getKeyChar() != '\n' && e.getKeyChar() != '\b')

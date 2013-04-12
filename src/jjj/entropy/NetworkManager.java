@@ -194,10 +194,11 @@ public class NetworkManager extends Listener
 			System.out.println(pdm);
 			if (pdm.loginAccepted)
 			{
-				Player p = new Player(pdm.playerID, pdm.name, pdm.activeDeck, pdm.allCards, pdm.allCardCounts, pdm.decks, pdm.deckCounts, pdm.deckDBIDs);
+				Player p = new Player(pdm.playerID, pdm.name, pdm.battleTokens, pdm.goldTokens, pdm.activeDeck, pdm.allCards, pdm.allCardCounts, pdm.decks, pdm.deckCounts, pdm.deckDBIDs);
 				Game.GetInstance().SetPlayer(p);
 				
-					
+				UIManager.GetInstance().SetBattleTokensLabel(pdm.battleTokens);
+				UIManager.GetInstance().SetGoldTokensLabel(pdm.goldTokens);
 				UIManager.GetInstance().GetCardTable().SetDataSource(p.GetAllCards());
 
 				//Game.GetInstance().GetDeckDropdown().SetDataSource(decks);

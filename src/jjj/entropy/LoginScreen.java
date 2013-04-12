@@ -8,6 +8,14 @@ import jjj.entropy.ui.UIManager;
 public class LoginScreen implements GameState 
 {
 	
+	private GameState exitState;
+	
+	public LoginScreen(GameState exitState)
+	{
+		this.exitState = exitState;
+	}
+	
+	
 	@Override
 	public void Activate(Game game) 
 	{
@@ -41,5 +49,10 @@ public class LoginScreen implements GameState
 		return UIManager.GetInstance().GetDefaultFocusedUIElement(this);
 	}
 
+	@Override
+	public GameState GetExitState() 
+	{
+		return exitState;
+	}
 
 }

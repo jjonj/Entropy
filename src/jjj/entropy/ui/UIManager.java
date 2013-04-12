@@ -33,9 +33,9 @@ public class UIManager
 	
 	
 	//Maximum number of gamestates set to 10 here (MONITOR)
-	public HashMap<jjj.entropy.GameState, List<UIComponent>> GameStateUIComponenstMap = new HashMap<jjj.entropy.GameState, List<UIComponent>>(10);	
+	public HashMap<jjj.entropy.GameState, List<UIComponent>> GameStateUIComponenstMap = new HashMap<jjj.entropy.GameState, List<UIComponent>>(8);	
 	
-	private HashMap<jjj.entropy.GameState, UIComponent> defaultFocusedUIElementMap = new HashMap<jjj.entropy.GameState, UIComponent>(10);	
+	private HashMap<jjj.entropy.GameState, UIComponent> defaultFocusedUIElementMap = new HashMap<jjj.entropy.GameState, UIComponent>(8);	
 	
 	
 	
@@ -44,6 +44,8 @@ public class UIManager
     private List<UIComponent> MainMenuUIComponents = new ArrayList<UIComponent>();	
     private List<UIComponent> LoginScreenUIComponents = new ArrayList<UIComponent>();	
     private List<UIComponent> DeckScreenUIComponents = new ArrayList<UIComponent>();	
+    private List<UIComponent> ShopUIComponents = new ArrayList<UIComponent>();	
+    
     private UIComponent focusedUIComponent;
     Table playerCardTable,
     		 playerDeckTable;
@@ -55,15 +57,19 @@ public class UIManager
     				   passwordTextbox;
     
     
+    private Label battleTokensLabel,
+    			  goldTokensLabel;
+    
     private SimpleCollection<TableRow> activeDataSource;	// The datasource currently being used for updating table data
     
-    public void InitUIComponents(jjj.entropy.GameState loginScreen, jjj.entropy.GameState mainMenu, jjj.entropy.GameState inGameState, jjj.entropy.GameState deckScreen)
+    public void InitUIComponents(jjj.entropy.GameState loginScreen, jjj.entropy.GameState mainMenu, jjj.entropy.GameState inGameState, jjj.entropy.GameState deckScreen, jjj.entropy.GameState shop)
     {
     	
     	GameStateUIComponenstMap.put(loginScreen, LoginScreenUIComponents);
     	GameStateUIComponenstMap.put(mainMenu, MainMenuUIComponents);
     	GameStateUIComponenstMap.put(inGameState, IngameUIComponents);
     	GameStateUIComponenstMap.put(deckScreen, DeckScreenUIComponents);
+    	GameStateUIComponenstMap.put(shop, ShopUIComponents);
     	
     	//Ingame UI components
      	
@@ -94,12 +100,29 @@ public class UIManager
      				}
      			}
      	));
+
+     	MainMenuUIComponents.add(new Button(-0.16f, -0.15f, 80, 27, "Shop", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.orange), Texture.bigButtonTexture,
+     			new UIAction() {@Override
+				public void Activate(){
+     					Game.GetInstance().SetGameState(Game.GetInstance().GetShop());
+     				}
+     			}
+     	));
+     
+     	
+     	//Shop UI components
+
+     	defaultFocusedUIElementMap.put(shop, null);
+
+     	battleTokensLabel = new Label(1120, 638, "0", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black));
+     	goldTokensLabel = new Label(1120, 580, "0", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black));
+     	ShopUIComponents.add(battleTokensLabel);
+     	ShopUIComponents.add(goldTokensLabel);
+     	
      	
      	
      	//Deck screen UI components
      	
-
-       
      	
      	
      	//Initiate the player card table UI element with an empty list of data. The players cards are added once logged in.
@@ -199,7 +222,6 @@ public class UIManager
 
 	public void RenderUI(Game game) 
 	{
-		
 		 for (UIComponent c : GameStateUIComponenstMap.get(game.GetGameState()))
          {
          	c.Render(game);
@@ -234,6 +256,11 @@ public class UIManager
         	if (uic instanceof Clickable)
 				((Clickable)uic).OnResize(view, model, proj);
         }
+        for (UIComponent uic : ShopUIComponents)
+        {
+        	if (uic instanceof Clickable)
+				((Clickable)uic).OnResize(view, model, proj);
+        }
 	}
 	
 	public void SetFocusOnGameState(Game game) 
@@ -242,6 +269,15 @@ public class UIManager
 		SetFocusedUIComponent(game.GetGameState().GetDefaultFocusedUIElement());
 		
 
+	}
+	
+	public void SetBattleTokensLabel(Integer amount)
+	{
+		battleTokensLabel.SetText(amount.toString());
+	}
+	public void SetGoldTokensLabel(Integer amount)
+	{
+		goldTokensLabel.SetText(amount.toString());
 	}
 	
 	
@@ -253,19 +289,23 @@ public class UIManager
 		toIterate = GameStateUIComponenstMap.get(Game.GetInstance().GetGameState());
 		
 		
+		
 		//First test for collision with the focused UI component, this helps as caching and also fixes a problem with clicking dropdown overlapping other clickable
 		Clickable ecl = (Clickable)focusedUIComponent;
-		int mx = EntMouseListener.MouseX;
-		int my = EntMouseListener.MouseY; //720 - EntMouseListener.MouseY -1;
-		if ( mx > ecl.GetScreenX() )
+		if (focusedUIComponent != null)
 		{
-			if ( mx < ecl.GetScreenWidth()+ecl.GetScreenX() )
+			int mx = EntMouseListener.MouseX;
+			int my = EntMouseListener.MouseY; //720 - EntMouseListener.MouseY -1;
+			if ( mx > ecl.GetScreenX() )
 			{
-				if (my < ecl.GetScreenY())
+				if ( mx < ecl.GetScreenWidth()+ecl.GetScreenX() )
 				{
-					if (my > ecl.GetScreenY() - ecl.GetScreenHeight())
+					if (my < ecl.GetScreenY())
 					{
-						return focusedUIComponent;
+						if (my > ecl.GetScreenY() - ecl.GetScreenHeight())
+						{
+							return focusedUIComponent;
+						}
 					}
 				}
 			}

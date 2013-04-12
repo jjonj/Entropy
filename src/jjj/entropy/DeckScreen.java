@@ -8,6 +8,13 @@ import jjj.entropy.ui.UIManager;
 public class DeckScreen implements GameState 
 {
 
+	public DeckScreen(GameState exitState)
+	{
+		this.exitState = exitState;
+	}
+	
+	private GameState exitState;
+	
 	@Override
 	public void Activate(Game game) 
 	{
@@ -37,6 +44,16 @@ public class DeckScreen implements GameState
 	{
 		return UIManager.GetInstance().GetDefaultFocusedUIElement(this);
 	}
+
+
+	@Override
+	public GameState GetExitState() 
+	{
+		return exitState;
+	}
+
+
+
 
 	//@Override
 //	public void Update() 

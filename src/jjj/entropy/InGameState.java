@@ -20,6 +20,7 @@ public class InGameState implements GameState
 {
 
 	
+	
 	//private float rotator = 0.0f;
 	
 	private Set<Card> cardsToRender;
@@ -28,12 +29,13 @@ public class InGameState implements GameState
 	private int FPSDisplayCounter = 0;
 	private ByteArrayOutputStream FPSCounter;
 	private FPSAnimator animator;
-	GLAutoDrawable canvas;
+	private GLAutoDrawable canvas;
 	
-
+	private GameState exitState;
 	
-	public InGameState(GLCanvas canvas)
+	public InGameState(GLCanvas canvas, GameState exitState)
 	{
+		this.exitState = exitState;
 		this.canvas = canvas;
 		FPSCounter = new ByteArrayOutputStream();
         PrintStream ps = new PrintStream(FPSCounter);
@@ -47,9 +49,8 @@ public class InGameState implements GameState
 	}
 	
 	@Override
-	public void Activate(Game game) 
+	public void Activate(Game gamete) 
 	{
-
 	}
 	
 	
@@ -273,5 +274,12 @@ public class InGameState implements GameState
 	{
 		return UIManager.GetInstance().GetDefaultFocusedUIElement(this);
 	}
-	
+
+	@Override
+	public GameState GetExitState() 
+	{
+		return exitState;
+	}
+
+
 }
