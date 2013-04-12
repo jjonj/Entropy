@@ -1,20 +1,31 @@
 package jjj.entropy;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 import javax.media.opengl.GL2ES1;
+import javax.media.opengl.GLAutoDrawable;
+import javax.media.opengl.GLEventListener;
 import javax.media.opengl.fixedfunc.GLLightingFunc;
 import javax.media.opengl.fixedfunc.GLMatrixFunc;
 import javax.media.opengl.glu.GLU;
 
+import jjj.entropy.Card.Facing;
+import jjj.entropy.Card.Status;
+import jjj.entropy.CardTemplate.CardRace;
+import jjj.entropy.CardTemplate.CardRarity;
+import jjj.entropy.CardTemplate.CardType;
 import jjj.entropy.classes.Const;
 import jjj.entropy.ui.Button;
 import jjj.entropy.ui.Dropdown;
 import jjj.entropy.ui.Table;
 import jjj.entropy.ui.Textbox;
+import jjj.entropy.ui.UIManager;
 
 
-public class OGLManager
+public class OGLManager implements GLEventListener  
 {
 
 	
@@ -35,7 +46,9 @@ public class OGLManager
 				TinySquareButtonModel,
 				TextboxModel;
 	
-	private static float HALF_CARD_HEIGHT;
+	private static List<OGLAction> glActionQueue;
+	 
+	private static float HALF_CARD_HEIGHT;	//TODO: Move to constants
 	private static float HALF_CARD_WIDTH;
 
 	private static int viewport[] = new int[4];
@@ -52,8 +65,29 @@ public class OGLManager
 				GL.GL_LINEAR_MIPMAP_LINEAR);
 	}
 	
-	public static void InitOpenGL() {
-		OGLManager.gl.glClearColor(0.9f, 0.78f, 0.6f, 1.0f);
+	private static OGLManager eventInstance;
+
+	public static GLEventListener GetEvenListenerInstance() 
+	{
+		if (eventInstance == null)
+			eventInstance = new OGLManager();
+		return eventInstance;
+	}
+
+	
+	
+	@Override
+	public void init(GLAutoDrawable gLDrawable) 
+    {
+   
+		
+    	gl = gLDrawable.getGL().getGL2();
+    	
+    	Texture.LoadTextureList();	//Simply loads a string array of texturepaths from file.
+    	
+    	Texture.InitTextures();
+   		
+    	OGLManager.gl.glClearColor(0.9f, 0.78f, 0.6f, 1.0f);
         
 		OGLManager.gl.glEnable(GL.GL_BLEND);
     	OGLManager.gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
@@ -76,8 +110,80 @@ public class OGLManager
      	OGLManager.GenerateDeck(OGLManager.gl, Texture.cardBackside, Texture.deckSideTexture, Const.CARD_WIDTH, Const.CARD_HEIGHT, 0.5f);
        	OGLManager.GenerateTextbox(OGLManager.gl, Texture.textboxTexture);
      	OGLManager.GenerateCard(OGLManager.gl, Texture.cardBackside, Const.CARD_WIDTH, Const.CARD_HEIGHT, Const.CARD_THICKNESS);
+     	
+     	//Setting the real window height as GL scaling changes it
+     	int viewport[] = new int[4];
+        OGLManager.gl.glGetIntegerv(GL2.GL_VIEWPORT, viewport, 0);
+        int realGameHeight = viewport[3];
         
+        glActionQueue = new ArrayList<OGLAction>(4);
+    	
+        Game.GetInstance().Init(realGameHeight);	//Exerting responsibility of Game object
+
+    }
+ 
+    @Override
+	public void display(GLAutoDrawable gLDrawable) 
+    {
+		OGLManager.gl.glMatrixMode(GLMatrixFunc.GL_PROJECTION);	//Switch to camera adjustment mode
+    	OGLManager.gl.glLoadIdentity();
+    	OGLManager.glu.gluPerspective(45, Game.GetInstance().GetAspectRatio(), 1, 100);
+    	OGLManager.gl.glMatrixMode(GLMatrixFunc.GL_MODELVIEW);	//Switch to hand adjustment mode
+    	OGLManager.gl.glLoadIdentity();
+    	OGLManager.gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
+    	
+    	for (OGLAction a : glActionQueue)	//Execute any tasks that need to be executed on the GL containing thread
+    	{
+    		a.Execute();
+    	}
+    	glActionQueue.clear();
+    	
+    	Game.GetInstance().Update();		//Exerting responsibility of Game object
+    	Game.GetInstance().Draw();			//Exerting responsibility of Game object
+    	
+    	OGLManager.gl.glFlush();	
+    	
 	}
+    
+    public void displayChanged(GLAutoDrawable gLDrawable, boolean modeChanged, boolean deviceChanged) 
+    {
+    }
+ 
+    @Override
+	public void reshape(GLAutoDrawable gLDrawable, int x, int y, int width, int height) 
+    {
+        final GL2 gl = gLDrawable.getGL().getGL2();
+ 
+        if (height <= 0) // avoid a divide by zero error!
+        {
+            height = 1;
+        }
+        
+    	int viewport[] = new int[4];
+        gl.glGetIntegerv(GL2.GL_VIEWPORT, viewport, 0);
+        Game.GetInstance().UpdateRealGameHeight(viewport[3]);
+        
+        int view[] = new int[4];
+	    double model[] = new double[16];
+	    double proj[] = new double[16];
+		gl.glGetIntegerv(GL2.GL_VIEWPORT, view, 0);
+		gl.glGetDoublev(GLMatrixFunc.GL_MODELVIEW_MATRIX, model, 0);
+		gl.glGetDoublev(GLMatrixFunc.GL_PROJECTION_MATRIX, proj, 0);
+    
+		Game.GetInstance().HandleResize(view, model, proj);
+
+    }
+ 
+    //openGL specific cleanup code
+	@Override
+	public void dispose(GLAutoDrawable arg0)
+	{
+	}
+
+
+
+	
+	
 	
 	public static void DrawTable(GL2 gl, float x, float BOARD_HEIGHT )
 	{
@@ -542,6 +648,13 @@ public class OGLManager
         return new int[] {(int) winPos[0], (int) winPos[1]};
 	}
 
+
+	public static void QueueOGLAction(OGLAction action) 
+	{
+		glActionQueue.add(action);
+	}
+
+	
 
 
 	

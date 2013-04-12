@@ -62,7 +62,7 @@ public class Main
         });
 
         //Register listener with openGL
-        canvas.addGLEventListener(Game.GetInstance());
+        canvas.addGLEventListener(OGLManager.GetEvenListenerInstance());
 	}
 
 }

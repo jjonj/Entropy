@@ -21,7 +21,7 @@ import jjj.entropy.shop.Shop;
 import jjj.entropy.ui.*;
 
 
-public class Game implements GLEventListener  
+public class Game
 {
 	
     
@@ -40,8 +40,7 @@ public class Game implements GLEventListener
     private int realGameHeight;	//Used for calculating the real Y values
 	
     
-    private GameState currentGameState,
-    				  outerGameState;		//Used for exiting current gamestate
+    private GameState currentGameState;
     
     private InGameState inGameState;
     private DeckScreen deckScreen;
@@ -64,7 +63,7 @@ public class Game implements GLEventListener
     
    
     
-    private List<OGLAction> glActionQueue;
+   
 
     public CardTemplate TinidQueen;	//Temporary
 
@@ -100,31 +99,26 @@ public class Game implements GLEventListener
     	shop = new Shop(mainMenu);
     	
     	currentGameState = loginScreen;
-    	
-        
-    	
-        glActionQueue = new ArrayList<OGLAction>(4);
-    	
+
+     
         neutralPlayer = new Player(0, "Neutral", null, null);
     } 
 
-    @Override
-	public void init(GLAutoDrawable gLDrawable) 
+   
+    public void Init(int realGameHeight)
     {
-    	  //  	NetworkManager.Connect("10.0.0.5", 11759);
+    	this.realGameHeight = realGameHeight;
+    	
+   	  //  	NetworkManager.Connect("10.0.0.5", 11759);
     	NetworkManager.GetInstance().Connect("127.0.0.1", 54555);	//Temporary location
-    	
-    //	gl = gLDrawable.getGL().getGL2();
-    	System.out.println("init() called");
 
-    	OGLManager.gl = gLDrawable.getGL().getGL2();
     	
-    	Texture.LoadTextureList();	//Simply loads a string array of texturepaths from file.
+    	 UIManager.GetInstance().InitUIComponents(loginScreen, mainMenu, inGameState, deckScreen, shop);
+
+	     SetGameState(loginScreen);
     	
-    	Texture.InitTextures();
-   		
-   		
-   		//Creating cards require a template, this is just an old template still used below
+    	
+		//Creating cards require a template, this is just an old template still used below
 		TinidQueen = new CardTemplate((short)1, "Tinid Queen", CardRace.CRAWNID, CardType.CREATURE, CardRarity.COMMON, (short)0,(short)0,(short)0,(short)0,(short)0,Texture.cardtestfront);
 
 		// Easiest way atm to detect clicks on the deck pile, is to just place to cards there that cant move.
@@ -137,85 +131,30 @@ public class Game implements GLEventListener
 		ShowCard(card0);
 		ShowCard(card1);
        
-        OGLManager.InitOpenGL();
-     	
-        
-        UIManager.GetInstance().InitUIComponents(loginScreen, mainMenu, inGameState, deckScreen, shop);
-
-
-     	SetGameState(loginScreen);
-     	
-     	
-     	//Setting the real window height as GL scaling changes it
-     	int viewport[] = new int[4];
-        OGLManager.gl.glGetIntegerv(GL2.GL_VIEWPORT, viewport, 0);
-        realGameHeight = viewport[3];
     }
- 
-    @Override
-	public void display(GLAutoDrawable gLDrawable) 
+    
+    
+    
+    public void Update()
     {
-		OGLManager.gl.glMatrixMode(GLMatrixFunc.GL_PROJECTION);	//Switch to camera adjustment mode
-    	OGLManager.gl.glLoadIdentity();
-    	OGLManager.glu.gluPerspective(45, aspectRatio, 1, 100);
-    	OGLManager.gl.glMatrixMode(GLMatrixFunc.GL_MODELVIEW);	//Switch to hand adjustment mode
-    	OGLManager.gl.glLoadIdentity();
-    	OGLManager.gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
     	
-
+    	
+    	
+    }
+    
+    public void Draw()
+    {
+    	
     	currentGameState.Draw();
-    	
-    	 //     ------------------------------------------          RENDER UI      ------------------------------------------------
-    	
     	UIManager.GetInstance().RenderUI(this);
-    	
-
-    	for (OGLAction a : glActionQueue)	//Execute any tasks that need to be executed on the GL containing thread
-    	{
-    		a.Execute();
-    	}
-    	glActionQueue.clear();
-    	
-    	
-    	OGLManager.gl.glFlush();		
-	}
-    
-    public void displayChanged(GLAutoDrawable gLDrawable, boolean modeChanged, boolean deviceChanged) 
-    {
     }
- 
-    @Override
-	public void reshape(GLAutoDrawable gLDrawable, int x, int y, int width, int height) 
-    {
-        final GL2 gl = gLDrawable.getGL().getGL2();
- 
-        if (height <= 0) // avoid a divide by zero error!
-        {
-            height = 1;
-        }
-        
-    	int viewport[] = new int[4];
-        gl.glGetIntegerv(GL2.GL_VIEWPORT, viewport, 0);
-        realGameHeight = viewport[3];
-        
-        int view[] = new int[4];
-	    double model[] = new double[16];
-	    double proj[] = new double[16];
-		gl.glGetIntegerv(GL2.GL_VIEWPORT, view, 0);
-		gl.glGetDoublev(GLMatrixFunc.GL_MODELVIEW_MATRIX, model, 0);
-		gl.glGetDoublev(GLMatrixFunc.GL_PROJECTION_MATRIX, proj, 0);
     
-		
-		UIManager.GetInstance().OnResize(view, model, proj);
-		
-    }
- 
-    //openGL specific cleanup code
-	@Override
-	public void dispose(GLAutoDrawable arg0)
+    //Certain things will need to be recomputed upon resize of the game window. This method will automatically be called by the OGLManager
+    public void HandleResize(int[] view, double[] model, double[] proj) 
 	{
+		UIManager.GetInstance().OnResize(view, model, proj);
 	}
-
+    
 	//All non-openGL cleanup code
 	public void Cleanup() 
 	{
@@ -237,7 +176,7 @@ public class Game implements GLEventListener
 		activeMatch = new Match(matchID, player, opponent, player1Starts);
 		SetGameState(inGameState);
 		
-		glActionQueue.add(new OGLAction(){@Override
+		OGLManager.QueueOGLAction(new OGLAction(){@Override
 				public void Execute(){
 					activeMatch.Start();			//starting the match requires loading of player textures, which require a GL context
 		}});
@@ -257,14 +196,14 @@ public class Game implements GLEventListener
 	
 	public void SetGameState(final GameState state) 
 	{
-		outerGameState = state.GetExitState();
+		state.GetExitState();
 		currentGameState = state;
 		
 		UIManager.GetInstance().SetFocusOnGameState(this);
 
 		final Game game = this;
 		
-		glActionQueue.add(new OGLAction(){@Override
+		OGLManager.QueueOGLAction(new OGLAction(){@Override
 			public void Execute(){
 				state.Activate(game);
 		}});
@@ -358,10 +297,10 @@ public class Game implements GLEventListener
 
 	public void ExitGameState() 
 	{
-		if (outerGameState == null)
+		if (currentGameState.GetExitState() == null)
 			Quit();
 		else
-			currentGameState = outerGameState;
+			currentGameState = currentGameState.GetExitState();
 	}
 
 	public boolean IsInGame() 
@@ -399,6 +338,13 @@ public class Game implements GLEventListener
 	{
 		return shop;
 	}
+
+	public void UpdateRealGameHeight(int value) 
+	{
+		realGameHeight = value;
+	}
+
+	
 
 
 	
