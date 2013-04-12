@@ -288,14 +288,15 @@ public class UIManager
 		
 		toIterate = GameStateUIComponenstMap.get(Game.GetInstance().GetGameState());
 		
-		
+		int mx = EntMouseListener.MouseX;
+		int my = EntMouseListener.MouseY;
 		
 		//First test for collision with the focused UI component, this helps as caching and also fixes a problem with clicking dropdown overlapping other clickable
 		Clickable ecl = (Clickable)focusedUIComponent;
 		if (focusedUIComponent != null)
 		{
-			int mx = EntMouseListener.MouseX;
-			int my = EntMouseListener.MouseY; //720 - EntMouseListener.MouseY -1;
+			mx = EntMouseListener.MouseX;
+			my = EntMouseListener.MouseY; //720 - EntMouseListener.MouseY -1;
 			if ( mx > ecl.GetScreenX() )
 			{
 				if ( mx < ecl.GetScreenWidth()+ecl.GetScreenX() )
