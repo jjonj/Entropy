@@ -17,6 +17,7 @@ import jjj.entropy.Card.Status;
 import jjj.entropy.CardTemplate.CardRace;
 import jjj.entropy.CardTemplate.CardRarity;
 import jjj.entropy.CardTemplate.CardType;
+import jjj.entropy.messages.Purchase;
 import jjj.entropy.shop.Shop;
 import jjj.entropy.ui.*;
 
@@ -342,6 +343,11 @@ public class Game
 	public void UpdateRealGameHeight(int value) 
 	{
 		realGameHeight = value;
+	}
+
+	public void FinalizePurchase(Purchase purchase) 
+	{
+		shop.FinalizePurchase(purchase);
 	}
 
 	

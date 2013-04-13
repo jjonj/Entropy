@@ -29,6 +29,8 @@ public class NetworkManager extends Listener
 	
 	private Player cachedPlayer;
 	
+	
+	
 	public static NetworkManager GetInstance()
 	{
 		return instance;
@@ -66,6 +68,7 @@ public class NetworkManager extends Listener
 			  kryo.register(CardDataMessage.class);
 			  kryo.register(LoginMessage.class);
 			  kryo.register(PlayerDataMessage.class);
+			  kryo.register(Purchase.class);
 			  kryo.register(String[].class);
 			  kryo.register(int[].class);
 			  kryo.register(int[][].class);
@@ -149,14 +152,26 @@ public class NetworkManager extends Listener
 	
 	public void SendTextMessage(String text)
 	{
-		ChatMessage request = new ChatMessage();
-		client.sendTCP(request);
+		ChatMessage cmsg = new ChatMessage();
+		cmsg.message = text;
+		client.sendTCP(cmsg);
+	}
+	
+	public void SendPurchase(int itemID, int purchaseID)
+	{
+		Purchase pch = new Purchase();
+		pch.itemID = itemID;
+		pch.purchaseID = purchaseID;
+		pch.playerID = Game.GetInstance().GetPlayer().GetID();
+		client.sendTCP(pch);
 	}
 	
 	public void QueueCardTemplateLoad(CardTemplate template)
 	{
 		cardsToLoad.add(template);
 	}
+	
+	
 	
 	public NetworkState GetNetworkState()
 	{
@@ -186,7 +201,6 @@ public class NetworkManager extends Listener
 				// MISSING: Notify user
 				networkState = NetworkState.CONNECTED;
 			}
-			
 		}
 		else if (object instanceof PlayerDataMessage)	//When logging in, a cardDataMessage should always be recieved first to load the players deck.
 		{
@@ -344,6 +358,11 @@ public class NetworkManager extends Listener
 			if (amsg.swapTurn)
 				Game.GetInstance().GetActiveMatch().SwapTurn();
 			
+		}
+		else if(object instanceof Purchase)
+		{
+			System.out.println((Purchase) object);
+			Game.GetInstance().FinalizePurchase((Purchase) object);
 		}
 	}
 

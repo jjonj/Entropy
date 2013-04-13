@@ -7,8 +7,10 @@ import javax.media.opengl.GL2;
 
 import jjj.entropy.Game;
 import jjj.entropy.GameState;
+import jjj.entropy.NetworkManager;
 import jjj.entropy.OGLManager;
 import jjj.entropy.Texture;
+import jjj.entropy.messages.Purchase;
 import jjj.entropy.ui.UIComponent;
 import jjj.entropy.ui.UIManager;
 
@@ -29,6 +31,7 @@ public class Shop implements GameState
 	@Override
 	public void Activate(Game game) 
 	{
+		NetworkManager.GetInstance().SendPurchase(1, 1);
 	}
 
 
@@ -59,6 +62,12 @@ public class Shop implements GameState
 	public GameState GetExitState() 
 	{
 		return exitState;
+	}
+
+
+	public void FinalizePurchase(Purchase purchase) 
+	{
+		//TODO: Implement
 	}
 	
 	
