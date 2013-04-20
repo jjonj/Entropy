@@ -12,17 +12,9 @@ import javax.media.opengl.fixedfunc.GLLightingFunc;
 import javax.media.opengl.fixedfunc.GLMatrixFunc;
 import javax.media.opengl.glu.GLU;
 
-import jjj.entropy.Card.Facing;
-import jjj.entropy.Card.Status;
-import jjj.entropy.CardTemplate.CardRace;
-import jjj.entropy.CardTemplate.CardRarity;
-import jjj.entropy.CardTemplate.CardType;
 import jjj.entropy.classes.Const;
-import jjj.entropy.ui.Button;
 import jjj.entropy.ui.Dropdown;
-import jjj.entropy.ui.Table;
 import jjj.entropy.ui.Textbox;
-import jjj.entropy.ui.UIManager;
 
 
 public class OGLManager implements GLEventListener  
@@ -105,7 +97,6 @@ public class OGLManager implements GLEventListener
      	
      	//Calling generate methods that initiate the displaylists in openGL for fast rendering
      	OGLManager.GenerateTable(OGLManager.gl, Const.BOARD_WIDTH, Const.BOARD_LENGTH, Const.BOARD_THICKNESS);
-     	OGLManager.GenerateButtons(OGLManager.gl, Texture.bigButtonTexture);
      	OGLManager.GenerateUI(OGLManager.gl, 0, 0, 0, Texture.uiTexture);
      	OGLManager.GenerateDeck(OGLManager.gl, Texture.cardBackside, Texture.deckSideTexture, Const.CARD_WIDTH, Const.CARD_HEIGHT, 0.5f);
        	OGLManager.GenerateTextbox(OGLManager.gl, Texture.textboxTexture);
@@ -142,7 +133,6 @@ public class OGLManager implements GLEventListener
     	Game.GetInstance().Draw();			//Exerting responsibility of Game object
     	
     	OGLManager.gl.glFlush();	
-    	
 	}
     
     public void displayChanged(GLAutoDrawable gLDrawable, boolean modeChanged, boolean deviceChanged) 
@@ -154,15 +144,15 @@ public class OGLManager implements GLEventListener
     {
         final GL2 gl = gLDrawable.getGL().getGL2();
  
-        if (height <= 0) // avoid a divide by zero error!
+        if (height <= 0) // avoid a divide by zero error hack!
         {
             height = 1;
         }
         
     	int viewport[] = new int[4];
         gl.glGetIntegerv(GL2.GL_VIEWPORT, viewport, 0);
-        Game.GetInstance().UpdateRealGameHeight(viewport[3]);
-        
+        Game.GetInstance().SetScreenDimensions(width, height, viewport[3]);
+  
         int view[] = new int[4];
 	    double model[] = new double[16];
 	    double proj[] = new double[16];
@@ -171,7 +161,6 @@ public class OGLManager implements GLEventListener
 		gl.glGetDoublev(GLMatrixFunc.GL_PROJECTION_MATRIX, proj, 0);
     
 		Game.GetInstance().HandleResize(view, model, proj);
-
     }
  
     //openGL specific cleanup code
@@ -372,45 +361,25 @@ public class OGLManager implements GLEventListener
 	}
 
 	
-	public static void GenerateButtons(GL2 gl, Texture texture)
+
+	public static int GenerateRectangularSurface(float width, float height)
 	{
-		BigButtonModel = gl.glGenLists(1);
-        gl.glNewList(BigButtonModel, GL2.GL_COMPILE);
+		int dsl = gl.glGenLists(1);
+        gl.glNewList(dsl, GL2.GL_COMPILE);
 
-		 gl.glBegin(GL2.GL_QUADS);
-		 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(0, 0, 0f );
-		    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(Const.BIG_BUTTON_WIDTH, 0, 0f );
-		    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(Const.BIG_BUTTON_WIDTH, -Const.BIG_BUTTON_HEIGHT, 0f  );
-		    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(0, -Const.BIG_BUTTON_HEIGHT, 0f  );
-		 gl.glEnd();
+		gl.glBegin(GL2.GL_QUADS);
+			gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-width/2, height/2, 0f );
+			gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(width/2, height/2, 0f );
+			gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(width/2, -height/2, 0f  );
+			gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-width/2, -height/2, 0f  );
+		gl.glEnd();
 		 
-		 gl.glEndList();
-		 
-		TinySquareButtonModel = gl.glGenLists(1);
-        gl.glNewList(TinySquareButtonModel, GL2.GL_COMPILE);
+		gl.glEndList();
 
-		 gl.glBegin(GL2.GL_QUADS);
-		 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(0, 0, 0f );
-		    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(Const.TINY_SQUARE_BUTTON_WIDTH, 0, 0f );
-		    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(Const.TINY_SQUARE_BUTTON_WIDTH, -Const.TINY_SQUARE_BUTTON_HEIGHT, 0f  );
-		    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(0, -Const.TINY_SQUARE_BUTTON_HEIGHT, 0f  );
-		 gl.glEnd();
-		 
-		 gl.glEndList();
-		 
-		 SmallButtonModel = gl.glGenLists(1);
-         gl.glNewList(SmallButtonModel, GL2.GL_COMPILE);
-
-		 gl.glBegin(GL2.GL_QUADS);
-		 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(0, 0, 0f );
-		    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(Const.SMALL_BUTTON_WIDTH, 0, 0f );
-		    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(Const.SMALL_BUTTON_WIDTH, -Const.SMALL_BUTTON_HEIGHT, 0f  );
-		    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(0, -Const.SMALL_BUTTON_HEIGHT, 0f  );
-		 gl.glEnd();
-		 
-		 gl.glEndList();
+		return dsl;
 	}
 	
+
 	public static void GenerateTextbox(GL2 gl, Texture texture)
 	{
 	    	
@@ -430,28 +399,13 @@ public class OGLManager implements GLEventListener
 	
 	
 	
-	public static void DrawUIButton(GL2 gl, Button button)
+	public static void DrawShape(float x, float y, float z, int displayList)
 	{
 		 gl.glPushMatrix();
 		 
-
-		 gl.glTranslatef(button.GetX(), button.GetY(), 0);
+		 gl.glTranslatef(x, y, z);
 		 
-		 switch ( button.GetButtonSize() )
-		 {
-		 case TINY_SQUARE:
-			 gl.glCallList(TinySquareButtonModel);
-			 break;
-		 case SMALL:
-			 gl.glCallList(SmallButtonModel);
-			 break;
-		 case BIG:
-			 gl.glCallList(BigButtonModel);
-			 break;
-		 default:
-			 
-		 }
-		 
+		 gl.glCallList(displayList);	
 		
 		 gl.glPopMatrix();
 	}
@@ -460,11 +414,32 @@ public class OGLManager implements GLEventListener
 	{
 		 gl.glPushMatrix();
 
-		 gl.glTranslatef(textbox.GetX(), textbox.GetY(), 0);
+		// gl.glTranslatef(textbox.GetX(), textbox.GetY(), 0);
 
 		 gl.glCallList(TextboxModel);
 		 gl.glPopMatrix();
 	}
+	
+	
+	public static void DrawVerticallyRepeatingRectanglularShape(float x, float y, float width, float rowHeight, float repeatCount)
+	{
+		gl.glPushMatrix();
+		 
+		gl.glTranslatef(x, y, 0);
+		 
+		gl.glBegin(GL2.GL_QUADS);
+			gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-width/2, rowHeight/2, 0f );
+			gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(width/2, rowHeight/2, 0f );
+			gl.glTexCoord2f(1.0f, repeatCount); gl.glVertex3f(width/2, -rowHeight * repeatCount + rowHeight/2, 0f  );
+			gl.glTexCoord2f(0.0f, repeatCount); gl.glVertex3f(-width/2, -rowHeight * repeatCount + rowHeight/2, 0f  );
+		gl.glEnd();
+		
+		gl.glPopMatrix();
+	}
+	
+	
+	
+	
 	
 	@SuppressWarnings("rawtypes")	//The fact that EntDropdown is generic, is not important for the rendering method
 	public static void DrawUIDropdown(GL2 gl, Dropdown dropdown) 
@@ -473,20 +448,20 @@ public class OGLManager implements GLEventListener
 		 gl.glPushMatrix();
 		 gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_REPEAT);	//Why is it needed to re-set this seting?
 		 gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-		 gl.glTranslatef(dropdown.GetX(), dropdown.GetY(), 0);
+		// gl.glTranslatef(dropdown.GetX(), dropdown.GetY(), 0);
 
-		 if (dropdown.IsSelecting())
+		// if (dropdown.IsSelecting())
 		 {
-			 dropdown.GetTexture().bind(OGLManager.gl);
+		//	 dropdown.GetTexture().bind(OGLManager.gl);
 			
 			 gl.glBegin(GL2.GL_QUADS);
 			 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( 0, 0, 0);
 			    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(Const.DROPDOWN_WIDTH, 0,  0);
-			    gl.glTexCoord2f(1.0f, dropdown.GetDataSize()); gl.glVertex3f(Const.DROPDOWN_WIDTH, -dropdown.GetDataSize()*Const.TABLE_ROW_HEIGHT, 0 );
-			    gl.glTexCoord2f(0.0f, dropdown.GetDataSize()); gl.glVertex3f(0, -dropdown.GetDataSize()*Const.TABLE_ROW_HEIGHT, 0);
+	//		    gl.glTexCoord2f(1.0f, dropdown.GetDataSize()); gl.glVertex3f(Const.DROPDOWN_WIDTH, -dropdown.GetDataSize()*Const.TABLE_ROW_HEIGHT, 0 );
+	//		    gl.glTexCoord2f(0.0f, dropdown.GetDataSize()); gl.glVertex3f(0, -dropdown.GetDataSize()*Const.TABLE_ROW_HEIGHT, 0);
 			 gl.glEnd();
 			 //Showing the selected element
-			 dropdown.GetSelectedTexture().bind(gl);
+			// dropdown.GetSelectedTexture().bind(gl);
 		
 			 gl.glBegin(GL2.GL_QUADS);
 			 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( 0, -dropdown.GetSelectedIndex()*Const.DROPDOWN_ROW_HEIGHT, 0);
@@ -495,7 +470,7 @@ public class OGLManager implements GLEventListener
 			    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(0, -(dropdown.GetSelectedIndex()+1)*Const.DROPDOWN_ROW_HEIGHT,  0);
 			 gl.glEnd();
 		 }
-		 else
+	//	 else
 		 {
 		//	 dropdown.GetTexture().bind(OpenGL.gl);
 			 gl.glBegin(GL2.GL_QUADS);
@@ -510,12 +485,12 @@ public class OGLManager implements GLEventListener
 
 	}
 
-	
+	/*
 	public static void DrawUITable(GL2 gl, Table table)
 	{
 		 gl.glPushMatrix();
 
-		 gl.glTranslatef(table.GetX(), table.GetY(), 0);
+		// gl.glTranslatef(table.GetX(), table.GetY(), 0);
 		 gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 		 gl.glBegin(GL2.GL_QUADS);
 		 	gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( 0, 0, 0);
@@ -551,7 +526,7 @@ public class OGLManager implements GLEventListener
 		 gl.glPopMatrix();
 		 
 		 
-	}
+	}*/
 	
 
 	
@@ -652,6 +627,47 @@ public class OGLManager implements GLEventListener
 	public static void QueueOGLAction(OGLAction action) 
 	{
 		glActionQueue.add(action);
+	}
+
+	public static float MapPercentToFloatX(int x) 
+	{
+		//Gets the % of input x of the whole screen and applies that to the GL Coordinates
+		return (Const.SCREEN_GL_WIDTH*((float)x/100))-Const.SCREEN_GL_WIDTH/2;
+	}
+	public static float MapPercentToFloatY(int y) 
+	{
+		return (-Const.SCREEN_GL_HEIGHT*((float)y/100))+Const.SCREEN_GL_HEIGHT/2;
+	}
+
+	public static float MapPercentToFloatWidth(int width) 
+	{
+		return Const.SCREEN_GL_WIDTH*((float)width/100);
+	}
+	public static float MapPercentToFloatHeight(int height) 
+	{
+		return Const.SCREEN_GL_HEIGHT*((float)height/100);
+	}
+
+	public static float MapScreenToFloatX(int x) 
+	{
+		//Gets the % of input x of the whole screen and applies that to the GL Coordinates
+		return (Const.SCREEN_GL_WIDTH*((float)x/Game.GetInstance().GetGameWidth()))-Const.SCREEN_GL_WIDTH/2;
+	}
+	public static float MapScreenToFloatY(int y) 
+	{
+		return (-Const.SCREEN_GL_HEIGHT*((float)y/Game.GetInstance().GetRealGameHeight()))+Const.SCREEN_GL_HEIGHT/2;
+	}
+
+
+
+	public static int MapPercentToScreenX(int x) 
+	{
+		return (int) (Game.GetInstance().GetGameWidth()*((float)x/100));
+	}
+
+	public static int MapPercentToScreenY(int y) 
+	{
+		return Game.GetInstance().GetRealGameHeight()- (int) (Game.GetInstance().GetRealGameHeight()*((float)y/100));
 	}
 
 	

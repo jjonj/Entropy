@@ -16,7 +16,6 @@ import jjj.entropy.Player;
 import jjj.entropy.SimpleCollection;
 import jjj.entropy.Texture;
 import jjj.entropy.classes.Const;
-import jjj.entropy.ui.Button.ButtonSize;
 import jjj.entropy.ui.EntFont.FontTypes;
 
 public class UIManager 
@@ -73,8 +72,8 @@ public class UIManager
     	
     	//Ingame UI components
      	
-    	chatWindow = new Label(129, 116,  Const.CHAT_LINES, "", new EntFont(EntFont.FontTypes.MainParagraph, Font.BOLD, 12, Color.BLUE));
-    	chatTextbox = new Textbox(-0.59f, -0.389f, 5,  10, "", new EntFont(EntFont.FontTypes.MainParagraph, Font.BOLD, 12, Color.BLUE), null);
+    	chatWindow = new Label(10, 80,  Const.CHAT_LINES, "", new EntFont(EntFont.FontTypes.MainParagraph, Font.BOLD, 12, Color.BLUE));
+    	chatTextbox = new Textbox(20, 80, 15,  5, "", new EntFont(EntFont.FontTypes.MainParagraph, Font.BOLD, 12, Color.BLUE), null);
     	
     	IngameUIComponents.add(chatWindow);
     	IngameUIComponents.add(chatTextbox);
@@ -84,8 +83,8 @@ public class UIManager
     	
     	
     	//Main menu UI components
-    	
-     	MainMenuUIComponents.add(new Button(-0.16f, 0.05f, 48, 15, "Multiplayer", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.orange), Texture.bigButtonTexture,
+    	//-0.16f, 0.05f
+     	MainMenuUIComponents.add(new Button(50, 35, 20, 6, "Multiplayer", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.orange), Texture.bigButtonTexture,
      			new UIAction() {@Override
 				public void Activate(){
 	     				NetworkManager.GetInstance().JoinGame();
@@ -93,15 +92,16 @@ public class UIManager
      			}
      	));
      	defaultFocusedUIElementMap.put(mainMenu, MainMenuUIComponents.get(MainMenuUIComponents.size()-1));	//Set the default uicomponent to the last added one (just above)
-     	MainMenuUIComponents.add(new Button(-0.16f, -0.05f, 60, 22, "My decks", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.orange), Texture.bigButtonTexture,
+     	//-0.16f, -0.05f
+     	MainMenuUIComponents.add(new Button(50, 47, 20, 6, "My decks", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.orange), Texture.bigButtonTexture,
      			new UIAction() {@Override
 				public void Activate(){
      					Game.GetInstance().SetGameState(Game.GetInstance().GetDeckScreen());
      				}
      			}
      	));
-
-     	MainMenuUIComponents.add(new Button(-0.16f, -0.15f, 80, 27, "Shop", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.orange), Texture.bigButtonTexture,
+//-0.16f, -0.15f
+     	MainMenuUIComponents.add(new Button(50, 59, 20, 6, "Shop", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.orange), Texture.bigButtonTexture,
      			new UIAction() {@Override
 				public void Activate(){
      					Game.GetInstance().SetGameState(Game.GetInstance().GetShop());
@@ -114,12 +114,12 @@ public class UIManager
 
      	defaultFocusedUIElementMap.put(shop, null);
 
-     	battleTokensLabel = new Label(1120, 638, "0", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black));
-     	goldTokensLabel = new Label(1120, 580, "0", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black));
+     	battleTokensLabel = new Label(80, 5, "0", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black));
+     	goldTokensLabel = new Label(80, 8, "0", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black));
      	ShopUIComponents.add(battleTokensLabel);
      	ShopUIComponents.add(goldTokensLabel);
-     	
-     	
+
+   
      	
      	//Deck screen UI components
      	
@@ -128,15 +128,15 @@ public class UIManager
      	//Initiate the player card table UI element with an empty list of data. The players cards are added once logged in.
      	SimpleCollection<TableRow> tempDeck = new CardCollection();
      	
-     	playerCardTable = new Table(-0.715f, 0.39f, 20, 21, tempDeck, 20, deckScreen);
+     	playerCardTable = new Table(13, 5, 23, 2, tempDeck, 20, deckScreen);
      	DeckScreenUIComponents.add(playerCardTable);
      	defaultFocusedUIElementMap.put(deckScreen, playerCardTable);
      	//The card table for the current deck
-     	playerDeckTable = new Table(-0.283f, 0.16f, 20, 12, tempDeck, 20, deckScreen);
+     	playerDeckTable = new Table(43, 33, 23, 2, tempDeck, 20, deckScreen);
      	DeckScreenUIComponents.add(playerDeckTable);
      	
     	//Dropdown initiated with a temporary data source that is updated on login ( game.OnLogin(); )
-     	playerDeckDropdown = new Dropdown<Deck>(-0.275f, 0.21f, 12, 14, new ArrayList<Deck>(),
+     	playerDeckDropdown = new Dropdown<Deck>(37, 28, 8, 2, new ArrayList<Deck>(),
 				new UIAction() {@Override
 				public void Activate(){
 					Deck newActiveDeck = playerDeckDropdown.GetSelectedObject();
@@ -147,8 +147,8 @@ public class UIManager
 
      	DeckScreenUIComponents.add(playerDeckDropdown);
 
-     	
-      	DeckScreenUIComponents.add(new Button(-0.06f, 0.21f, 25, -7, "Save deck", new EntFont(FontTypes.MainParagraph, Font.PLAIN, 16, Color.black), ButtonSize.SMALL, Texture.smallButtonTexture,
+     	//-0.06f, 0.21f
+      	DeckScreenUIComponents.add(new Button(48, 27, 12, 3, "Save deck", new EntFont(FontTypes.MainParagraph, Font.PLAIN, 16, Color.black), Texture.smallButtonTexture,
      			new UIAction() {@Override
 				public void Activate(){
      					NetworkManager.GetInstance().SendDeckUpdate(Game.GetInstance().GetPlayer().GetActiveDeck());
@@ -157,15 +157,15 @@ public class UIManager
      	));
      	
      	
-     	//transfer card left arrow
-     	DeckScreenUIComponents.add(new Button(-0.35f, -0.05f, 0, 0, "", ButtonSize.TINY_SQUARE, Texture.arrow1ButtonTexture,
+     	//transfer card left arrow       -0.35f, -0.05f
+     	DeckScreenUIComponents.add(new Button(28, 70, 3, 3, "", Texture.arrow1ButtonTexture,
      			new UIAction() {@Override
 				public void Activate(){
      				
      				Player player = Game.GetInstance().GetPlayer();
  					Deck activeDeck = player.GetActiveDeck();
  					CardTemplate transferCard = (CardTemplate)playerDeckTable.GetSelectedObject();
- 					if ( activeDeck.GetCount(transferCard) > 0 )
+ 					if ( transferCard != null && activeDeck.GetCount(transferCard) > 0 )
  					{
 
      					activeDeck.ChangeCount(transferCard, -1);
@@ -177,15 +177,15 @@ public class UIManager
      				}
      			}
      	));
-     	//transfer card right arrow
-     	DeckScreenUIComponents.add(new Button(-0.35f, -0.12f, 0, 0, "", ButtonSize.TINY_SQUARE, Texture.arrow2ButtonTexture,
+     	//transfer card right arrow -0.35f, -0.12f
+     	DeckScreenUIComponents.add(new Button(28, 60, 3, 3, "", Texture.arrow2ButtonTexture,
      			new UIAction() {@Override
 				public void Activate(){
      				
      					Player player = Game.GetInstance().GetPlayer();
      					Deck activeDeck = player.GetActiveDeck();
      					CardTemplate transferCard = (CardTemplate)playerCardTable.GetSelectedObject();
-     					if ( (player.GetAllCards().GetCount(transferCard) - activeDeck.GetCount(transferCard)) > 0 )
+     					if ( (transferCard != null &&  (player.GetAllCards().GetCount(transferCard) - activeDeck.GetCount(transferCard)) > 0) )
      					{
      						if (activeDeck.Contains(transferCard))
          						activeDeck.ChangeCount(transferCard, 1);
@@ -202,22 +202,33 @@ public class UIManager
      	//Login screen UI components
      	
      	
-        usernameTextbox = new Textbox(-0.155f, 0.05f, 15, 8, "", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black), Texture.textboxTexture);
-     	passwordTextbox = new Textbox(-0.155f, -0.06f, 15, 8, "", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black), Texture.textboxTexture);
+        usernameTextbox = new Textbox(50, 40, 20, 4, "", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black), Texture.textboxTexture);
+     	passwordTextbox = new Textbox(50, 55, 20, 4, "", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black), Texture.textboxTexture);
      	LoginScreenUIComponents.add(usernameTextbox);
      	defaultFocusedUIElementMap.put(loginScreen, usernameTextbox);
      	LoginScreenUIComponents.add(passwordTextbox);
-     	LoginScreenUIComponents.add(new Label(555, 415, "Username", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black)));
-     	LoginScreenUIComponents.add(new Label(555, 320, "Password", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black)));
-     	
-     	LoginScreenUIComponents.add(new Button(-0.155f, -0.155f, 85, 28, "Login", new EntFont(FontTypes.MainParagraph, Font.BOLD, 22, Color.black), Texture.bigButtonTexture,
+     	LoginScreenUIComponents.add(new Label(50, 34, "Username", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black)));
+     	LoginScreenUIComponents.add(new Label(50, 49, "Password", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black)));
+     	//-0.155f, -0.155f
+     	LoginScreenUIComponents.add(new Button(50, 68, 15, 5, "Login", new EntFont(FontTypes.MainParagraph, Font.BOLD, 22, Color.black), Texture.bigButtonTexture,
      			new UIAction() {@Override
 				public void Activate(){
      				NetworkManager.GetInstance().Login(usernameTextbox.GetText(), passwordTextbox.GetText());
-     				//Game.GetInstance().SetGameState(GameState.MAIN_MENU);
  				}
  			}
      	));
+     	
+     	
+     	List<String> data1 = new ArrayList<String>();
+    	data1.add("HELLO");
+     	data1.add("OMG");
+     	data1.add("SUCH");
+     	data1.add("BITCH");
+    	data1.add("HELLO");
+     	data1.add("OMG");
+     	data1.add("SUCH");
+     	data1.add("BITCH");
+
     }
 
 	public void RenderUI(Game game) 
@@ -234,7 +245,7 @@ public class UIManager
 
 	public void OnResize(int[] view, double[] model, double[] proj) 
 	{
-		
+		EntFont.OnResize();
 		
 		for (UIComponent uic : LoginScreenUIComponents)	//Should probably just let a static list handle every EntClickable resize call
         {
@@ -285,50 +296,32 @@ public class UIManager
 	{
 		List<UIComponent> toIterate = null;
 		
-		
 		toIterate = GameStateUIComponenstMap.get(Game.GetInstance().GetGameState());
 		
-		int mx = EntMouseListener.MouseX;
-		int my = EntMouseListener.MouseY;
+		int mouseX = EntMouseListener.MouseX;
+		int mouseY = EntMouseListener.MouseY;
 		
 		//First test for collision with the focused UI component, this helps as caching and also fixes a problem with clicking dropdown overlapping other clickable
 		Clickable ecl = (Clickable)focusedUIComponent;
 		if (focusedUIComponent != null)
 		{
-			mx = EntMouseListener.MouseX;
-			my = EntMouseListener.MouseY; //720 - EntMouseListener.MouseY -1;
-			if ( mx > ecl.GetScreenX() )
+			if (ecl.CheckCollision(mouseX, mouseY))
 			{
-				if ( mx < ecl.GetScreenWidth()+ecl.GetScreenX() )
-				{
-					if (my < ecl.GetScreenY())
-					{
-						if (my > ecl.GetScreenY() - ecl.GetScreenHeight())
-						{
-							return focusedUIComponent;
-						}
-					}
-				}
+				return focusedUIComponent;
 			}
+				
 		}
+		
+		
 		//After check for collision with all components in the current context (toIterate)
 		for (UIComponent uic : toIterate)
 		{
 			if (uic instanceof Clickable) 
 			{
 				ecl = (Clickable)uic;
-				if ( mx > ecl.GetScreenX() )
+				if (ecl.CheckCollision(mouseX, mouseY))
 				{
-					if ( mx < ecl.GetScreenWidth()+ecl.GetScreenX() )
-					{
-						if (my < ecl.GetScreenY())
-						{
-							if (my > ecl.GetScreenY() - ecl.GetScreenHeight())
-							{
-								return uic;
-							}
-						}
-					}
+					return uic;
 				}
 			}
 		}

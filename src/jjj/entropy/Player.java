@@ -47,7 +47,9 @@ public class Player {
 			{
 				this.decks.add(Deck.LoadDeck(this, "Deck "+(i+1), decks[i], deckCounts[i], deckDBIDs[i]));	//Temporary deck names
 			}
-			this.activeDeck = this.decks.get(activeDeck);
+			
+			if (decks.length > 0)
+				this.activeDeck = this.decks.get(activeDeck);
 		}
 		
 		

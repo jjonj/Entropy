@@ -1,41 +1,55 @@
 package jjj.entropy.ui;
 
 import jjj.entropy.Game;
+import jjj.entropy.OGLManager;
 
 public abstract class UIComponent {
 
 	
-	protected float x;
-	protected float y;
 	
-	public UIComponent(float x, float y)
+	protected int x, y,
+				  screenX, screenY;			//Coordinates in screen coordinates
+					  
+	protected float glX, glY;
+	
+	
+	public UIComponent(int x, int y)
 	{
 		this.x = x;
 		this.y = y;
+		this.glX = OGLManager.MapPercentToFloatX(x);
+		this.glY = OGLManager.MapPercentToFloatY(y);
+		screenX = OGLManager.MapPercentToScreenX(x);
+		screenY = OGLManager.MapPercentToScreenY(y);
+		
 	}
 	
-	public float GetX()
+	public int GetScreenX() 
+	{
+		return screenX;
+	}
+	public int GetScreenY() 
+	{
+		return screenY;
+		
+	}
+	public int GetPercentX()
 	{
 		return x;
 	}
-	public float GetY()
+	public int GetPercentY()
 	{
 		return y;
 	}
-	public void SetX(float x)
+	public float GetGLX()
 	{
-		this.x = x;
+		return glX;
 	}
-	public void SetY(float y)
+	public float GetGLY()
 	{
-		this.y = y;
+		return glY;
 	}
-	public void Move(float x, float y)
-	{
-		this.x = x;
-		this.y = y;
-	}
-	
+
 	public abstract void Render(Game game);
 
 

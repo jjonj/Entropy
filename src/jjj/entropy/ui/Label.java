@@ -1,6 +1,8 @@
 package jjj.entropy.ui;
 
 import java.awt.Font;
+import java.awt.geom.Rectangle2D;
+
 import jjj.entropy.Game;
 import jjj.entropy.classes.Const;
 
@@ -11,21 +13,24 @@ public class Label extends UIComponent{
 	private String text;
 	private EntFont  font;
 	private boolean boxed;
-	private int maxLines; 
+	private int textX,
+				textY,
+				maxLines;
+	private Rectangle2D textBounds; 
 	
-	public Label(Game game, int x, int y)
+	
+	
+	public Label(int x, int y)
 	{
 		this(x, y, "", new EntFont(EntFont.FontTypes.MainParagraph, Font.PLAIN, 16));
 	}
-	public Label(Game game, int x, int y, String text)
+	public Label(int x, int y, String text)
 	{
 		this(x, y, text, new EntFont(EntFont.FontTypes.MainParagraph, Font.PLAIN, 16));
 	}
 	public Label(int x, int y, String text, EntFont font)
 	{
-		super(x, y);
-		this.text = text;
-		this.font = font;
+		this(x, y, 1, text, font);
 	}
 	public Label(int x, int y, int maxLines, String text, EntFont font)
 	{
@@ -34,15 +39,21 @@ public class Label extends UIComponent{
 		this.font = font;
 		boxed = true;
 		this.maxLines = maxLines;
+		
+		textBounds = font.GetRenderer().getBounds(text);
+
+		this.textX = screenX - (int) (textBounds.getWidth()/2+12);
+        this.textY = screenY - (int) (textBounds.getHeight()/4);
+		
 	}
 	
 	@Override
 	public void Render(Game game)
 	{
 		if (boxed)
-			font.RenderBox(game, (int)x, (int)y, maxLines, Const.CHAT_LINE_WIDTH, text);
+			font.RenderBox(game, textX, textY, maxLines, Const.CHAT_LINE_WIDTH, text);
 		else
-			font.Render(game, (int)x, (int)y, text);
+			font.Render(textX, textY, text);
 	}
 	
 	public String GetText()

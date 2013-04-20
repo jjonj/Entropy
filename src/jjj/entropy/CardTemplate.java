@@ -188,19 +188,19 @@ public class CardTemplate implements TableRow {
 	}
 
 	@Override
-	public String[] GenRow() 
+	public String GenRow() 
 	{
 		// Using a slightly complicated method of extracting the count of this CardTemplate in the dataSource being used for generating rows for a table
 		CardCollection dataSource = (CardCollection)(UIManager.GetInstance().GetActiveDataSource());
 		if (dataSource != null)
 		{
 			if (dataSource == Game.GetInstance().GetPlayer().GetAllCards())	//The representation is the number of cards in the players card not already in the active deck
-				return new String[] { Title, ""+(dataSource.GetCount(this)-Game.GetInstance().GetPlayer().GetActiveDeck().GetCount(this))+"/"+dataSource.GetCount(this)};
+				return Title + "		"+(dataSource.GetCount(this)-Game.GetInstance().GetPlayer().GetActiveDeck().GetCount(this))+"/"+dataSource.GetCount(this);
 			else	//It is assumed here that the collection is then the active deck (TODO: NOT PRETTY)
-				return new String[] { Title, ""+dataSource.GetCount(this)+"/"+Game.GetInstance().GetPlayer().GetAllCards().GetCount(this)};
+				return Title + "		"+dataSource.GetCount(this)+"/"+Game.GetInstance().GetPlayer().GetAllCards().GetCount(this);
 		}
 			
-		return new String[] { Title, "0"};
+		return Title + "		0";
 	}
 
 	@Override

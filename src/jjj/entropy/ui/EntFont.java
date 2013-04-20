@@ -2,10 +2,13 @@ package jjj.entropy.ui;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.font.FontRenderContext;
 import java.util.ArrayList;
 import java.util.List;
 
 import jjj.entropy.Game;
+import jjj.entropy.OGLManager;
+import jjj.entropy.classes.Const;
 
 import com.jogamp.opengl.util.awt.TextRenderer;
 
@@ -32,7 +35,9 @@ public class EntFont extends Font {
 	
 	private TextRenderer renderer;
 	private Color color;
-
+	private static int originalGameWidth,
+					   originalGameHeight;
+	private static boolean gameDimensionsSet = false;
 	
 	
 	public EntFont(FontTypes type, int style, int size) {
@@ -42,16 +47,19 @@ public class EntFont extends Font {
 		super(type.GetFontName(), style, size);
 		this.color = color;
 		renderer = new TextRenderer(this);
+		
+		
 	}
 	
-	public void Render(Game game, int x, int y, String text)
+	public void Render(int x, int y, String text)
 	{
 		if (text.length() > 0)
 		{
-			renderer.beginRendering(game.GetWidth(), game.GetHeight());
+			renderer.beginRendering(originalGameWidth, originalGameHeight);	//TODO: RealHeight?
 	        renderer.setColor(color);
 	        renderer.draw(text, x, y);
 	        renderer.endRendering();
+	        OGLManager.gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 		}
 	}
 
@@ -78,14 +86,15 @@ public class EntFont extends Font {
 	        	index = 0;
 	        
 	        renderer.setColor(color);
-	    	renderer.beginRendering(game.GetWidth(), game.GetHeight());
+	    	renderer.beginRendering(originalGameWidth, originalGameHeight);
 
 	        for (;index < cLines.size(); index++)
 	        {
-	        	   renderer.draw(cLines.get(index), x, y-heightLineSkip);
-	        	   heightLineSkip += super.size+5;
+        	   renderer.draw(cLines.get(index), x, y-heightLineSkip);
+        	   heightLineSkip += super.size+5;
 	        }
 	        renderer.endRendering();
+	        OGLManager.gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 		}
 	}
 
@@ -151,8 +160,22 @@ public class EntFont extends Font {
 		return i-1;
 		
 	}
-	public TextRenderer GetRenderer() {
+	public TextRenderer GetRenderer() 
+	{
 		return renderer;
+	}
+	public FontRenderContext GetFontRenderContext() 
+	{
+		return renderer.getFontRenderContext();
+	}
+	public static void OnResize() 
+	{
+		if (!gameDimensionsSet )
+		{
+			gameDimensionsSet = true;
+			originalGameWidth =  Game.GetInstance().GetWidth();
+			originalGameHeight = Game.GetInstance().GetHeight();
+		}
 	}
 	
 }

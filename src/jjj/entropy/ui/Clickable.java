@@ -14,137 +14,86 @@ public abstract class Clickable extends UIComponent
 	public void Activate(int mouseX, int mouseY) {}
 
 	//Optional virtual method for certain code that need to be run on window resize, such as updating gl/screen relative coordinates.
-	// Note that UpdateScreenCoords() should be called from a overriding method
 	public void OnResize(int[] view, double[] model , double[] proj) 
 	{
-		UpdateScreenCoords();
+		screenX = OGLManager.MapPercentToScreenX(x);
+		screenY = OGLManager.MapPercentToScreenY(y);
+		screenWidth = OGLManager.MapPercentToScreenX(width);
+		//Uses MapPercentToScreenX instead of MapPercentToScreenY to make it easier for users to estimate proportions
+		screenHeight = OGLManager.MapPercentToScreenX(height);
 	}
 	
 	
-	protected int w, h,
-				screenX,
-				screenY;
+	protected int width, height,				//Percentage width/height
+				  screenWidth, screenHeight;	//Width/height in pixels
+	protected float glWidth, glHeight;			//Width/Height in openGL coordinates
 	
-	protected float glW, glH;	//OpenGL width & Height
-	
-	public Clickable(float x, float y, float width, float height)
+	public Clickable(int x, int y, int width, int height)
 	{
 		super(x, y);
-		glW = width;
-		glH = height;
 		
-	    int[] temp = OGLManager.ConvertGLFloatToGLScreen(x, y);
-	    this.screenX = temp[0];
-        this.screenY = temp[1];
-        
-        
-    	temp = OGLManager.ConvertGLFloatToGLScreen(x+glW, y+glH);
-
-    	
-        int screenRight = temp[0],
-        	screenTop = temp[1];	// Note: OpenGL screen coordinates are from bottom to top so screenY = bottom
-        
-        w = screenRight - screenX;
-        h = screenTop - screenY;
-	
-    
-         
-         
+		this.width = width;
+		this.height = height;
+		screenWidth = OGLManager.MapPercentToScreenX(width);
+		//Uses MapPercentToScreenX instead of MapPercentToScreenY to make it easier for users to estimate proportions
+		screenHeight = OGLManager.MapPercentToScreenX(height);
+		glWidth = OGLManager.MapPercentToFloatWidth(width);
+		//Uses MapPercentToFloatWidth instead of MapPercentToFloatHeight to make it easier for users to estimate proportions
+		glHeight = OGLManager.MapPercentToFloatWidth(height);
 	}
 	
-	// Update screen X, Y, W and H which changes on resize
-	protected void UpdateScreenCoords()
+	
+	public int GetScreenWidth() 
 	{
-		
-		int[] temp = OGLManager.ConvertGLFloatToGLScreen(x, y);
-	    this.screenX = temp[0];
-        this.screenY = temp[1];
-        
-        temp = OGLManager.ConvertGLFloatToGLScreen(x+glW, y+glH);
-
-    	
-        int screenRight = temp[0],
-        	screenTop = temp[1];	// Note: OpenGL screen coordinates are from bottom to top so screenY = bottom
-        
-        w = screenRight - screenX;
-        h = screenTop - screenY;
-        
-        /*
-		
-		   double winPos[] = new double[4];// wx, wy, wz;// returned xyz coords
-	       Game.glu.gluProject((double) x, (double) y, 0f, //
-	        		 model, 0,
-	        		 proj, 0, 
-	        		 view, 0, 
-	        		 winPos, 0);
-	        
-	        this.screenLeft = (int) winPos[0];
-	        this.screenTop = (int) winPos[1];
-	        double right = 0, bottom = 0;
-	 		switch (buttonSize)
-	 		{
-	 		case BIG:
-	 			right = (double) x+Game.BIG_BUTTON_WIDTH;
-	 			bottom = (double) y-Game.BIG_BUTTON_HEIGHT;
-	 			break;
-	 		default:
-	 			break;
-	 		}
-	         
-	         Game.glu.gluProject(right, bottom, 0f, //
-	        		 model, 0,
-	        		 proj, 0, 
-	        		 view, 0, 
-	        		 winPos, 0);
-	        
-	        this.screenRight = (int) winPos[0];
-	        this.screenBottom =(int) winPos[1];
-	        
-	        this.w = this.screenRight - this.screenLeft;
-	        this.h = this.screenTop - this.screenBottom ;*/
+		return screenWidth;
 	}
-	
-
-	public void SetGLWidth(float w)
+	public int GetScreenHeight() 
 	{
-
-		glW = w;
-		int[] temp = OGLManager.ConvertGLFloatToGLScreen(x+glW, y+glH);
-
-
-        int screenRight = temp[0];
-        
-        this.w = screenRight - screenX;
+		return screenHeight;
 	}
 	
-	public void SetGLHeight(float h)
+	public int GetPercentWidth() 
 	{
-		
-		
-		glH = h;
-		int[] temp = OGLManager.ConvertGLFloatToGLScreen(x+glW, y+glH);
-
-
-	    int screenTop = temp[1];	// Note: OpenGL screen coordinates are from bottom to top so screenY = bottom
-	        
-	    this.h = screenTop - screenY;
-
+		return width;
+	}
+	public int GetPercentHeight() 
+	{
+		return height;
 	}
 	
+	public float GetGLWidth() 
+	{
+		return glWidth;
+	}
+	public float GetGLHeight() 
+	{
+		return glHeight;
+	}
 	
-	public int GetScreenWidth() {
-		return w;
-	}
-	public int GetScreenHeight() {
-		return h;
-		
+	public void SetPercentWidth(int w)
+	{
+		this.width = w;
+		screenWidth = OGLManager.MapPercentToScreenX(w);
+		glWidth = OGLManager.MapPercentToFloatWidth(w);
 	}
 	
-	public float GetScreenX() {
-		return screenX;
+	public void SetPercentHeight(int h)
+	{
+		this.height = h;
+		//Uses MapPercentToScreenX instead of MapPercentToScreenY to make it easier for users to estimate proportions
+		screenHeight = OGLManager.MapPercentToScreenX(h);
+		//Uses MapPercentToFloatWidth instead of MapPercentToFloatHeight to make it easier for users to estimate proportions
+		glHeight = OGLManager.MapPercentToFloatWidth(h);
 	}
-	public float GetScreenY() {
-		return screenY;
+
+	public boolean CheckCollision(int mouseX, int mouseY) 
+	{
+		if ( mouseX > screenX-screenWidth/2 && mouseX < screenX+screenWidth/2 &&
+			 mouseY < screenY+screenHeight/2 && mouseY > screenY - screenHeight/2)
+		{
+			return true;
+		}
+		return false;
 	}
 	
 }

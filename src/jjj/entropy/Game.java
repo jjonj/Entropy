@@ -103,13 +103,16 @@ public class Game
 
      
         neutralPlayer = new Player(0, "Neutral", null, null);
+        
+        System.out.println("AAAAAA: " + gameHeight);
+        
     } 
 
    
     public void Init(int realGameHeight)
     {
     	this.realGameHeight = realGameHeight;
-    	
+    
    	  //  	NetworkManager.Connect("10.0.0.5", 11759);
     	NetworkManager.GetInstance().Connect("127.0.0.1", 54555);	//Temporary location
 
@@ -131,7 +134,7 @@ public class Game
 
 		ShowCard(card0);
 		ShowCard(card1);
-       
+		 
     }
     
     
@@ -153,6 +156,7 @@ public class Game
     //Certain things will need to be recomputed upon resize of the game window. This method will automatically be called by the OGLManager
     public void HandleResize(int[] view, double[] model, double[] proj) 
 	{
+    	
 		UIManager.GetInstance().OnResize(view, model, proj);
 	}
     
@@ -340,9 +344,11 @@ public class Game
 		return shop;
 	}
 
-	public void UpdateRealGameHeight(int value) 
+	public void SetScreenDimensions(int width, int height, int realHeight) 
 	{
-		realGameHeight = value;
+		this.gameWidth = width;
+		this.gameHeight = height;
+		realGameHeight = realHeight;
 	}
 
 	public void FinalizePurchase(Purchase purchase) 
@@ -350,6 +356,14 @@ public class Game
 		shop.FinalizePurchase(purchase);
 	}
 
+	public int GetGameWidth() 
+	{
+		return gameWidth;
+	}
+	public int GetGameHeight() 
+	{
+		return gameHeight;
+	}
 	
 
 

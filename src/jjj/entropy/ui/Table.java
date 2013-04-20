@@ -4,6 +4,7 @@ import java.awt.Font;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,7 +23,6 @@ import jjj.entropy.classes.Const;
 
 
 
-//MISSING: Add parameter for text offset coordinates or even better automatize it
 public class Table extends Clickable implements MouseListener, MouseMotionListener
 {
 	
@@ -30,84 +30,103 @@ public class Table extends Clickable implements MouseListener, MouseMotionListen
 	private EntFont  font;
 	private SimpleCollection<TableRow> dataSource;	//The actual source of the data
 	private List<TableRow> orderedData; 		//An internal sorted list of the data
-	private String[][] data;					//A cache of the string data (no need to recompute that every render call)
+	private String[] data;					//A cache of the string data (no need to recompute that every render call)
 	
 	private Texture texture;
 	private Texture scrollHandleTexture,
 					selectedFieldTexture;
-	private float lineHeight,	//The height of the font used
-				  scrollHandleYOffsetGLFloat;	//The offset of the scroll handle in GL float coordinates
-	
+	private float glScrollHandleOffsetY,	//The offset of the scroll handle in GL float coordinates
+				  glRowHeight,
+				  glScrollHandleHeight,
+				  glScrollHandleWidth,
+				  screenRowHeight;
 	
 	//private GameState activeGameState;
 	
 	
-	private int fontLineHeight,
+	private int rowHeight,
 				textX,
 				textY,
 				selectedIndex = 2,
-				scrollHandleY,
-				scrollHandleWidth,
-				scrollHandleHeight,
+				screenScrollHandleX,
+				screenScrollHandleTop,
+				screenScrollHandleWidth,
+				screenScrollHandleHeight,
 				maxLines,
 				displayLineCount,
 				offsetScrollHandleTop,
 				mouseOffSetFromTaTop,
 				lineOffset = 0;	// Used for scrolling
+	
+	
+	
 	private boolean scrolling = false;
 	private GameState activeGameState;
+	private int glSelectedFieldDisplayList;
+	private int glScrollHandleDisplayList;
 
-	public Table(float x, float y,  int offsetX, int offsetY, GameState activeGameState)	// Table supports a null dataSource
+	public Table(int x, int y, int width, int rowHeight, GameState activeGameState)	// Table supports a null dataSource
 	{
-		this(x, y, offsetX, offsetY, null, 0, activeGameState);
+		this(x, y, width, rowHeight, null, 0, activeGameState);
 	}
-	public Table(float x, float y,  int offsetX, int offsetY,  SimpleCollection<TableRow> dataSource, GameState activeGameState)
+	public Table(int x, int y, int width, int rowHeight,  SimpleCollection<TableRow> dataSource, GameState activeGameState)
 	{
-		this(x, y, offsetX, offsetY, dataSource, dataSource.Size(), activeGameState);
+		this(x, y, width, rowHeight, dataSource, dataSource.Size(), activeGameState);
 	}
-	public Table(float x, float y, int offsetX, int offsetY, SimpleCollection<TableRow> dataSource, int maxLines, GameState activeGameState)
+	public Table(int x, int y, int width, int rowHeight, SimpleCollection<TableRow> dataSource, int maxLines, GameState activeGameState)
 	{
 		//Width should be adjustable, probably like button size "is"
-		super(x, y, Const.TABLE_WIDTH, Const.TABLE_ROW_HEIGHT*maxLines);
+		super(x, y, width, rowHeight*maxLines);
+		
+		
+		
+		
+		
 		this.maxLines = maxLines;
 		this.font = new EntFont(EntFont.FontTypes.MainParagraph, Font.PLAIN, 16);
-		lineHeight = Const.TABLE_ROW_HEIGHT_PX;
+		
+		
 		this.dataSource = dataSource;
 		this.activeGameState = activeGameState;
 		
-		int[] temp =  OGLManager.ConvertGLFloatToGLScreen(0, 0);
-		float zeroOnScreenX = temp[0],
-		      zeroOnScreenY = temp[1];
+	
 		
-		temp =  OGLManager.ConvertGLFloatToGLScreen(0, Const.TABLE_ROW_HEIGHT);
-		lineHeight = temp[1] - zeroOnScreenY;
+
+		Rectangle2D textBounds = font.GetRenderer().getBounds("A");
+
+		this.textX = screenX - screenWidth/2 + (int)textBounds.getWidth();	//Left orientation
+	    this.textY = screenY - (int) (textBounds.getHeight()/2.5);
+        
+        
+        this.rowHeight = rowHeight;
+        
+        //Uses MapPercentToScreenX/FloatWidth instead of MapPercentToScreenY/FloatHeight to make it easier for users to estimate proportions. This needs to match method used in the Clickable class
+        screenRowHeight = ((float)Game.GetInstance().GetGameWidth())*((float)rowHeight/100)-1.2f;	//0.9 added as a magic adjustment value, note that this assignment is always overwritten by OnResize assignment
+        
+     //   this.screenRowHeight = OGLManager.MapPercentToScreenX(rowHeight);
+        this.glRowHeight = OGLManager.MapPercentToFloatWidth(rowHeight);
 		
-		temp = OGLManager.ConvertGLFloatToGLScreen(Const.SCROLL_HANDLE_WIDHT, 0);
-		scrollHandleWidth = (int) (temp[0] - zeroOnScreenX);
+        
+        screenScrollHandleWidth = OGLManager.MapPercentToScreenX(1);	//Update in OnResize aswell
+		screenScrollHandleHeight = (int) (screenRowHeight*1.5);
+		glScrollHandleWidth = OGLManager.MapPercentToFloatHeight(1);
+		glScrollHandleHeight = glRowHeight*1.5f;
 		
-		temp = OGLManager.ConvertGLFloatToGLScreen(0, Const.SCROLL_HANDLE_HEIGHT);
-		scrollHandleHeight = (int) (temp[1] - zeroOnScreenY);
 		
-		
-		fontLineHeight = (int)lineHeight+1;
-		//selectedIndex = -1;
-		try {
-			texture = Texture.Load(new File("resources/textures/TableEntry.png"), true);
-			scrollHandleTexture = Texture.Load(new File("resources/textures/ScrollHandle.png"), true);
-			selectedFieldTexture = Texture.Load(new File("resources/textures/SelectedTableEntry.png"), true);
-		} catch (GLException | IOException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
-		OGLManager.InitTexture(texture);
-		OGLManager.InitTexture(scrollHandleTexture);
-		OGLManager.InitTexture(selectedFieldTexture);
-		temp = OGLManager.ConvertGLFloatToGLScreen(x, y);
-		this.textX = temp[0] + offsetX;
-	    this.textY = temp[1] + offsetY;
-		
-	    scrollHandleY = screenY;
-	    scrollHandleYOffsetGLFloat = 0;
+        texture = Texture.tableEntry;
+        scrollHandleTexture = Texture.scrollHandleTexture;
+        selectedFieldTexture = Texture.selectedTableEntryTexture;
+
+        
+        glSelectedFieldDisplayList = OGLManager.GenerateRectangularSurface(this.glWidth, this.glRowHeight);
+    	glScrollHandleDisplayList = OGLManager.GenerateRectangularSurface(glScrollHandleWidth, glScrollHandleHeight);
+        
+     
+    	screenScrollHandleX = screenX+screenWidth/2-screenScrollHandleWidth/2;
+	    screenScrollHandleTop = screenY+(int)screenRowHeight/2;
+	    
+	    
+	    glScrollHandleOffsetY = 0;
 	    if (dataSource != null)
 	    {
 			if (dataSource.Size() < maxLines)
@@ -136,7 +155,7 @@ public class Table extends Clickable implements MouseListener, MouseMotionListen
 			
 			if (data == null || data.length != dataSource.Size())
 			{
-				data = new String[dataSource.Size()][];
+				data = new String[dataSource.Size()];
 				orderedData = new ArrayList<TableRow>(dataSource.Size());
 			}
 			
@@ -146,43 +165,49 @@ public class Table extends Clickable implements MouseListener, MouseMotionListen
 			
 			for (int i = 0; i < orderedData.size(); i++)
 			{
-				try {
 				data[i] = orderedData.get(i).GenRow();
-				}
-				catch (Exception e)
-				{
-					e.printStackTrace();
-				}
 			}
 		}
 		else
-			data = new String[0][0];
+			data = new String[0];
 	}
 	
 	@Override
 	public void Render(Game game)
 	{
-		int i,
-			xOffset = textX,
-			yOffset = textY;
+		int i;
+		float yOffset = textY;
 		
-		
-		if (texture != null)
-		{
-			texture.bind(OGLManager.gl);
-			OGLManager.DrawUITable(OGLManager.gl, this);
-		}
 
+		texture.bind(OGLManager.gl);
+		
+		OGLManager.DrawVerticallyRepeatingRectanglularShape(glX, glY, glWidth, glRowHeight, displayLineCount);
+		
+		//OGLManager.DrawUITable(OGLManager.gl, this);
+		
+		
+		 if (selectedIndex != -1)
+		 {
+			 
+			 int selectedIndexShown = selectedIndex - lineOffset;	//Ensures that the correct index is drawn when scrolled
+			 if (selectedIndexShown < displayLineCount && selectedIndexShown >= 0)
+			 {
+				 selectedFieldTexture.bind(OGLManager.gl);
+				 OGLManager.DrawShape(glX, glY - glRowHeight*selectedIndexShown, 0, glSelectedFieldDisplayList);
+			 }
+		 }
+		 if (displayLineCount < data.length)
+		 {
+			 scrollHandleTexture.bind(OGLManager.gl);
+			 OGLManager.DrawShape(glX+glWidth/2-glScrollHandleWidth/2, (glY+(glRowHeight/2)-glScrollHandleHeight/2)-glScrollHandleOffsetY, 0, glScrollHandleDisplayList);
+		 }
+			
+		
 		for (int k = lineOffset; k < displayLineCount+lineOffset; k++)
 		{
-			i = 0;
-			for (String cell : data[k])
-			{
-				xOffset = textX + i * Const.TABLE_COLUMN_WIDTH_PX;
-				font.Render(game, xOffset, yOffset, cell);
-				++i;
-			}
-			yOffset -= fontLineHeight;
+			font.Render(textX, (int)yOffset, data[k]);
+			
+			yOffset -= screenRowHeight;
 		}
 	}
 	
@@ -213,43 +238,39 @@ public class Table extends Clickable implements MouseListener, MouseMotionListen
 		return displayLineCount;
 	}
 	
-	public float GetScrollHandleGLYOffset()
-	{
-		return scrollHandleYOffsetGLFloat;
-	}
 	
-	public Texture GetScrollHandleTexture() 
-	{
-		return scrollHandleTexture;
-	}
-	public boolean DisplayScrollbar() 
-	{
-		return displayLineCount < dataSource.Size();
-	}
+
 	
 	@Override
 	public void OnResize(int[] view, double[] model , double[] proj) 
 	{
-		System.out.println("RESIZE!!!");
-		UpdateScreenCoords();
-		scrollHandleY = screenY - mouseOffSetFromTaTop;
-		int[] temp =  OGLManager.ConvertGLFloatToGLScreen(0, 0);
-		float zeroOnScreenX = temp[0],
-		      zeroOnScreenY = temp[1];
+		super.OnResize(view, model, proj);
+		this.screenRowHeight = OGLManager.MapPercentToScreenX(rowHeight);
 		
-		temp =  OGLManager.ConvertGLFloatToGLScreen(0, Const.TABLE_ROW_HEIGHT);
-		lineHeight = temp[1] - zeroOnScreenY;
+		screenScrollHandleWidth = OGLManager.MapPercentToScreenX(1);
+		screenScrollHandleHeight = (int) (screenRowHeight*1.5);
+		screenScrollHandleX = screenX+screenWidth/2-screenScrollHandleWidth/2;
+	    screenScrollHandleTop = screenY+(int)screenRowHeight/2;
 		
-		temp = OGLManager.ConvertGLFloatToGLScreen(Const.SCROLL_HANDLE_WIDHT, 0);
-		scrollHandleWidth = (int) (temp[0] - zeroOnScreenX);
-		
-		temp = OGLManager.ConvertGLFloatToGLScreen(0, Const.SCROLL_HANDLE_HEIGHT);
-		scrollHandleHeight = (int) (temp[1] - zeroOnScreenY);
-		
-		//Resetting the scrollbar position on resize simplifies problems with pixel calculations done in one window size transfering to another. It could be done with converting to GL coordinates before resize then recalculating the new pixel values using GLHelperConvert
-		scrollHandleY = screenY;
-	    lineOffset = 0;
-	    scrollHandleYOffsetGLFloat = 0;
+	}
+	
+	@Override
+	public boolean CheckCollision(int mouseX, int mouseY) 
+	{
+		if ( mouseX > screenX-screenWidth/2 && mouseX < screenX+screenWidth/2 &&
+			 mouseY < screenY+screenRowHeight/2 && mouseY > screenY - screenRowHeight*(data.length-0.5))
+		{
+			if ( mouseX > screenScrollHandleX-screenScrollHandleWidth/2 && mouseX < screenScrollHandleX+screenScrollHandleWidth/2 &&
+			     mouseY < screenScrollHandleTop && mouseY > screenScrollHandleTop - screenScrollHandleHeight)
+			{
+				offsetScrollHandleTop = screenScrollHandleTop - EntMouseListener.MouseY;
+				scrolling = true;
+			}
+			else
+				selectedIndex = (screenY + (int)screenRowHeight/2 - mouseY) / (int)screenRowHeight+lineOffset;
+		}
+
+		return false;
 	}
 	
 	
@@ -263,21 +284,6 @@ public class Table extends Clickable implements MouseListener, MouseMotionListen
 	@Override
 	public void mousePressed(MouseEvent e) 
 	{
-		if ( Game.GetInstance().GetGameState() == activeGameState)	
-		{
-			if (e.getButton() == MouseEvent.BUTTON1 && screenX < EntMouseListener.MouseX && screenX+w > EntMouseListener.MouseX && screenY > EntMouseListener.MouseY && screenY-(displayLineCount*lineHeight) < EntMouseListener.MouseY)
-			{																	
-				if (screenX+w - EntMouseListener.MouseX < scrollHandleWidth && EntMouseListener.MouseY > scrollHandleY - scrollHandleHeight  && EntMouseListener.MouseY < scrollHandleY)
-				{
-					offsetScrollHandleTop = scrollHandleY - EntMouseListener.MouseY;
-					scrolling = true;
-				}
-				else
-				{
-					selectedIndex = (screenY - EntMouseListener.MouseY) / (int)lineHeight+lineOffset;
-				}
-			}
-		}
 	}
 	
 	
@@ -287,24 +293,39 @@ public class Table extends Clickable implements MouseListener, MouseMotionListen
 		if (e.getButton() == MouseEvent.BUTTON1)
 			scrolling = false;
 	}
+	
+	
+
+
+	
 	@Override
-	public void mouseDragged(MouseEvent e) {
+	public void mouseDragged(MouseEvent e) 
+	{
 	
 		if (scrolling)
 		{
+			int originalScrollHandleTop = screenY+(int)screenRowHeight/2;
 			//Subtracting the height of a scroll handle allows mouse offset on the handle to be taken into account for positioning the handle. This also require the handle offset be added to the mouse Y coordinate
-			int adjH = h -  scrollHandleHeight;	//Adjusted height
-			mouseOffSetFromTaTop = screenY - (EntMouseListener.MouseY+offsetScrollHandleTop);
+			int adjH = screenHeight - screenScrollHandleHeight;	//Adjusted height = the height of the entire scroll area minus the height of the scroller, this tells how much space the scroller has to move on
+			
+			mouseOffSetFromTaTop =  originalScrollHandleTop - (EntMouseListener.MouseY+offsetScrollHandleTop);
 			if (mouseOffSetFromTaTop < 0 )
 				mouseOffSetFromTaTop = 0;
 			else if (mouseOffSetFromTaTop > adjH)
 				mouseOffSetFromTaTop = adjH;
-			scrollHandleY = screenY - mouseOffSetFromTaTop;
-			lineOffset = (int) ((float)(mouseOffSetFromTaTop)/(adjH)*(dataSource.Size()-displayLineCount));
-			scrollHandleYOffsetGLFloat = (Const.TABLE_ROW_HEIGHT*displayLineCount - Const.SCROLL_HANDLE_HEIGHT) * ((float)(mouseOffSetFromTaTop)/(adjH));
 			
+			screenScrollHandleTop = originalScrollHandleTop - mouseOffSetFromTaTop;
+		
+			//glScrollHandleHeight/glRowHeight is here used to substract how much larger the scroll handle is in relation to a single column
+			glScrollHandleOffsetY = (glRowHeight*(displayLineCount-(glScrollHandleHeight/glRowHeight))) * ((float)(mouseOffSetFromTaTop)/(adjH));
+			
+			
+			lineOffset = (int) ((float)(mouseOffSetFromTaTop)/(adjH)*(dataSource.Size()-displayLineCount));
 		}
 	}
+	
+	
+	
 	@Override
 	public void mouseMoved(MouseEvent arg0) {
 		// TODO Auto-generated method stub
@@ -318,15 +339,12 @@ public class Table extends Clickable implements MouseListener, MouseMotionListen
 	//Assumes UpdateData has been called before the last change to the dataSource
 	public TableRow GetSelectedObject()
 	{
-		return orderedData.get(selectedIndex);	//Ordered data is in the same order as Data so there is a 1 to 1 correspondence
+		if (selectedIndex < data.length)
+			return orderedData.get(selectedIndex);	//Ordered data is in the same order as Data so there is a 1 to 1 correspondence
+		return null;
 	}
-	public Texture GetSelectedTexture() {
-		return selectedFieldTexture;
-	}
-	public int GetLineOffset() 
-	{
-		return lineOffset;
-	}
+
+
 	public SimpleCollection<TableRow> GetDatSource() {
 		return dataSource;
 	}

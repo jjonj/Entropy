@@ -50,16 +50,23 @@ public class Texture
 				    bigButtonTexture,
 				    arrow1ButtonTexture,
 				    arrow2ButtonTexture,
-				    textboxTexture;
+				    textboxTexture,
+				    dropdownEntry,
+					dropdownEntrySelected,
+					tableEntry,
+			        scrollHandleTexture,
+			        selectedTableEntryTexture;
 
 
 
-	
-	//private static HashMap<String, Texture> textureMap = new HashMap<String, Texture>();
-	
 	public static void InitTextures()
 	{
 		try {
+			tableEntry = new Texture(TextureIO.newTexture(new File("resources/textures/TableEntry.png"), true));
+	        scrollHandleTexture = new Texture(TextureIO.newTexture(new File("resources/textures/ScrollHandle.png"), true));
+	        selectedTableEntryTexture = new Texture(TextureIO.newTexture(new File("resources/textures/SelectedTableEntry.png"), true));;
+			dropdownEntry = tableEntry;
+			dropdownEntrySelected = selectedTableEntryTexture;
    			cardtestfront = new Texture(TextureIO.newTexture(new File("resources/textures/card1.png"), true));
    			cardBackside = new Texture(TextureIO.newTexture(new File("resources/textures/backside.png"), true));
    			board = new Texture(TextureIO.newTexture(new File("resources/textures/board.jpg"), true));
@@ -83,6 +90,10 @@ public class Texture
    			System.exit(1);
    		}
 		
+		
+		OGLManager.InitTexture(tableEntry);
+     	OGLManager.InitTexture(scrollHandleTexture);
+     	OGLManager.InitTexture(selectedTableEntryTexture);
 		OGLManager.InitTexture(cardBackside);
      	OGLManager.InitTexture(cardtestfront);
      	OGLManager.InitTexture(crawnidworkertexture);

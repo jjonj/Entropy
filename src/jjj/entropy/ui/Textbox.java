@@ -1,6 +1,8 @@
 package jjj.entropy.ui;
 
 import java.awt.Font;
+import java.awt.geom.Rectangle2D;
+
 import jjj.entropy.OGLManager;
 import jjj.entropy.Game;
 import jjj.entropy.Texture;
@@ -13,35 +15,39 @@ public class Textbox extends Clickable{
 	private String text;
 	private EntFont  font;
 	
-	private int textOffsetX,
-				textOffsetY;
 	private Texture texture;
 	
 	private int textX,
 				textY;
+	
+	private int glDisplayList;
 
 	
 	
-	public Textbox(float x, float y, int xOffset, int yOffset, Texture texture)
+	public Textbox(int x, int y, int width, int height, Texture texture)
 	{
-		this(x, y, xOffset, yOffset, "", new EntFont(EntFont.FontTypes.MainParagraph, Font.PLAIN, 16), texture);
+		this(x, y, width, height, "", new EntFont(EntFont.FontTypes.MainParagraph, Font.PLAIN, 16), texture);
 	}
-	public Textbox(float x, float y, int xOffset, int yOffset, String text, Texture texture)
+	public Textbox(int x, int y, int width, int height, String text, Texture texture)
 	{
-		this(x, y, xOffset, yOffset, text, new EntFont(EntFont.FontTypes.MainParagraph, Font.PLAIN, 16), texture);
+		this(x, y, width, height, text, new EntFont(EntFont.FontTypes.MainParagraph, Font.PLAIN, 16), texture);
 	}
 	
-	public Textbox(float x, float y, int xOffset, int yOffset, String startText, EntFont font, Texture texture )
+	public Textbox(int x, int y, int width, int height, String startText, EntFont font, Texture texture )
 	{
-		super(x, y, Const.TEXTBOX_WIDTH, Const.TEXTBOX_HEIGHT);
+		super(x, y, width, height);
 		this.text = startText;
 		this.font = font;
 		this.texture = texture;
-			
-	    textOffsetY = yOffset;
-	    textOffsetX = xOffset;
-	    this.textX = screenX;
-	    this.textY = screenY;
+		
+		this.glDisplayList = OGLManager.GenerateRectangularSurface(this.glWidth, this.glHeight);
+		
+		
+		Rectangle2D textBounds = font.GetRenderer().getBounds("A");
+		
+		
+		this.textX = screenX - screenWidth/2 + ((int) textBounds.getWidth()/2);
+        this.textY = screenY - (int) (textBounds.getHeight()/2.5);
 	}
 
   
@@ -50,12 +56,10 @@ public class Textbox extends Clickable{
 	{
 		if (texture != null)
 		{
-			OGLManager.gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-			if (texture != null)
-				texture.bind(OGLManager.gl);
-			 OGLManager.DrawUITextbox(OGLManager.gl, this);
+			texture.bind(OGLManager.gl);
+			OGLManager.DrawShape(glX, glY, 0, glDisplayList);
 		}
-		font.RenderBox(game, textX + textOffsetX, textY - textOffsetY, 1, Const.TEXTBOX_LINE_WIDTH, text);
+		font.RenderBox(game, textX, textY, 1, screenWidth, text);
 	}
 	
 	public String GetText()
