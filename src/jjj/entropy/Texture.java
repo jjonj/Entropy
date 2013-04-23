@@ -51,21 +51,27 @@ public class Texture
 				    arrow1ButtonTexture,
 				    arrow2ButtonTexture,
 				    textboxTexture,
+				    previewTexture,
 				    dropdownEntry,
 					dropdownEntrySelected,
-					tableEntry,
+					tableEntryTexture,
 			        scrollHandleTexture,
-			        selectedTableEntryTexture;
+			        selectedTableEntryTexture,
+			        ItemTexture;//KILL ME
 
 
 
 	public static void InitTextures()
 	{
 		try {
-			tableEntry = new Texture(TextureIO.newTexture(new File("resources/textures/TableEntry.png"), true));
+			ItemTexture = new Texture(TextureIO.newTexture(new File("resources/textures/ITEM.png"), true));
+			
+			
+			previewTexture = new Texture(TextureIO.newTexture(new File("resources/textures/Preview.png"), true));
+			tableEntryTexture = new Texture(TextureIO.newTexture(new File("resources/textures/TableEntry.png"), true));
 	        scrollHandleTexture = new Texture(TextureIO.newTexture(new File("resources/textures/ScrollHandle.png"), true));
 	        selectedTableEntryTexture = new Texture(TextureIO.newTexture(new File("resources/textures/SelectedTableEntry.png"), true));;
-			dropdownEntry = tableEntry;
+			dropdownEntry = tableEntryTexture;
 			dropdownEntrySelected = selectedTableEntryTexture;
    			cardtestfront = new Texture(TextureIO.newTexture(new File("resources/textures/card1.png"), true));
    			cardBackside = new Texture(TextureIO.newTexture(new File("resources/textures/backside.png"), true));
@@ -90,8 +96,10 @@ public class Texture
    			System.exit(1);
    		}
 		
+		OGLManager.InitTexture(ItemTexture);
 		
-		OGLManager.InitTexture(tableEntry);
+		OGLManager.InitTexture(previewTexture);
+		OGLManager.InitTexture(tableEntryTexture);
      	OGLManager.InitTexture(scrollHandleTexture);
      	OGLManager.InitTexture(selectedTableEntryTexture);
 		OGLManager.InitTexture(cardBackside);
@@ -145,7 +153,9 @@ public class Texture
 
 	public static Texture Load(File file, boolean mipmaps) throws GLException, IOException 
 	{
-		return new Texture(com.jogamp.opengl.util.texture.TextureIO.newTexture(file, mipmaps));
+		Texture rt = new Texture(com.jogamp.opengl.util.texture.TextureIO.newTexture(file, mipmaps));
+		OGLManager.InitTexture(rt);
+		return rt;
 	}
 
 	//Proxy method

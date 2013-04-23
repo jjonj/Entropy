@@ -3,12 +3,14 @@ package jjj.entropy;
 
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLEventListener;
+import javax.media.opengl.GLException;
 import javax.media.opengl.awt.GLCanvas;
 import javax.media.opengl.fixedfunc.GLMatrixFunc;
 
@@ -18,6 +20,7 @@ import jjj.entropy.CardTemplate.CardRace;
 import jjj.entropy.CardTemplate.CardRarity;
 import jjj.entropy.CardTemplate.CardType;
 import jjj.entropy.messages.Purchase;
+import jjj.entropy.messages.ShopDataMessage;
 import jjj.entropy.shop.Shop;
 import jjj.entropy.ui.*;
 
@@ -92,20 +95,11 @@ public class Game
     	gameWidth = width;
     	gameHeight = height;
     	aspectRatio = (float)width/height;
-    	
-    	loginScreen = new LoginScreen(null);
-    	mainMenu = new MainMenu(null);
-    	inGameState = new InGameState(canvas, mainMenu);
-    	deckScreen = new DeckScreen(mainMenu);
-    	shop = new Shop(mainMenu);
-    	
-    	currentGameState = loginScreen;
-
+    
      
         neutralPlayer = new Player(0, "Neutral", null, null);
         
-        System.out.println("AAAAAA: " + gameHeight);
-        
+
     } 
 
    
@@ -117,13 +111,22 @@ public class Game
     	NetworkManager.GetInstance().Connect("127.0.0.1", 54555);	//Temporary location
 
     	
-    	 UIManager.GetInstance().InitUIComponents(loginScreen, mainMenu, inGameState, deckScreen, shop);
+    	loginScreen = new LoginScreen(null);
+    	mainMenu = new MainMenu(null);
+    	inGameState = new InGameState(canvas, mainMenu);
+    	deckScreen = new DeckScreen(mainMenu);
+		shop = new Shop(mainMenu);
+   
+    	UIManager.GetInstance().InitUIComponents(loginScreen, mainMenu, inGameState, deckScreen, shop);
 
-	     SetGameState(loginScreen);
     	
-    	
+		
+		currentGameState = loginScreen;
+		
+	    SetGameState(loginScreen);
+		
 		//Creating cards require a template, this is just an old template still used below
-		TinidQueen = new CardTemplate((short)1, "Tinid Queen", CardRace.CRAWNID, CardType.CREATURE, CardRarity.COMMON, (short)0,(short)0,(short)0,(short)0,(short)0,Texture.cardtestfront);
+		TinidQueen = new CardTemplate((short)1, "Tinid Queen", CardRace.CRAWNID, CardType.CREATURE, CardRarity.COMMON, (short)0,(short)0,(short)0,(short)0,(short)0,"TinidQueen");
 
 		// Easiest way atm to detect clicks on the deck pile, is to just place to cards there that cant move.
 		Card card0 = new Card(-3, 0.51f, 1.0f, 
@@ -363,6 +366,11 @@ public class Game
 	public int GetGameHeight() 
 	{
 		return gameHeight;
+	}
+
+	public void LoadShopData(ShopDataMessage sdm) //TODO: Just a proxy method
+	{
+		shop.LoadShopData(sdm);		
 	}
 	
 

@@ -20,7 +20,17 @@ public class CardCollection implements SimpleCollection<TableRow>, Iterable<Card
 	
 	public void AddCard(CardTemplate card, int count)
 	{
-		cards.put(card, count);
+		if (!cards.containsKey(card))
+			cards.put(card, count);
+		else
+			cards.put(card, count+cards.get(card));	//Increment the count to the already existing ones
+	}
+	public void AddCards(CardCollection collection)
+	{
+		for (CardTemplate c : collection)
+		{
+			AddCard(c, collection.GetCount(c));
+		}
 	}
 	public void RemoveCard(Card card)
 	{

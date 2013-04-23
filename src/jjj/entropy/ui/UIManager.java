@@ -20,6 +20,18 @@ import jjj.entropy.ui.EntFont.FontTypes;
 
 public class UIManager 
 {
+	private class StateCompPair
+	{
+		public StateCompPair(GameState state, UIComponent component) 
+		{
+			this.state = state;
+			this.component = component;
+		}
+		public GameState state;
+		public UIComponent component;
+	}
+	
+	
 	//Singleton pattern without lazy initialization
 	private static UIManager instance = new UIManager();
 
@@ -36,8 +48,9 @@ public class UIManager
 	
 	private HashMap<jjj.entropy.GameState, UIComponent> defaultFocusedUIElementMap = new HashMap<jjj.entropy.GameState, UIComponent>(8);	
 	
-	
-	
+	//Used to avoid modifying uicomponents while they are getting looped through
+	private List<StateCompPair> uiComponentsToAdd = new ArrayList<StateCompPair>();	
+	    
 	
     private List<UIComponent> IngameUIComponents = new ArrayList<UIComponent>();	
     private List<UIComponent> MainMenuUIComponents = new ArrayList<UIComponent>();	
@@ -114,11 +127,12 @@ public class UIManager
 
      	defaultFocusedUIElementMap.put(shop, null);
 
-     	battleTokensLabel = new Label(80, 5, "0", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black));
-     	goldTokensLabel = new Label(80, 8, "0", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black));
+     	battleTokensLabel = new Label(87, 11, "0", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black));
+     	goldTokensLabel = new Label(87, 19, "0", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.black));
      	ShopUIComponents.add(battleTokensLabel);
      	ShopUIComponents.add(goldTokensLabel);
 
+     	
    
      	
      	//Deck screen UI components
@@ -218,16 +232,7 @@ public class UIManager
  			}
      	));
      	
-     	
-     	List<String> data1 = new ArrayList<String>();
-    	data1.add("HELLO");
-     	data1.add("OMG");
-     	data1.add("SUCH");
-     	data1.add("BITCH");
-    	data1.add("HELLO");
-     	data1.add("OMG");
-     	data1.add("SUCH");
-     	data1.add("BITCH");
+
 
     }
 
@@ -292,14 +297,16 @@ public class UIManager
 	}
 	
 	
-	public UIComponent CheckUICollision() 	//MOVE COLLISION DETECTION LOGIC TO EntUIComponent
+	public UIComponent CheckUICollision()
 	{
-		List<UIComponent> toIterate = null;
+		for (StateCompPair scp : uiComponentsToAdd)
+			GameStateUIComponenstMap.get(scp.state).add(scp.component);
 		
-		toIterate = GameStateUIComponenstMap.get(Game.GetInstance().GetGameState());
+		List<UIComponent> toIterate = GameStateUIComponenstMap.get(Game.GetInstance().GetGameState());
 		
 		int mouseX = EntMouseListener.MouseX;
 		int mouseY = EntMouseListener.MouseY;
+		
 		
 		//First test for collision with the focused UI component, this helps as caching and also fixes a problem with clicking dropdown overlapping other clickable
 		Clickable ecl = (Clickable)focusedUIComponent;
@@ -329,6 +336,11 @@ public class UIManager
 	}
 	
 	
+	public void AddUIComponent(GameState gamestate, UIComponent component)
+	{
+		uiComponentsToAdd.add(new StateCompPair(gamestate, component));
+	}
+	
 	public Textbox GetChatTextbox() 
 	{
 		return chatTextbox;
@@ -356,11 +368,6 @@ public class UIManager
 	
 	//Returns the UI EntTable object that manages the players cards
 	public Table GetDeckTable() 
-	{
-		return playerDeckTable;
-	}
-
-	public Table GetPlayerDeckTable() 
 	{
 		return playerDeckTable;
 	}

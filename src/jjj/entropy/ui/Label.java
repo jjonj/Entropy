@@ -51,7 +51,7 @@ public class Label extends UIComponent{
 	public void Render(Game game)
 	{
 		if (boxed)
-			font.RenderBox(game, textX, textY, maxLines, Const.CHAT_LINE_WIDTH, text);
+			font.RenderBox(textX, textY, maxLines, Const.CHAT_LINE_WIDTH, text);
 		else
 			font.Render(textX, textY, text);
 	}

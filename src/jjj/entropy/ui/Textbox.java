@@ -59,7 +59,7 @@ public class Textbox extends Clickable{
 			texture.bind(OGLManager.gl);
 			OGLManager.DrawShape(glX, glY, 0, glDisplayList);
 		}
-		font.RenderBox(game, textX, textY, 1, screenWidth, text);
+		font.RenderBox(textX, textY, 1, screenWidth, text);
 	}
 	
 	public String GetText()

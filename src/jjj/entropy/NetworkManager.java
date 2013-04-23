@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.activity.InvalidActivityException;
+
 
 import jjj.entropy.classes.EntUtilities;
 import jjj.entropy.classes.Enums.Life;
@@ -68,6 +70,7 @@ public class NetworkManager extends Listener
 			  kryo.register(CardDataMessage.class);
 			  kryo.register(LoginMessage.class);
 			  kryo.register(PlayerDataMessage.class);
+			  kryo.register(ShopDataMessage.class);
 			  kryo.register(Purchase.class);
 			  kryo.register(String[].class);
 			  kryo.register(int[].class);
@@ -157,10 +160,11 @@ public class NetworkManager extends Listener
 		client.sendTCP(cmsg);
 	}
 	
-	public void SendPurchase(int itemID, int purchaseID)
+	public void SendPurchase(int itemID, int purchaseID, boolean ironPrice)
 	{
 		Purchase pch = new Purchase();
 		pch.itemID = itemID;
+		pch.ironPrice = ironPrice;
 		pch.purchaseID = purchaseID;
 		pch.playerID = Game.GetInstance().GetPlayer().GetID();
 		client.sendTCP(pch);
@@ -199,7 +203,7 @@ public class NetworkManager extends Listener
 			if (networkState == NetworkState.LOGGING_IN && ((LoginMessage)object).rejected)
 			{
 				// MISSING: Notify user
-				networkState = NetworkState.CONNECTED;
+			
 			}
 		}
 		else if (object instanceof PlayerDataMessage)	//When logging in, a cardDataMessage should always be recieved first to load the players deck.
@@ -361,8 +365,11 @@ public class NetworkManager extends Listener
 		}
 		else if(object instanceof Purchase)
 		{
-			System.out.println((Purchase) object);
 			Game.GetInstance().FinalizePurchase((Purchase) object);
+		}
+		else if(object instanceof ShopDataMessage)
+		{
+			Game.GetInstance().LoadShopData((ShopDataMessage)object);
 		}
 	}
 

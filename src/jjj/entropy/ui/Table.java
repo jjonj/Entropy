@@ -113,7 +113,7 @@ public class Table extends Clickable implements MouseListener, MouseMotionListen
 		glScrollHandleHeight = glRowHeight*1.5f;
 		
 		
-        texture = Texture.tableEntry;
+        texture = Texture.tableEntryTexture;
         scrollHandleTexture = Texture.scrollHandleTexture;
         selectedFieldTexture = Texture.selectedTableEntryTexture;
 

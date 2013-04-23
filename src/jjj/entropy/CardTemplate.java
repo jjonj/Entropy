@@ -102,12 +102,7 @@ public class CardTemplate implements TableRow {
 
 
 	
-	// ArrayList<Specials>
-	public CardTemplate(short id, String title, CardRace race, CardType type, CardRarity rarity, short raceCost, short anyCost, short strength, short intelligence, short vitality, Texture texture)
-	{
-		this(id, title, race, type, rarity, raceCost, anyCost, strength, intelligence, vitality, "");
-		this.texture = texture;
-	}
+
 	
 	public CardTemplate(short id, String title, CardRace race, CardType type, CardRarity rarity,  short raceCost, short anyCost, short strength, short intelligence, short vitality, String texturePath)
 	{
@@ -154,9 +149,8 @@ public class CardTemplate implements TableRow {
 	
 	
 	//Takes an encoded card template and loads it
-	public static void LoadCardTemplate(String encodedTemplate) 
+	public static CardTemplate LoadCardTemplate(String encodedTemplate) 
 	{
-
 		// Encoding: 	ID,TITLE,RACE,TYPE,RARITY,COSTR,COSTA,STR,INT,VIT
 		
 		String[] data = encodedTemplate.split(",");
@@ -164,7 +158,7 @@ public class CardTemplate implements TableRow {
 		short id = Short.parseShort(data[0]);
 		
 		if (allCardTemplates[id] != null)	// If the template already is loaded
-			return;
+			return allCardTemplates[id];
 		
 		CardRace race = CardRace.GetRace(Short.parseShort(data[2]));
 		CardType type = CardType.GetType(Short.parseShort(data[3]));
@@ -185,6 +179,8 @@ public class CardTemplate implements TableRow {
 		String texturePath = Texture.GetTexturePath(id);
 		CardTemplate ct = new CardTemplate(id,title, race, type, rarity, raceCost, anyCost, strenght, intelligence, vitality, texturePath);
 		allCardTemplates[id] = ct;
+		return ct;
+		
 	}
 
 	@Override

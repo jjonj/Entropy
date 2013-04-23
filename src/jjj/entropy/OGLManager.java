@@ -36,12 +36,11 @@ public class OGLManager implements GLEventListener
 				MediumButtonModel,
 				SmallButtonModel,
 				TinySquareButtonModel,
-				TextboxModel;
+				TextboxModel,
+				screen;
 	
 	private static List<OGLAction> glActionQueue;
 	 
-	private static float HALF_CARD_HEIGHT;	//TODO: Move to constants
-	private static float HALF_CARD_WIDTH;
 
 	private static int viewport[] = new int[4];
 	private static double mvmatrix[] = new double[16];
@@ -53,8 +52,7 @@ public class OGLManager implements GLEventListener
 		texture.setTexParameteri(OGLManager.gl, GL.GL_TEXTURE_WRAP_S, GL.GL_REPEAT);
 		texture.setTexParameteri(OGLManager.gl, GL.GL_TEXTURE_WRAP_T, GL.GL_REPEAT);
 		texture.setTexParameteri(OGLManager.gl, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
-		texture.setTexParameteri(OGLManager.gl, GL.GL_TEXTURE_MIN_FILTER,
-				GL.GL_LINEAR_MIPMAP_LINEAR);
+		texture.setTexParameteri(OGLManager.gl, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR_MIPMAP_LINEAR);
 	}
 	
 	private static OGLManager eventInstance;
@@ -99,8 +97,7 @@ public class OGLManager implements GLEventListener
      	OGLManager.GenerateTable(OGLManager.gl, Const.BOARD_WIDTH, Const.BOARD_LENGTH, Const.BOARD_THICKNESS);
      	OGLManager.GenerateUI(OGLManager.gl, 0, 0, 0, Texture.uiTexture);
      	OGLManager.GenerateDeck(OGLManager.gl, Texture.cardBackside, Texture.deckSideTexture, Const.CARD_WIDTH, Const.CARD_HEIGHT, 0.5f);
-       	OGLManager.GenerateTextbox(OGLManager.gl, Texture.textboxTexture);
-     	OGLManager.GenerateCard(OGLManager.gl, Texture.cardBackside, Const.CARD_WIDTH, Const.CARD_HEIGHT, Const.CARD_THICKNESS);
+     	OGLManager.GenerateCard(OGLManager.gl, Texture.cardBackside);
      	
      	//Setting the real window height as GL scaling changes it
      	int viewport[] = new int[4];
@@ -111,6 +108,17 @@ public class OGLManager implements GLEventListener
     	
         Game.GetInstance().Init(realGameHeight);	//Exerting responsibility of Game object
 
+        screen = gl.glGenLists(1);
+        gl.glNewList(screen, GL2.GL_COMPILE);
+        
+        OGLManager.gl.glBegin(GL2.GL_QUADS);
+		 	OGLManager.gl.glTexCoord2f(0.0f, 0.0f); OGLManager.gl.glVertex3f(-Const.SCREEN_GL_WIDTH/2,-Const.SCREEN_GL_HEIGHT/2, 0f);
+		 	OGLManager.gl.glTexCoord2f(1.0f, 0.0f); OGLManager.gl.glVertex3f(Const.SCREEN_GL_WIDTH/2,-Const.SCREEN_GL_HEIGHT/2, 0f);
+		 	OGLManager.gl.glTexCoord2f(1.0f, 1.0f); OGLManager.gl.glVertex3f(Const.SCREEN_GL_WIDTH/2,Const.SCREEN_GL_HEIGHT/2, 0f);
+		 	OGLManager.gl.glTexCoord2f(0.0f, 1.0f); OGLManager.gl.glVertex3f(-Const.SCREEN_GL_WIDTH/2,Const.SCREEN_GL_HEIGHT/2, 0f);
+	 	OGLManager.gl.glEnd();
+	 	
+	 	gl.glEndList();
     }
  
     @Override
@@ -281,25 +289,25 @@ public class OGLManager implements GLEventListener
 	     gl.glGetDoublev(GLMatrixFunc.GL_MODELVIEW_MATRIX, mvmatrix, 0);
 	     gl.glGetDoublev(GLMatrixFunc.GL_PROJECTION_MATRIX, projmatrix, 0);
 	     
-	     glu.gluProject(0-HALF_CARD_WIDTH, 0-HALF_CARD_HEIGHT, 0, //
+	     glu.gluProject(0-Const.CARD_WIDTH/2, 0+Const.CARD_HEIGHT/2, 0, //
 	             mvmatrix, 0,
 	             projmatrix, 0, 
 	             viewport, 0, 
 	             wincoord, 0);
 	     card.SetWinPos(0, wincoord[0], wincoord[1]);			//How effecient is this? :( CPU rounding mode switch???
-         glu.gluProject(0+HALF_CARD_WIDTH, 0-HALF_CARD_HEIGHT, 0, //
+	     glu.gluProject(0-Const.CARD_WIDTH/2, 0+Const.CARD_HEIGHT/2, 0, //
 	                mvmatrix, 0,
 	                projmatrix, 0, 
 	                viewport, 0, 
 	                wincoord, 0);
          card.SetWinPos(1, wincoord[0], wincoord[1]);
-         glu.gluProject(0+HALF_CARD_WIDTH, 0+HALF_CARD_HEIGHT, 0, //
+         glu.gluProject(0-Const.CARD_WIDTH/2, 0+Const.CARD_HEIGHT/2, 0, //
 	                mvmatrix, 0,
 	                projmatrix, 0, 
 	                viewport, 0, 
 	                wincoord, 0);
          card.SetWinPos(2, wincoord[0], wincoord[1]);
-         glu.gluProject(0-HALF_CARD_WIDTH, 0+HALF_CARD_HEIGHT, 0, //
+         glu.gluProject(0-Const.CARD_WIDTH/2, 0+Const.CARD_HEIGHT/2, 0, //
 	                mvmatrix, 0,
 	                projmatrix, 0, 
 	                viewport, 0, 
@@ -311,10 +319,8 @@ public class OGLManager implements GLEventListener
 		 
 	}
 	
-	public static void GenerateCard(GL2 gl, Texture backSideTexture, float CARD_WIDTH, float CARD_HEIGHT, float CARD_THICKNESS)
+	public static void GenerateCard(GL2 gl, Texture backSideTexture)
 	{
-		HALF_CARD_HEIGHT = CARD_HEIGHT / 2;
-		HALF_CARD_WIDTH = CARD_WIDTH / 2;
 			
      	cardModel = gl.glGenLists(1);
         
@@ -324,20 +330,20 @@ public class OGLManager implements GLEventListener
 
 	    // Front Face	
         gl.glNormal3f(0, 0, 1);
-	    gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( CARD_WIDTH/2, -CARD_HEIGHT/2,  0.0f);
-	    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(-CARD_WIDTH/2, -CARD_HEIGHT/2,  0.0f);
-	    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(-CARD_WIDTH/2,  CARD_HEIGHT/2, 0.0f);
-	    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f( CARD_WIDTH/2,  CARD_HEIGHT/2,  0.0f);
+	    gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( Const.CARD_WIDTH/2, -Const.CARD_HEIGHT/2,  0.0f);
+	    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(-Const.CARD_WIDTH/2, -Const.CARD_HEIGHT/2,  0.0f);
+	    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(-Const.CARD_WIDTH/2,  Const.CARD_HEIGHT/2, 0.0f);
+	    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f( Const.CARD_WIDTH/2,  Const.CARD_HEIGHT/2,  0.0f);
 	    
 		gl.glEnd();   
 		
 		backSideTexture.bind(gl);
 		gl.glBegin(GL2.GL_QUADS);
 		// Back Face
-	    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f( CARD_WIDTH/2,  CARD_HEIGHT/2, CARD_THICKNESS);
-	    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f( CARD_WIDTH/2,  -CARD_HEIGHT/2, CARD_THICKNESS);
-	    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f( -CARD_WIDTH/2, -CARD_HEIGHT/2, CARD_THICKNESS);
-	    gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-CARD_WIDTH/2,  CARD_HEIGHT/2, CARD_THICKNESS);
+	    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f( Const.CARD_WIDTH/2,  Const.CARD_HEIGHT/2, Const.CARD_THICKNESS);
+	    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f( Const.CARD_WIDTH/2,  -Const.CARD_HEIGHT/2, Const.CARD_THICKNESS);
+	    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f( -Const.CARD_WIDTH/2, -Const.CARD_HEIGHT/2, Const.CARD_THICKNESS);
+	    gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-Const.CARD_WIDTH/2,  Const.CARD_HEIGHT/2, Const.CARD_THICKNESS);
 	    gl.glEnd();   
     
 	    gl.glEnd();
@@ -379,7 +385,7 @@ public class OGLManager implements GLEventListener
 		return dsl;
 	}
 	
-
+/*
 	public static void GenerateTextbox(GL2 gl, Texture texture)
 	{
 	    	
@@ -397,7 +403,7 @@ public class OGLManager implements GLEventListener
 		 gl.glEndList();
 	}
 	
-	
+	*/
 	
 	public static void DrawShape(float x, float y, float z, int displayList)
 	{
@@ -439,7 +445,7 @@ public class OGLManager implements GLEventListener
 	
 	
 	
-	
+	/*
 	
 	@SuppressWarnings("rawtypes")	//The fact that EntDropdown is generic, is not important for the rendering method
 	public static void DrawUIDropdown(GL2 gl, Dropdown dropdown) 
@@ -484,7 +490,7 @@ public class OGLManager implements GLEventListener
 		 
 
 	}
-
+*/
 	/*
 	public static void DrawUITable(GL2 gl, Table table)
 	{
@@ -668,6 +674,14 @@ public class OGLManager implements GLEventListener
 	public static int MapPercentToScreenY(int y) 
 	{
 		return Game.GetInstance().GetRealGameHeight()- (int) (Game.GetInstance().GetRealGameHeight()*((float)y/100));
+	}
+
+
+
+	public static void DrawScreen() 
+	{
+		OGLManager.gl.glTranslatef(0,0,-1);
+		gl.glCallList(screen);
 	}
 
 	

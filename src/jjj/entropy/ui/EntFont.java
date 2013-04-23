@@ -64,7 +64,7 @@ public class EntFont extends Font {
 	}
 
 	List<String> cLines = new ArrayList<String>();
-	public void RenderBox(Game game, int x, int y, int maxLines, int lineWidth, String text)
+	public void RenderBox(int x, int y, int maxLines, int lineWidth, String text)
 	{
 		if (text.length() > 0)
 		{

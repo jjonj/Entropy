@@ -1,4 +1,6 @@
 package jjj.entropy.shop;
+import jjj.entropy.Texture;
+import jjj.entropy.shop.ShopItem.ShopItemType;
 
 
 
@@ -6,6 +8,24 @@ package jjj.entropy.shop;
 public class ShopItem 
 {
 	
+	public enum ShopItemType {
+		CARDS,
+		BOOST,
+		UNDEFINED;
+
+		public static ShopItemType GetType(int i) {
+			switch (i)
+			{
+			case 1:
+				return CARDS;
+			case 2:
+				return BOOST;
+			default:
+				return UNDEFINED; 
+			}
+		}
+	}
+
 	
 	
 	private boolean avaliable;
@@ -13,21 +33,26 @@ public class ShopItem
 	private String name,
 				   description;
 	
+	private Texture previewImage;
+	
 	private int itemID,
 				priceBT,
 				priceGT;
+
+	private ShopItemType type;
 	
 	
 	
-	public ShopItem(int itemID, String name, int priceBattleTokens, int priceGoldTokens)
+	public ShopItem(int itemID, ShopItemType type, String name, int priceBattleTokens, int priceGoldTokens, Texture image)
 	{
-		this(itemID, name, priceBattleTokens, priceGoldTokens, "");
+		this(itemID, type, name, priceBattleTokens, priceGoldTokens, "", image);
 	}
 	
-	public ShopItem(int itemID, String name, int priceBattleTokens, int priceGoldTokens, String description)
+	public ShopItem(int itemID, ShopItemType type, String name, int priceBattleTokens, int priceGoldTokens, String description, Texture image)
 	{
 		this.itemID = itemID;
 		this.name = name;
+		this.type = type;
 		this.description = description;
 		priceBT = priceBattleTokens;
 		priceGT = priceGoldTokens;
@@ -69,6 +94,15 @@ public class ShopItem
 		return priceBT;
 	}
 	
+	public ShopItemType GetType()
+	{
+		return type;
+	}
+	
+	public Texture GetTexture()
+	{
+		return previewImage;
+	}
 	
 	
 	

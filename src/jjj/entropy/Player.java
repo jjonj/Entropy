@@ -3,6 +3,8 @@ package jjj.entropy;
 import java.util.ArrayList;
 import java.util.List;
 
+import jjj.entropy.ui.UIManager;
+
 
 public class Player {
 
@@ -106,6 +108,32 @@ public class Player {
 		activeDeck.GameResetDeck();
 		activeDeck.LoadTextures();
 	}
+
+	public void AddCollection(CardCollection cards) 
+	{
+		allCards.AddCards(cards); //TODO: Let players choose when to open instead of adding to collection instantly as here
+		
+	}
+
+	public void AddBattleTokens(int amount) 
+	{
+		battleTokens += amount;
+		UIManager.GetInstance().SetBattleTokensLabel(battleTokens);
 	
+	}
 	
+	public void AddGoldTokens(int amount) 
+	{
+		goldTokens += amount;
+		UIManager.GetInstance().SetGoldTokensLabel(goldTokens);
+	}
+
+	public int GetBattleTokens() 
+	{
+		return battleTokens;
+	}
+	public int GetGoldTokens() 
+	{
+		return goldTokens;
+	}
 }

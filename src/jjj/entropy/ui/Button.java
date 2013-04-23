@@ -87,7 +87,8 @@ public class Button extends Clickable
 	@Override
 	public void Activate(int mouseX, int mouseY)
 	{
-		onClick.Activate();
+		if (onClick != null)
+			onClick.Activate();
 	}
 
 }

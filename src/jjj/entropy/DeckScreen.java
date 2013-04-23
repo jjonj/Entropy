@@ -18,7 +18,7 @@ public class DeckScreen implements GameState
 	@Override
 	public void Activate(Game game) 
 	{
-		UIManager.GetInstance().GetPlayerDeckTable().SetDataSource(game.GetPlayer().GetActiveDeck());
+		UIManager.GetInstance().GetDeckTable().SetDataSource(game.GetPlayer().GetActiveDeck());
 	}
 	
 	
