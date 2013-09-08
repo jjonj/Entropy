@@ -8,8 +8,7 @@ import javax.activity.InvalidActivityException;
 
 
 import jjj.entropy.classes.EntUtilities;
-import jjj.entropy.classes.Enums.Life;
-import jjj.entropy.classes.Enums.Zone;
+import jjj.entropy.classes.Enums.GameLocation;
 import jjj.entropy.messages.*;
 import jjj.entropy.ui.UIManager;
 
@@ -276,7 +275,7 @@ public class NetworkManager extends Listener
 			}
 			
 			boolean movingOutOfZone = false;
-			Zone cardOldZone = card.GetZone();
+			GameLocation cardOldZone = card.GetZone();
 			float oldCardX = 0;
 			if (cardOldZone != null)	//If the card is in a combat zone
 			{
@@ -292,16 +291,16 @@ public class NetworkManager extends Listener
 				switch(amsg.modeNumber)
 				{
 				case 1:
-					card.PlayToLife(Life.LIFE1, true);
+					card.PlayToLife(GameLocation.LIFE1, true);
 					break;
 				case 2:
-					card.PlayToLife(Life.LIFE2, true);
+					card.PlayToLife(GameLocation.LIFE2, true);
 					break;
 				case 3:
-					card.PlayToLife(Life.LIFE3, true);
+					card.PlayToLife(GameLocation.LIFE3, true);
 					break;
 				case 4:
-					card.PlayToLife(Life.LIFE4, true);
+					card.PlayToLife(GameLocation.LIFE4, true);
 					break;
 				}
 				break;
@@ -312,37 +311,37 @@ public class NetworkManager extends Listener
 				switch(amsg.modeNumber)	//Note that zone numbers are reversed for the other player so they get reversed here
 				{
 				case 1:
-					if (cardOldZone != Zone.ZONE4)
+					if (cardOldZone != GameLocation.ZONE4)
 					{
-						card.PlayToZone(Zone.ZONE4, true);
-						card.SetZone(Zone.ZONE4);
+						card.PlayToZone(GameLocation.ZONE4, true);
+						card.SetZone(GameLocation.ZONE4);
 					}
 					else
 						movingOutOfZone = false;
 					break;
 				case 2:
-					if (cardOldZone != Zone.ZONE3)
+					if (cardOldZone != GameLocation.ZONE3)
 					{
-						card.PlayToZone(Zone.ZONE3, true);
-						card.SetZone(Zone.ZONE3);
+						card.PlayToZone(GameLocation.ZONE3, true);
+						card.SetZone(GameLocation.ZONE3);
 					}
 					else
 						movingOutOfZone = false;
 					break;
 				case 3:
-					if (cardOldZone != Zone.ZONE2)
+					if (cardOldZone != GameLocation.ZONE2)
 					{
-						card.PlayToZone(Zone.ZONE2, true);
-						card.SetZone(Zone.ZONE2);
+						card.PlayToZone(GameLocation.ZONE2, true);
+						card.SetZone(GameLocation.ZONE2);
 					}
 					else
 						movingOutOfZone = false;
 					break;
 				case 4:
-					if (cardOldZone != Zone.ZONE1)
+					if (cardOldZone != GameLocation.ZONE1)
 					{
-						card.PlayToZone(Zone.ZONE1, true);
-						card.SetZone(Zone.ZONE1);
+						card.PlayToZone(GameLocation.ZONE1, true);
+						card.SetZone(GameLocation.ZONE1);
 					}
 					else
 						movingOutOfZone = false;
@@ -356,7 +355,7 @@ public class NetworkManager extends Listener
 			
 			if (movingOutOfZone)
 			{
-				Zone.ReturnAvailCardX(cardOldZone, oldCardX, true);
+				GameLocation.ReturnAvailCardX(cardOldZone, oldCardX, true);
 			}
 			
 			if (amsg.swapTurn)

@@ -7,8 +7,7 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
 
-import jjj.entropy.classes.Enums.Life;
-import jjj.entropy.classes.Enums.Zone;
+import jjj.entropy.classes.Enums.GameLocation;
 import jjj.entropy.ui.Clickable;
 import jjj.entropy.ui.UIComponent;
 import jjj.entropy.ui.UIManager;
@@ -66,7 +65,7 @@ public class EntMouseListener implements MouseListener, MouseMotionListener, Mou
 				
 				
 				boolean movingOutOfZone = false;
-				Zone cardOldZone = c.GetZone();
+				GameLocation cardOldZone = c.GetZone();
 				float oldCardX = 0;
 				if (cardOldZone != null)	//If the card is in a combat zone
 				{
@@ -82,16 +81,16 @@ public class EntMouseListener implements MouseListener, MouseMotionListener, Mou
 					switch(Game.modeNumber)
 					{
 					case 1:
-						c.PlayToLife(Life.LIFE1);
+						c.PlayToLife(GameLocation.LIFE1);
 						break;
 					case 2:
-						c.PlayToLife(Life.LIFE2);
+						c.PlayToLife(GameLocation.LIFE2);
 						break;
 					case 3:
-						c.PlayToLife(Life.LIFE3);
+						c.PlayToLife(GameLocation.LIFE3);
 						break;
 					case 4:
-						c.PlayToLife(Life.LIFE4);
+						c.PlayToLife(GameLocation.LIFE4);
 						break;
 					}
 					break;
@@ -106,37 +105,37 @@ public class EntMouseListener implements MouseListener, MouseMotionListener, Mou
 						switch(Game.modeNumber)
 						{
 						case 1:
-							if (cardOldZone != Zone.ZONE1)
+							if (cardOldZone != GameLocation.ZONE1)
 							{
-								c.PlayToZone(Zone.ZONE1);
-								c.SetZone(Zone.ZONE1);
+								c.PlayToZone(GameLocation.ZONE1);
+								c.SetZone(GameLocation.ZONE1);
 							}
 							else
 								movingOutOfZone = false;
 							break;
 						case 2:
-							if (cardOldZone != Zone.ZONE2)
+							if (cardOldZone != GameLocation.ZONE2)
 							{
-								c.PlayToZone(Zone.ZONE2);
-								c.SetZone(Zone.ZONE2);
+								c.PlayToZone(GameLocation.ZONE2);
+								c.SetZone(GameLocation.ZONE2);
 							}
 							else
 								movingOutOfZone = false;
 							break;
 						case 3:
-							if (cardOldZone != Zone.ZONE3)
+							if (cardOldZone != GameLocation.ZONE3)
 							{
-								c.PlayToZone(Zone.ZONE3);
-								c.SetZone(Zone.ZONE3);
+								c.PlayToZone(GameLocation.ZONE3);
+								c.SetZone(GameLocation.ZONE3);
 							}
 							else
 								movingOutOfZone = false;
 							break;
 						case 4:
-							if (cardOldZone != Zone.ZONE4)
+							if (cardOldZone != GameLocation.ZONE4)
 							{
-								c.PlayToZone(Zone.ZONE4);
-								c.SetZone(Zone.ZONE4);
+								c.PlayToZone(GameLocation.ZONE4);
+								c.SetZone(GameLocation.ZONE4);
 							}
 							else
 								movingOutOfZone = false;
@@ -153,7 +152,7 @@ public class EntMouseListener implements MouseListener, MouseMotionListener, Mou
 						
 				if (movingOutOfZone)
 				{
-					Zone.ReturnAvailCardX(cardOldZone, oldCardX, false);
+					GameLocation.ReturnAvailCardX(cardOldZone, oldCardX, false);
 				}
 					
 				

@@ -2,8 +2,7 @@ package jjj.entropy;
 
 import java.lang.Math;
 
-import jjj.entropy.classes.Enums.Life;
-import jjj.entropy.classes.Enums.Zone;
+import jjj.entropy.classes.Enums.GameLocation;
 
 
 public class Card implements Comparable<Card>
@@ -33,7 +32,7 @@ public class Card implements Comparable<Card>
 	
 	private CardTemplate template;
 	
-	private Zone zone = null;	//The cards current zone, equals null if the card is not in a zone
+	private GameLocation zone = null;	//The cards current zone, equals null if the card is not in a zone TODO: Changes to enums.GameLocation
 	
 	private float oldX, oldY, oldZ,						//Cached location for when card is zoomed on
 				  oldRX, oldRY, oldRZ,					//Cached rotation for when card is zoomed on
@@ -157,21 +156,24 @@ public class Card implements Comparable<Card>
 		}
 	}
 
-	public void PlayToZone(Zone zone) {PlayToZone(zone, false);}
-	public void PlayToZone(Zone zone, boolean opponent)
+
+	
+	
+	public void PlayToZone(GameLocation zone) {PlayToZone(zone, false);}
+	public void PlayToZone(GameLocation zone, boolean opponent)
 	{
 		if (!opponent)	
-			SetTarget(Zone.GetAvailCardX(zone, opponent), 0, Zone.GetZLoc(zone), 90, 0, 0);
+			SetTarget(GameLocation.GetAvailCardX(zone, opponent), 0, GameLocation.GetZLoc(zone), 90, 0, 0);
 		else
-			SetTarget(Zone.GetAvailCardX(zone, opponent), 0, Zone.GetZLoc(zone), -90, 180, 0);
+			SetTarget(GameLocation.GetAvailCardX(zone, opponent), 0, GameLocation.GetZLoc(zone), -90, 180, 0);
 	}
-	public void PlayToLife(Life life){PlayToLife(life, false);}
-	public void PlayToLife(Life life, boolean enemy)
+	public void PlayToLife(GameLocation life){PlayToLife(life, false);}
+	public void PlayToLife(GameLocation life, boolean enemy)
 	{
 		if (!enemy)	
-			SetTarget(Life.GetXLoc(life), 0, 1, -90, 0, 0);
+			SetTarget(GameLocation.GetXLoc(life), 0, 1, -90, 0, 0);
 		else
-			SetTarget(Life.GetXLoc(life), 0, 10, -90, 0, 180);
+			SetTarget(GameLocation.GetXLoc(life), 0, 10, -90, 0, 180);
 	}
 	public void PlayToHand(int cardsOnHand){PlayToHand(cardsOnHand, false);}
 	public void PlayToHand(int cardsOnHand, boolean enemy)
@@ -429,12 +431,12 @@ public class Card implements Comparable<Card>
 			return 0;
 	}
 
-	public Zone GetZone() 
+	public GameLocation GetZone() 
 	{
 		return zone;
 	}
 
-	public void SetZone(Zone zone) 
+	public void SetZone(GameLocation zone) 
 	{
 		this.zone = zone;
 	}

@@ -190,10 +190,18 @@ public class CardTemplate implements TableRow {
 		CardCollection dataSource = (CardCollection)(UIManager.GetInstance().GetActiveDataSource());
 		if (dataSource != null)
 		{
+			StringBuilder res = new StringBuilder(32);
+	//		res.append(Title);
+
+			res.append(String.format("%-" + 25 + "s", Title));
+
+			
+			
 			if (dataSource == Game.GetInstance().GetPlayer().GetAllCards())	//The representation is the number of cards in the players card not already in the active deck
-				return Title + "		"+(dataSource.GetCount(this)-Game.GetInstance().GetPlayer().GetActiveDeck().GetCount(this))+"/"+dataSource.GetCount(this);
+				res.append((dataSource.GetCount(this)-Game.GetInstance().GetPlayer().GetActiveDeck().GetCount(this))+"/"+dataSource.GetCount(this));
 			else	//It is assumed here that the collection is then the active deck (TODO: NOT PRETTY)
-				return Title + "		"+dataSource.GetCount(this)+"/"+Game.GetInstance().GetPlayer().GetAllCards().GetCount(this);
+				res.append((dataSource.GetCount(this)+"/"+Game.GetInstance().GetPlayer().GetAllCards().GetCount(this)));
+			return res.toString();
 		}
 			
 		return Title + "		0";

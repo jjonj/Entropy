@@ -121,7 +121,14 @@ public class UIManager
      				}
      			}
      	));
-     
+     	
+     	MainMenuUIComponents.add(new Button(50, 75, 20, 6, "Quit", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.orange), Texture.bigButtonTexture,
+     			new UIAction() {@Override
+				public void Activate(){
+     					Game.GetInstance().Quit();
+     				}
+     			}
+     	));
      	
      	//Shop UI components
 

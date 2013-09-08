@@ -673,10 +673,25 @@ public class OGLManager implements GLEventListener
 
 	public static int MapPercentToScreenY(int y) 
 	{
-		return Game.GetInstance().GetRealGameHeight()- (int) (Game.GetInstance().GetRealGameHeight()*((float)y/100));
+		int rgh = Game.GetInstance().GetRealGameHeight();
+		return rgh - (int) (rgh * ((float)y/100));
 	}
 
-
+	public static float MapPercentToScreenWidth(int x) 
+	{
+		return (Game.GetInstance().GetGameWidth()*((float)x/100));
+	}
+	
+	public static float MapPercentToMagicScreenWidth(int x) 
+	{
+		return (1210*((float)x/100));	//The magic value 1210 is selected for screenwidth. While 1280 should be a working value, it has proven not so. TODO: Explain
+	}
+	
+	public static float MapPercentToScreenHeight(int y) 
+	{
+		int rgh = Game.GetInstance().GetRealGameHeight();
+		return (rgh * ((float)y/100));
+	}
 
 	public static void DrawScreen() 
 	{

@@ -75,7 +75,7 @@ public class Table extends Clickable implements MouseListener, MouseMotionListen
 	}
 	public Table(int x, int y, int width, int rowHeight, SimpleCollection<TableRow> dataSource, int maxLines, GameState activeGameState)
 	{
-		//Width should be adjustable, probably like button size "is"
+	
 		super(x, y, width, rowHeight*maxLines);
 		
 		
@@ -101,10 +101,10 @@ public class Table extends Clickable implements MouseListener, MouseMotionListen
         this.rowHeight = rowHeight;
         
         //Uses MapPercentToScreenX/FloatWidth instead of MapPercentToScreenY/FloatHeight to make it easier for users to estimate proportions. This needs to match method used in the Clickable class
-        screenRowHeight = ((float)Game.GetInstance().GetGameWidth())*((float)rowHeight/100)-1.2f;	//0.9 added as a magic adjustment value, note that this assignment is always overwritten by OnResize assignment
+       
         
-     //   this.screenRowHeight = OGLManager.MapPercentToScreenX(rowHeight);
         this.glRowHeight = OGLManager.MapPercentToFloatWidth(rowHeight);
+        this.screenRowHeight = OGLManager.MapPercentToMagicScreenWidth(rowHeight);
 		
         
         screenScrollHandleWidth = OGLManager.MapPercentToScreenX(1);	//Update in OnResize aswell
@@ -207,6 +207,7 @@ public class Table extends Clickable implements MouseListener, MouseMotionListen
 		{
 			font.Render(textX, (int)yOffset, data[k]);
 			
+			
 			yOffset -= screenRowHeight;
 		}
 	}
@@ -245,7 +246,10 @@ public class Table extends Clickable implements MouseListener, MouseMotionListen
 	public void OnResize(int[] view, double[] model , double[] proj) 
 	{
 		super.OnResize(view, model, proj);
-		this.screenRowHeight = OGLManager.MapPercentToScreenX(rowHeight);
+		
+		
+		
+//TODO: Test if this extra code sohuld be removed, by scaling window while scrollbar visible and observe effect and functionality
 		
 		screenScrollHandleWidth = OGLManager.MapPercentToScreenX(1);
 		screenScrollHandleHeight = (int) (screenRowHeight*1.5);
