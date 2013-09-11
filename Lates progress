@@ -1,0 +1,6 @@
+Was working on trigger system
+decided on using fine grained effects with variables defined in effect strings in cards (wc3 style) was workning on move effect
+
+This promted a refactoring of card position enums to a more uniform system!
+
+Testing if things still work, currently crashing on entering decks due to minor issur with rendering dropdowns in special case
