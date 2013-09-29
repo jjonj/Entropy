@@ -3,4 +3,6 @@ decided on using fine grained effects with variables defined in effect strings i
 
 This promted a refactoring of card position enums to a more uniform system!
 
-Testing if things still work, currently crashing on entering decks due to minor issur with rendering dropdowns in special case
+Testing if things still work ingame
+
+Need to give players some cards for testing

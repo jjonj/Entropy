@@ -100,7 +100,8 @@ public class UIManager
      	MainMenuUIComponents.add(new Button(50, 35, 20, 6, "Multiplayer", new EntFont(FontTypes.MainParagraph, Font.BOLD, 24, Color.orange), Texture.bigButtonTexture,
      			new UIAction() {@Override
 				public void Activate(){
-	     				NetworkManager.GetInstance().JoinGame();
+     					if (Game.GetInstance().GetPlayer().GetActiveDeck() != null && Game.GetInstance().GetPlayer().GetActiveDeck().GetSize() > Const.MINIMUM_DECK_SIZE_FOR_PLAY)
+     						NetworkManager.GetInstance().JoinGame();
      				}
      			}
      	));

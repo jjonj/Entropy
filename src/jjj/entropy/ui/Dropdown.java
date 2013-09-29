@@ -88,24 +88,27 @@ public class Dropdown <T> extends Clickable
 	{
 		texture.bind(OGLManager.gl);
 	
-		if (selecting)
+		if (dataSource.size() > 0)
 		{
-			texture.bind(OGLManager.gl);
-			OGLManager.DrawVerticallyRepeatingRectanglularShape(glX, glY, glWidth, glRowHeight, data.length);
-			selectedTexture.bind(OGLManager.gl);
-			OGLManager.DrawShape(glX, glY-(glRowHeight*selectedIndex), 0, glDisplayListRow);
-			float yOffset = textY;
-			
-			for (Object o : dataSource)
+			if (selecting)
 			{
-				font.Render(textX, (int)yOffset, o.toString());
-				yOffset -= (screenRowHeight);
+				texture.bind(OGLManager.gl);
+				OGLManager.DrawVerticallyRepeatingRectanglularShape(glX, glY, glWidth, glRowHeight, data.length);
+				selectedTexture.bind(OGLManager.gl);
+				OGLManager.DrawShape(glX, glY-(glRowHeight*selectedIndex), 0, glDisplayListRow);
+				float yOffset = textY;
+				
+				for (Object o : dataSource)
+				{
+					font.Render(textX, (int)yOffset, o.toString());
+					yOffset -= (screenRowHeight);
+				}
 			}
-		}
-		else
-		{
-			OGLManager.DrawShape(glX, glY, 0, glDisplayListRow);
-			font.Render(textX, textY, dataSource.get(selectedIndex).toString());
+			else
+			{
+				OGLManager.DrawShape(glX, glY, 0, glDisplayListRow);
+				font.Render(textX, textY, dataSource.get(selectedIndex).toString());
+			}
 		}
 		
 	}
