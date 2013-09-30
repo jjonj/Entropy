@@ -124,15 +124,14 @@ public class Game
 		currentGameState = loginScreen;
 		
 	    SetGameState(loginScreen);
-		
-		//Creating cards require a template, this is just an old template still used below
-		TinidQueen = new CardTemplate((short)1, "Tinid Queen", CardRace.CRAWNID, CardType.CREATURE, CardRarity.COMMON, (short)0,(short)0,(short)0,(short)0,(short)0,"TinidQueen");
 
+	    
+	    
 		// Easiest way atm to detect clicks on the deck pile, is to just place to cards there that cant move.
 		Card card0 = new Card(-3, 0.51f, 1.0f, 
-				Facing.DOWN, TinidQueen, Status.IN_ZONE, neutralPlayer);
+				Facing.DOWN, CardTemplate.DummyTemplate, Status.IN_ZONE, neutralPlayer);
 		Card card1 = new Card(3, 0.51f, 10.0f, 
-				Facing.DOWN, TinidQueen, Status.IN_ZONE, neutralPlayer);
+				Facing.DOWN, CardTemplate.DummyTemplate, Status.IN_ZONE, neutralPlayer);
 
 
 		ShowCard(card0);
@@ -181,8 +180,12 @@ public class Game
     
 	public void StartGame(int matchID, Player opponent, boolean player1Starts)
 	{
+		System.out.println("Preparing for game start!");
+		
 		activeMatch = new Match(matchID, player, opponent, player1Starts);
 		SetGameState(inGameState);
+		
+		
 		
 		OGLManager.QueueOGLAction(new OGLAction(){@Override
 				public void Execute(){

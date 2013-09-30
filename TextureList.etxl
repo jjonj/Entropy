@@ -1,11 +1,4 @@
-resources/textures/templates/Crawnid/Crawnidworker.png
-resources/textures/templates/Crawnid/Crawnidsoldier.png
-resources/textures/templates/Crawnid/Anidswarmers.png
-resources/textures/templates/Crawnid/Anidlarvaeswarm.png
-resources/textures/templates/Crawnid/Anidstingswarm.png
-resources/textures/templates/Crawnid/Anidqueen.png
-resources/textures/templates/Crawnid/Crawnidmutilator.png
-resources/textures/templates/Crawnid/Crawnidleaper.png
-resources/textures/templates/Crawnid/Crawnidcanibal.png
-resources/textures/templates/Crawnid/Crawnidharvester.png
-resources/textures/templates/Crawnid/Anidswarmspawner.png
+resources/textures/templates/Crawnid/CrawnidLarvaeSwarm.png
+resources/textures/templates/Crawnid/AnidStingSwarm.png
+resources/textures/templates/Crawnid/AnidSwarmSpawner.png
+resources/textures/templates/Crawnid/DarwinisticInnihilation.png

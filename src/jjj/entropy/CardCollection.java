@@ -11,9 +11,12 @@ public class CardCollection implements SimpleCollection<TableRow>, Iterable<Card
 
 	protected HashMap<CardTemplate, Integer> cards;
 	
+	//The size of the collection must sum all the counts of all card types in the collection
+	private int cardCount;
 
 	public CardCollection()
 	{
+		cardCount = 0;
 		cards = new HashMap<CardTemplate, Integer>();
 	}
 	
@@ -24,6 +27,7 @@ public class CardCollection implements SimpleCollection<TableRow>, Iterable<Card
 			cards.put(card, count);
 		else
 			cards.put(card, count+cards.get(card));	//Increment the count to the already existing ones
+		cardCount += count;
 	}
 	public void AddCards(CardCollection collection)
 	{
@@ -32,16 +36,27 @@ public class CardCollection implements SimpleCollection<TableRow>, Iterable<Card
 			AddCard(c, collection.GetCount(c));
 		}
 	}
-	public void RemoveCard(Card card)
+	
+	public void RemoveCardType(Card card)
 	{
-		cards.remove(card);
+		if (cards.containsKey(card))
+		{
+			//Reduce the count by the number of cards actually being removed from the collection (count of card type)
+			cardCount -= cards.get(card);
+			cards.remove(card);
+		}
+		
 	}
-
+	
+	
+	//TODO: Consider when these textures are unlaoded
 	public void LoadTextures()
 	{
 		for (CardTemplate card : cards.keySet())
 		{
 			card.LoadTexture();
+			
+			System.out.println("Loading texture for card: " +card.Title);
 		}
 	}
 	
@@ -60,11 +75,6 @@ public class CardCollection implements SimpleCollection<TableRow>, Iterable<Card
 		return arr;
 	}
 
-	public int GetSize()
-	{
-		return cards.size();
-	}
-
 
 	@Override
 	public Iterator<CardTemplate> iterator() 
@@ -73,6 +83,12 @@ public class CardCollection implements SimpleCollection<TableRow>, Iterable<Card
 	}
 
 
+	public int CardCount() {
+		return cardCount;
+	}
+	
+	
+	//Returns number of different cards
 	@Override
 	public int Size() {
 		return cards.size();

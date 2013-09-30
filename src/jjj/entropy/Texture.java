@@ -117,6 +117,8 @@ public class Texture
      	OGLManager.InitTexture(arrow1ButtonTexture);
      	OGLManager.InitTexture(arrow2ButtonTexture);
      	OGLManager.InitTexture(textboxTexture);
+     	
+     	CardTemplate.DummyTemplate.LoadTexture();
 	}
 	
 	

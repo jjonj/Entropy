@@ -41,9 +41,10 @@ public class Match
 	
 	public void Start()
 	{
+		System.out.println("Starting game!");
 		player1.InitGame();
 		player2.InitGame();
-		
+		System.out.println("Game started!");
 	}
 	
 	public void SwapTurn()

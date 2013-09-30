@@ -88,7 +88,7 @@ public class CardTemplate implements TableRow {
 	public final CardRarity Rarity;
 	
 	
-	public Texture texture = null; //Loaded when needed from texturePath
+	private Texture texture = null; //Loaded when needed from texturePath
 	
 	public final String Title,
 						texturePath;
@@ -101,7 +101,7 @@ public class CardTemplate implements TableRow {
 						Vitality;
 
 
-	
+	public final static CardTemplate DummyTemplate = new CardTemplate((short)-1, "Dummy Template",CardRace.UNDEFINED, CardType.UNDEFINED, CardRarity.UNDEFINED, (short)0,(short)0,(short)0,(short)0,(short)0, "resources/textures/templates/Other/DummyTemplate.png");
 
 	
 	public CardTemplate(short id, String title, CardRace race, CardType type, CardRarity rarity,  short raceCost, short anyCost, short strength, short intelligence, short vitality, String texturePath)
@@ -129,7 +129,6 @@ public class CardTemplate implements TableRow {
 				e.printStackTrace();
 				System.exit(1);	
 			}
-			OGLManager.InitTexture(texture);
 		}
 	}
 	

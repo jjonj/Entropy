@@ -277,7 +277,10 @@ public class OGLManager implements GLEventListener
 		 gl.glRotatef(card.GetRotZ(), 0.0f, 0.0f, 1.0f);
 		 
 		 
+		 Texture t =  card.GetTemplate().GetTexture();
 		 
+		 if (t == null)
+			 System.out.println("FAILED TO LOAD TEXTURE FOR: " +  card.GetTemplate().Title);
 		 
 		 card.GetTemplate().GetTexture().bind(gl);
 		 

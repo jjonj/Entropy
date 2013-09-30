@@ -175,7 +175,6 @@ public class Table extends Clickable implements MouseListener, MouseMotionListen
 	@Override
 	public void Render(Game game)
 	{
-		int i;
 		float yOffset = textY;
 		
 
