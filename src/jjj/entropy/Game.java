@@ -58,19 +58,19 @@ public class Game
     private GLCanvas canvas;
     
     
-	private Player neutralPlayer,
-				   player;
+    
+    public final Player neutralPlayer = new Player(0, "Neutral", null, null);
+	
+    private Player player;
 			   //    player2;
 
 
     private Deck buildingDeck;
     
    
+    public final Card deckDrawCardDummy1 = new Card(-3, 0.51f, 1.0f, Facing.DOWN, CardTemplate.DummyTemplate, Status.IN_ZONE, neutralPlayer, true),
+    				  deckDrawCardDummy2 = new Card(3, 0.51f, 10.0f, Facing.DOWN, CardTemplate.DummyTemplate, Status.IN_ZONE, neutralPlayer, true);;
     
-   
-
-    public CardTemplate TinidQueen;	//Temporary
-
   
     public static void InitSingleton(int width, int height, GLCanvas canvas)
     {
@@ -97,9 +97,6 @@ public class Game
     	aspectRatio = (float)width/height;
     
      
-        neutralPlayer = new Player(0, "Neutral", null, null);
-        
-
     } 
 
    
@@ -128,14 +125,11 @@ public class Game
 	    
 	    
 		// Easiest way atm to detect clicks on the deck pile, is to just place to cards there that cant move.
-		Card card0 = new Card(-3, 0.51f, 1.0f, 
-				Facing.DOWN, CardTemplate.DummyTemplate, Status.IN_ZONE, neutralPlayer);
-		Card card1 = new Card(3, 0.51f, 10.0f, 
-				Facing.DOWN, CardTemplate.DummyTemplate, Status.IN_ZONE, neutralPlayer);
 
 
-		ShowCard(card0);
-		ShowCard(card1);
+
+		ShowCard(deckDrawCardDummy1);
+		ShowCard(deckDrawCardDummy2);
 		 
     }
     

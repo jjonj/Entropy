@@ -46,13 +46,15 @@ public class Card implements Comparable<Card>
 
 	
 	private boolean zoomed,
-					moving;
+					moving,
+					isShown,
+					dummy;	//Dummy cards for special uses
 	
 	private double[] winX,
 				     winY;
 	
 	private int id;	//Id is an auto incrementing value, Note that there is an individual incrementer per player so two cards can have id X, one for each player.
-	public int glMIndex = -1;
+
 	
 	
 	
@@ -60,16 +62,15 @@ public class Card implements Comparable<Card>
 	
 	public Card(float x, float y, float z, CardTemplate type, Player owner)	
 	{
-		this(x,y,z,Facing.FRONT, type, Status.IN_DECK, owner);
+		this(x,y,z,Facing.FRONT, type, Status.IN_DECK, owner, false);
 	}
 	
-	public Card(float x, float y, float z, Facing face, CardTemplate template, Status status, Player owner)	
+	public Card(float x, float y, float z, Facing face, CardTemplate template, Status status, Player owner, boolean dummy)	
 	{
 
 		this.id = owner.GetNextCardID();
 		
 		this.status = status;
-		
 		this.currentOwner = owner;
 		this.originalOwner = owner;
 		
@@ -82,6 +83,7 @@ public class Card implements Comparable<Card>
 		this.targetY = y;
 		this.targetZ = z;
 		
+		this.dummy = dummy;
 		
 		switch(face)
 		{
@@ -112,6 +114,9 @@ public class Card implements Comparable<Card>
 		
 		currentOwner = originalOwner;
 		
+		this.dummy = source.dummy;
+		this.isShown = source.isShown;
+		
 		this.zone = source.zone;
 		this.template = source.template;
 		
@@ -122,7 +127,9 @@ public class Card implements Comparable<Card>
 		this.rotX = source.rotX;
 		this.rotY = source.rotY;
 		this.rotZ = source.rotZ;
-				  
+		
+		
+		
 		winX = new double[4];
 		winY = new double[4];
 	}
@@ -214,7 +221,7 @@ public class Card implements Comparable<Card>
 	}
 	
 	
-	public int GetGLMIndex()
+/*	public int GetGLMIndex()
 	{
 		return glMIndex;
 	}
@@ -222,12 +229,38 @@ public class Card implements Comparable<Card>
 	public void SetGLMIndex(int index)
 	{
 		glMIndex = index;
+	}*/
+	
+	
+	public void SetShown(boolean value)	//TODO: This method shouldnt exists, as there should be a card.Show() method instead
+	{
+		isShown = value;
+	}
+	
+	public boolean IsDummy()
+	{
+		return dummy;
+	}
+	
+	public boolean IsShown()
+	{
+		return isShown;
 	}
 	
 	public int GetID() {
 		return id;
 	}
 
+	public Player GetOwner()
+	{
+		return currentOwner;
+	}
+	
+	public Player GetOriginalOwner()
+	{
+		return originalOwner;
+	}
+	
 	public void SetTarget(float x, float y, float z, float rotX, float rotY, float rotZ)
 	{
 		

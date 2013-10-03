@@ -12,3 +12,6 @@ Need to give players some cards for testing
 
 Finally managed to get ingame for a test. Locations are mixed up needs fixing
 
+decided to first fix a bug with clicking the deck second time will not create a new card but move existing card
+
+Now it seems collision detection is messed up and always returns true without change. Try reverting to earlier working version to see if the case

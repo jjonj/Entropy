@@ -309,6 +309,7 @@ public class UIManager
 	
 	public UIComponent CheckUICollision()
 	{
+		//Add any queued UI components to the correct list of UI components before checking for collision
 		for (StateCompPair scp : uiComponentsToAdd)
 			GameStateUIComponenstMap.get(scp.state).add(scp.component);
 		

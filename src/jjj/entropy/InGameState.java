@@ -160,7 +160,7 @@ public class InGameState implements GameState
 		{
 		}
 		cardsToRender.add(card);
-		card.SetGLMIndex(cardsToRender.size()-1);	//TODO: Remove all GLMIndex since they shouldn't be used with new set implementation??
+		card.SetShown(true);	//TODO: replace with card.show and remove this encapsulating method
 	}
 	
 	public void RemoveCard(Card card)
@@ -259,7 +259,6 @@ public class InGameState implements GameState
 			}
 		}
 		--iteratingCardsToRender;
-
 		return rCard;	// Returns null if no card was hit
 	}
 	

@@ -268,7 +268,7 @@ public class NetworkManager extends Listener
 			Card card = opponent.GetActiveDeck().GameGetCard(amsg.cardID);
 		
 
-			if (card.GetGLMIndex() == -1)	//Returns the cards index in the render list and if it's -1 it was not already in the list
+			if (!card.IsShown())	//Returns the cards index in the render list and if it's -1 it was not already in the list
 			{
 				card.MoveToDeck(2);
 				Game.GetInstance().ShowCard(card);
